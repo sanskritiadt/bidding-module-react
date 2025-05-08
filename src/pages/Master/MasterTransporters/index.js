@@ -1,3 +1,6 @@
+
+
+
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Container, Row, Col, Card, CardHeader } from "reactstrap";
 import { Link } from "react-router-dom";
@@ -13,8 +16,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import Loader from "../../../Components/Common/Loader";
 
 // Import Modal Components
-import EditModal from "./EditModal/EditModal";
-import ViewModal from "./ViewModal/ViewModal";
+import EditModal from "./EditModal";
+import ViewModal from "./ViewModal";
 
 const initialValues = {
     name: "",
@@ -31,7 +34,7 @@ const initialValues = {
     panNo: "",
     status: "A",
     // Added new fields
-    meanOfTransport: "Truck",
+
     modeOfTransport: "",
     pricePerKm: "",
     termsOfPayment: "",
@@ -64,15 +67,22 @@ const initialValues = {
     };
 
     // Helper function to map form dropdown values back to API values
-const mapFormTermPaymentToApi = (formValue) => {
-    switch(formValue) {
-        case "Net30": return "30 Days";
-        case "Net45": return "45 Days";
-        case "Net60": return "60 Days";
-        case "Online": return "Online Payment";
-        default: return formValue;
-    }
-};
+
+
+
+
+const validatePAN = (panNumber) => {
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    return panRegex.test(panNumber);
+  };
+  
+  const validateGST = (gstNumber) => {
+    const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    return gstRegex.test(gstNumber);
+  };
+
+
+
 const MasterTransporter = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [devices, setDevice] = useState([]);
@@ -123,8 +133,8 @@ const MasterTransporter = () => {
     };
 
     const getAllDeviceData = (plantcode) => {
-       
-        axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/all?plantCode=${plantcode}`, config)
+        let plantCode1='N205'
+        axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/all?plantCode=${plantCode1}`, config)
             .then(res => {
                 const device = res;
                 setDevice(device);
@@ -144,41 +154,49 @@ const MasterTransporter = () => {
 
 
 
-const handleSubmit = async (e) => {
-    console.log(values)
-    e.preventDefault();
-
-    try {
-        // Create API payload with correct field mappings
-        const apiPayload = {
-            ...values,
-          
-          
-        };
-
-        if (isEdit) {
-            const res = await axios.put(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${CurrentID}`, apiPayload, config)
-            console.log(res);
-            toast.success("Transporter Updated Successfully", { autoClose: 3000 });
-            getAllDeviceData(Plant_Code);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Validate PAN and GST
+        if (!validatePAN(values.panNo)) {
+            toast.error("Invalid PAN Number! Format should be AAAAA0000A", { autoClose: 3000 });
+            return;
         }
-        else {
-            const res = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters`, apiPayload, config)
-            console.log(res);
-            if (!res.errorMsg) {
-                toast.success("Transporter Added Successfully.", { autoClose: 3000 });
+        
+        if (!validateGST(values.gstnNo)) {
+            toast.error("Invalid GST Number! Format should be 00AAAAA0000A0Z0", { autoClose: 3000 });
+            return;
+        }
+    
+        try {
+            // Create API payload with correct field mappings
+            const apiPayload = {
+                ...values,
+            };
+    
+            if (isEdit) {
+                const res = await axios.put(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${CurrentID}`, apiPayload, config)
+                console.log(res);
+                toast.success("Transporter Updated Successfully", { autoClose: 3000 });
+                getAllDeviceData(Plant_Code);
             }
             else {
-                toast.error(res.errorMsg, { autoClose: 3000 });
+                const res = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters`, apiPayload, config)
+                console.log(res);
+                if (!res.errorMsg) {
+                    toast.success("Transporter Added Successfully.", { autoClose: 3000 });
+                }
+                else {
+                    toast.error(res.errorMsg, { autoClose: 3000 });
+                }
+                getAllDeviceData(Plant_Code);
             }
-            getAllDeviceData(Plant_Code);
         }
-    }
-    catch (e) {
-        toast.error("Something went wrong!", { autoClose: 3000 });
-    }
-    toggle();
-};
+        catch (e) {
+            toast.error("Something went wrong!", { autoClose: 3000 });
+        }
+        toggle();
+    };
 
     // Add Data
     const handleCustomerClicks = () => {
@@ -213,7 +231,7 @@ const handleCustomerClick = useCallback((arg) => {
                 "panNo": result.panNo,
                 "status": result.status,
                 // Added new fields
-                "meanOfTransport": result.meanOfTransport || "Truck",
+            
                 "modeOfTransport": result.modeTransport || "",
                 "pricePerKm": result.priceKm || "",
                 // Apply mapping for termsOfPayment
@@ -297,6 +315,11 @@ const handleCustomerClick = useCallback((arg) => {
                 accessor: "contactEmail",
                 filterable: false,
             },
+            {
+                Header: "Mode OF Transport",
+                accessor: "modeTransport",
+                filterable: false,
+            },
 
             {
                 Header: "Action",
@@ -374,7 +397,7 @@ const handleCustomerClick = useCallback((arg) => {
                                                     id="create-btn"
                                                     onClick={() => { setIsEdit(false); toggle(); setValues(initialValues); }}
                                                 >
-                                                    <i className="ri-add-line align-bottom me-1"></i> Add Transporter
+                                                    <i className="ri-add-line align-bottom me-1"></i> Add New Transporter
                                                 </button>{" "}
                                             </div>
                                         </div>
@@ -416,7 +439,18 @@ const handleCustomerClick = useCallback((arg) => {
                                         viewData={viewData}
                                     />
 
-                                    <ToastContainer closeButton={false} limit={1} />
+<ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{ backgroundColor: "white" }}
+      />
                                 </div>
                             </Card>
                         </Col>

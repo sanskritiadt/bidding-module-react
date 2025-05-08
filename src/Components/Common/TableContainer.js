@@ -454,14 +454,14 @@ const TableContainer = ({
                     <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...getToggleHideAllColumnsProps()} />Toggle All
                   </span>
                   {
-                    allColumns.filter((col) => !col.disableHiding)
-                      .map(column => (
-                        (column.Header !== "" ?
-                          <span key={column.id} className="form-check form-switch form-switch-success mb-3">
-                            <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...column.getToggleHiddenProps()} />
-                            {column.Header}
-                          </span> : "")
-                      ))
+                    allColumns .filter((col) => !col.disableHiding)
+                    .map(column => (
+                      (column.Header !== "" ?
+                        <span key={column.id} className="form-check form-switch form-switch-success mb-3">
+                          <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...column.getToggleHiddenProps()} />
+                          {column.Header}
+                        </span> : "")
+                    ))
 
                   }
                 </div>
@@ -510,20 +510,23 @@ const TableContainer = ({
       <div className={`${divClass} res_tab_con`} >
 
         <Table hover {...getTableProps()} className={tableClass}>
-          <thead className={theadClass}>
-            {headerGroups.map((headerGroup) => (
-              <tr className={trClass} key={headerGroup.id}  {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th key={column.id} className={thClass} {...column.getSortByToggleProps()}>
-                    {column.render("Header")}
-                    {generateSortingIndicator(column)}
-                    {/* <Filter column={column} /> */}
-                  </th>
-                ))}
-              </tr>
-            ))}
-
-          </thead>
+        <thead className={theadClass}>
+  {headerGroups.map((headerGroup) => (
+    <tr className={trClass} key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
+      {headerGroup.headers.map((column) => (
+        <th 
+          key={column.id} 
+          className={thClass} 
+        
+          {...column.getSortByToggleProps()}
+        >
+          {column.render("Header")}
+          {generateSortingIndicator(column)}
+        </th>
+      ))}
+    </tr>
+  ))}
+</thead>
 
           <tbody {...getTableBodyProps()}>
             {(

@@ -5,7 +5,7 @@ import axios from "axios";
 import BulkOrder from "../BulkOrder";
 import SOBasedOrder from "../SOBasedOrder";
 
-const BidOrderConfirmation = ({ plantCode = "PLANT008" }) => {
+const BidOrderConfirmation = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [bidNo, setBidNo] = useState("");
   const [loading, setLoading] = useState(true);
@@ -13,36 +13,38 @@ const BidOrderConfirmation = ({ plantCode = "PLANT008" }) => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
-
+ 
   useEffect(() => {
     document.title = "Bid Management | EPLMS";
     fetchBidNo();
   }, []);
 
   const fetchBidNo = async () => {
+    const obj = JSON.parse(sessionStorage.getItem("authUser"));
+    let plantcode = obj.data.plantCode;
     try {
       setLoading(true);
-      
+
       // API call with the provided configuration
       const response = await axios({
         method: 'get',
-      
-        
-        url: `http://localhost:8085/biddingMaster/getBidNo?plantCode=${plantCode}`,
+
+
+        url: `http://localhost:8085/biddingMaster/getBidNo?plantCode=${plantcode}`,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
         }
       });
-      
+
       console.log("API Response:", response.data);
-      
+
       // Check the response structure and extract the bid number
       if (response) {
         // Check if the response has the biddingOrderNo property directly
         if (response.biddingOrderNo) {
           setBidNo(response.biddingOrderNo);
-        } 
+        }
         // If the response has a data property (in case of axios or similar client)
         else if (response.data && response.data.biddingOrderNo) {
           setBidNo(response.data.biddingOrderNo);
@@ -75,7 +77,7 @@ const BidOrderConfirmation = ({ plantCode = "PLANT008" }) => {
                     </h2>
                   </div>
 
-                  {/* Tabs */}
+
                   <Nav pills className="nav-customs nav-danger mb-3 nav nav-pills">
                     <NavItem>
                       <NavLink
@@ -105,7 +107,7 @@ const BidOrderConfirmation = ({ plantCode = "PLANT008" }) => {
 
                   <TabContent activeTab={activeTab} className="text-muted">
                     <TabPane tabId="1" id="bulk-order">
-                      <BulkOrder />
+                      <BulkOrder bidNo={bidNo} />
                     </TabPane>
 
                     {/* SO Based Order Tab */}

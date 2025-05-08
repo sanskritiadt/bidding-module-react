@@ -1,4 +1,3 @@
-// Modified RouteMapping.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { Container, Row, Col, Card, CardHeader, Button, Input, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { Link } from "react-router-dom";
@@ -96,9 +95,9 @@ const RouteMapping = () => {
                     id: item.id,
                     transporterCode: item.code,
                     transporterName: item.name,
-                    contactPerson: item.ownerPerson || "",
-                    phoneNo: item.ownerNumber || "",
-                    emailId: item.ownerEmail || "",
+                    contactPerson: item.contactPerson || "",
+                    phoneNo: item.contactNumber || "",
+                    emailId: item.contactEmail || "",
                     rType: item.modeTransport || ""  // Using modeTransport as the route type
                 }));
                 
@@ -533,7 +532,18 @@ const RouteMapping = () => {
             )}
             
             {/* Toast Container */}
-            <ToastContainer />
+            <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{ backgroundColor: "white" }}
+      />
         </React.Fragment>
     );
 };

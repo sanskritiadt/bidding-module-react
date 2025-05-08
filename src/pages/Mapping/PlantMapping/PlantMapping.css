@@ -1,102 +1,38 @@
-/* Improved and Cleaned CSS */
-
-.inside {
-    border: 1px solid #ddd;
+.inside{
+    border: solid 1px #ddd;
     padding: 20px;
-    background-color: #f3f3f9;
+    background: #f3f3f9;
+    margin: 0 0 0 0;
     border-radius: 5px;
 }
-
-.card-header {
+.card-header{
     padding: 10px;
-    background-color: #fff;
-    border-bottom: none;
 }
-
-.card-header button {
-    font-size: 14px;
-}
-
-.green {
-    color: #08b39c;
+.green{
+    color:#08b39c;
     margin: 3px;
 }
-
-#search_div {
-    margin-bottom: 10px;
+#search_div{
+    margin-bottom: 10px !important;
 }
-
-.add_calender_css,
-.add_calender_css1 {
+.add_calender_css{
     height: 27px;
-    border: 1px solid #808080;
-    line-height: 1;
+    margin-left: 15px;
+    border: solid 1px grey;
+    line-height: 1 !important;
     border-radius: 2px;
 }
 
-.add_calender_css {
-    margin-left: 15px;
-}
-
-.add_calender_css1 {
+.add_calender_css1{
+    height: 27px;
     margin-left: 8px;
+    border: solid 1px grey;
+    line-height: 1 !important;
+    border-radius: 2px;
 }
-
-.bg-salmon {
+.bg-salmon{
     display: none;
 }
-
-.width-200 {
-    width: 320%;
-}
-
-.card-title-box {
-    background-color: #f3f3f9;
-    padding: 10px 15px;
-    margin: -10px -10px 10px;
-    border-radius: 5px 5px 0 0;
-    border-bottom: 1px solid #eff0f2;
-}
-
-.card-title-box .card-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 0;
-}
-/* CSS to hide the toggle buttons */
-/* Target the toggle container and all its children */
-.column-toggle-container,
-div[class*="toggle-all"],
-div[class*="column-toggle"],
-.toggle-all,
-button[class*="toggle-col"],
-div[class*="column-visibility"],
-/* Based on your screenshot, these might be the elements we need to target */
-.toggle-all-container,
-[class*="toggle-checkbox"],
-/* Direct targeting based on your screenshot */
-.table-filter-dropdown .toggle-all,
-.table-filter-dropdown .toggle-item {
-  display: none !important;
-}
-
-/* Additional CSS to target any list items or dropdown items that might contain toggles */
-li[class*="toggle-item"],
-li[class*="column-visibility"],
-div[class*="dropdown-item"][class*="toggle"] {
-  display: none !important;
-}
-
-/* If the toggle is in a dropdown menu with a specific icon, hide that too */
-button[class*="dropdown-toggle"][aria-label*="column"],
-button[aria-label*="Toggle Column"],
-button[title*="Toggle Column"] {
-  display: none !important;
-}
-
-/* Specifically targeting the element that looks like what's in your screenshot */
-[class*="toggle"][class*="all"],
-.column-dropdown .toggle-item {
-  display: none !important;
+.width-200{
+    width: 320% !important;
 }

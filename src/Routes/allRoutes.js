@@ -391,7 +391,7 @@ import AuctionDashboard from "../pages/Auction/DashBoard";
 import ViewAllBids from "../pages/Auction/DashBoard/AllBids";
 import TransporterDashboard from "../pages/TransporterDashboard/DashBoard";
 import ViewTransporterBids from '../pages/TransporterDashboard/DashBoard/AllBids'
-
+import RouteDetails from "../pages/TransporterDashboard/RouteDetails/RouteDetails";
 
 
   
@@ -486,9 +486,10 @@ const authProtectedRoutes = [
   { path: "/view-all-bids", component: <ViewAllBids /> },
 
     //transporter 
-    // { path: "/bid-order-confirmation", component: <BidOrderConfirmation /> },
+   
     { path: "/transporter-dashboard", component: <TransporterDashboard /> },
     { path: "/view-all-transporter-bids", component: <ViewTransporterBids /> },
+    { path: "/transporter-route-details", component: <RouteDetails /> },
 
   // Sequencing
   { path: "/packer-loader", component: <PackerLoader /> },

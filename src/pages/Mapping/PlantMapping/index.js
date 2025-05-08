@@ -16,7 +16,7 @@ import TableContainer from "../../../Components/Common/TableContainer";
 import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
 import Loader from "../../../Components/Common/Loader";
 import ViewPlantsModal from "./ViewPlantsModal/ViewPlantsModal";
-import AssignPlantModal from "./AssignPlantModal/AssignPlantModal";
+import AssignPlantModal from "./AssignPlantModal/AssignPlantModel";
 
 const PlantMapping = () => {
   const [transporters, setTransporters] = useState([]);
@@ -105,8 +105,8 @@ const PlantMapping = () => {
           transporterCode: item.code,
           transporterName: item.name,
           contactPerson: item.contactPerson || "",
-          phoneNo: item.ownerNumber || "",
-          emailId: item.ownerEmail || "",
+          phoneNo: item.contactNumber || "",
+          emailId: item.contactEmail || "",
           rType: item.modeTransport || ""  // Using modeTransport as the route type
         }));
 
@@ -569,7 +569,18 @@ const PlantMapping = () => {
       )}
 
       {/* Toast Container */}
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{ backgroundColor: "white" }}
+      />
     </React.Fragment>
   );
 };

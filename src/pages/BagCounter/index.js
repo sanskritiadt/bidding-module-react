@@ -237,7 +237,7 @@ const TableComponent = () => {
       //})
   //};
 
-  document.title = "ORDER CONFIRMATION" + " || EPLMS";
+  document.title = "BAG ASSIGN MANUAL" + " || EPLMS";
   return (
     <React.Fragment>
       <div className="page-content">

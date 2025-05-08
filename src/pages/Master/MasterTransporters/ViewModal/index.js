@@ -43,10 +43,7 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
 
                     {/* ROW 3: Mean, Mode, Price */}
                     <Row className="g-2 mb-2">
-                        <Col md={4}>
-                            <Label className="form-label mb-0 fw-semibold">Mean Of Transport</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.meanOfTransport || "Truck"}</p>
-                        </Col>
+                       
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Mode Of Transport</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.modeOfTransport}</p>
@@ -55,14 +52,15 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">Price (Per KM)</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.pricePerKm || "10"}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 4: Term, Tax, Region */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Term Of Payment</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.termsOfPayment}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 4: Term, Tax, Region */}
+                    <Row className="g-2 mb-2">
+                     
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Tax Information</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.taxInformation}</p>
@@ -71,14 +69,15 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">Region/Location</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.regionLocation}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 5: SLA, GST, PAN */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Service Level Agreement</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.serviceLevelAgreement}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 5: SLA, GST, PAN */}
+                    <Row className="g-2 mb-2">
+                       
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">GST No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.gstnNo}</p>
@@ -87,14 +86,15 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">PAN No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.panNo}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 6: Bidding, Status, Rating */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Allowed for Bidding</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.allowedForBidding}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 6: Bidding, Status, Rating */}
+                    <Row className="g-2 mb-2">
+                       
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Status</Label>
                             <p className="form-control form-control-sm bg-light mb-0">
@@ -103,24 +103,11 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                                 viewData.status}
                             </p>
                         </Col>
-                        <Col md={4}>
-                                <Label className="form-label mb-0 fw-semibold">Owner Email</Label>
-                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerEmail}</p>
-                            </Col>  
-                    </Row>
+                      
 
-                    {/* Additional owner information if needed */}
-                    {(viewData.ownerPerson || viewData.ownerNumber || viewData.ownerEmail) && (
-                        <Row className="g-2 mb-2">
-                            <Col md={4}>
-                                <Label className="form-label mb-0 fw-semibold">Owner Person</Label>
-                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerPerson}</p>
-                            </Col>
-                            <Col md={4}>
-                                <Label className="form-label mb-0 fw-semibold">Owner Number</Label>
-                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerNumber}</p>
-                            </Col>
-                            <Col md={4}>
+
+
+                        <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Rating</Label>
                             <div className="mt-1">
                                 {/* Star Rating Display */}
@@ -133,9 +120,9 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                                 </div>
                             </div>
                         </Col>
-                           
-                        </Row>
-                    )}
+                    </Row>
+
+                  
                 </div>
             </ModalBody>
             <ModalFooter>

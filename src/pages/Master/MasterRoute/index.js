@@ -200,7 +200,7 @@ const handleSubmit = async (e) => {
         } else {
             // Create new route
             console.log("Creating new route");
-            const response = await fetch('${process.env.REACT_APP_LOCAL_URL_8082}/routes', {
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1094,7 +1094,18 @@ const ModalStyles = `
                                             <button type="button" className="btn btn-light" onClick={toggleView}>Close</button>
                                         </ModalFooter>
                                     </Modal>
-                                    <ToastContainer closeButton={false} limit={1} />
+                                    <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{ backgroundColor: "white" }}
+      />
                                 </div>
                             </Card>
                         </Col>
