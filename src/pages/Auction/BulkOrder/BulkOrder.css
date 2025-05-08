@@ -1,0 +1,385 @@
+Main container styles
+.bulk-order-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Form layout styles */
+.bulk-order-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.bulk-order-form-group {
+  flex: 1;
+  min-width: calc(25% - 20px);
+  max-width: calc(25% - 20px);
+}
+
+/* Form element styles */
+.bulk-order-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.bulk-order-input {
+  height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 14px;
+  color: #000;
+}
+
+.bulk-order-select {
+  height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 14px;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23666" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-color: #fff;
+  color: #000;
+}
+
+/* Button styles */
+.bulk-order-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.bulk-order-back-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.bulk-order-next-button {
+  background-color: #4361ee;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+.bulk-order-submit-button {
+  background-color: #4361ee;
+  border: none;
+  color: #fff;
+}
+
+/* Review section styles */
+.bulk-order-value-text {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #000;
+  font-weight: 400;
+}
+
+.bulk-order-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Tag styles */
+.bulk-order-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #4361ee;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin: 2px 4px;
+  font-size: 13px;
+}
+
+/* Transporter selector styles */
+.bulk-order-transporter-selector {
+  height: auto;
+  min-height: 38px;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  color: #000;
+}
+
+.bulk-order-transporter-selector-placeholder {
+  color: #666;
+}
+
+/* Dropdown styles */
+.bulk-order-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-top: 4px;
+}
+
+.bulk-order-dropdown-header {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  background-color: #4361ee;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.bulk-order-dropdown-search {
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.bulk-order-dropdown-content {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.bulk-order-dropdown-item {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.bulk-order-dropdown-item-selected {
+  background-color: #f0f4ff;
+}
+
+/* Success modal styles */
+.bulk-order-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.bulk-order-modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.bulk-order-modal-icon {
+  margin-bottom: 20px;
+}
+
+.bulk-order-modal-title {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.bulk-order-modal-button {
+  background-color: #4361ee;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Button container */
+.bulk-order-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+/* Finish step styles */
+.bulk-order-finish-container {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.bulk-order-finish-icon {
+  margin: 0 auto;
+  margin-bottom: 20px;
+  width: 120px;
+  height: 120px;
+}
+
+.bulk-order-finish-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.bulk-order-finish-title-success {
+  color: #0ab39c;
+}
+
+.bulk-order-finish-title-error {
+  color: #EF4444;
+}
+
+.bulk-order-error-message {
+  color: #EF4444;
+  margin-bottom: 20px;
+}
+
+.bulk-order-finish-button {
+  background-color: #4361ee;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  padding: 10px 24px;
+  margin-top: 20px;
+}
+
+/* Enhanced Stepper Styles for Material-UI v4 */
+.bulk-order-stepper-container {
+  /* padding: 24px 0 36px; */
+  margin-bottom: 20px;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+/* Material-UI v4 specific overrides */
+.bulk-order-stepper-container .MuiStepConnector-line {
+  border-top-width: 3px !important;
+}
+
+.bulk-order-stepper-container .MuiStepConnector-active .MuiStepConnector-line,
+.bulk-order-stepper-container .MuiStepConnector-completed .MuiStepConnector-line {
+  border-color: #00A389 !important;
+}
+
+/* Custom step icon animations */
+.custom-step-icon {
+  position: relative;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.custom-step-icon.active {
+  transform: scale(1.05);
+}
+
+.custom-step-icon.completed {
+  transform: scale(1);
+}
+
+/* Spin animation for loading */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+  .black-placeholder::placeholder {
+    color: #000 !important;
+    opacity: 1;
+  }
+  
+  /* For Microsoft Edge */
+  .black-placeholder::-ms-input-placeholder {
+    color: #000 !important;
+  }
+  
+  /* For Mozilla Firefox */
+  .black-placeholder::-moz-placeholder {
+    color: #000 !important;
+    opacity: 1;
+  }
+  /* Custom styles for the select input with a larger dropdown arrow */
+.bulk-order-select {
+  height: 40px; /* Adjust height */
+  font-size: 16px; /* Adjust font size */
+  padding: 8px 10px; /* Adjust padding */
+  appearance: none; /* Remove default dropdown arrow */
+  background-color: #fff; /* Background color */
+  border: 1px solid #ced4da; /* Border style */
+  border-radius: 4px; /* Border radius */
+  width: 100%;
+  max-width: 400px; /* Adjust max width */
+  position: relative;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat; /* Remove default background */
+  background-position: right 10px center; /* Position arrow */
+  background-size: 24px; /* Adjust arrow size */
+}
+
+/* Optional: Hover effect to show cursor */
+.bulk-order-select:hover {
+  cursor: pointer;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.custom-toast-error {
+  background-color: #fff !important;
+  opacity: 1 !important;
+}
+
+.Toastify__toast--error {
+  background-color: #fff !important;
+  opacity: 1 !important;
+}

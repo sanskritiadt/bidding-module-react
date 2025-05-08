@@ -1,0 +1,619 @@
+/* Main container styles */
+.so-based-order-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Form layout styles */
+.so-based-order-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.so-based-order-form-group {
+  flex: 1;
+  min-width: calc(25% - 20px);
+  max-width: calc(25% - 20px);
+}
+
+/* Form element styles */
+.so-based-order-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.so-based-order-input {
+  height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 14px;
+  color: #000;
+}
+
+.so-based-order-select {
+  height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 14px;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23666" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-color: #fff;
+  color: #000;
+}
+
+/* Button styles */
+.so-based-order-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.so-based-order-back-button {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.so-based-order-next-button {
+  background-color: #4361ee;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+
+/* Enhanced Stepper container */
+.so-based-order-stepper-container {
+  /* padding: 24px 0 36px; */
+  margin-bottom: 20px;
+  background-color: #f9fbfd;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+/* Material-UI v4 specific overrides for green connector lines */
+.so-based-order-stepper-container .MuiStepConnector-line {
+  border-top-width: 3px !important;
+}
+
+.so-based-order-stepper-container .MuiStepConnector-active .MuiStepConnector-line,
+.so-based-order-stepper-container .MuiStepConnector-completed .MuiStepConnector-line {
+  border-color: #00A389 !important;
+}
+
+/* Button container */
+.so-based-order-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+/* Finish step styles */
+.so-based-order-finish-container {
+  text-align: center;
+  padding: 40px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.so-based-order-finish-icon {
+  margin: 0 auto;
+  margin-bottom: 20px;
+  width: 120px;
+  height: 120px;
+}
+
+.so-based-order-finish-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.so-based-order-finish-title-success {
+  color: #0ab39c;
+}
+
+.so-based-order-finish-button {
+  background-color: #4361ee;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  padding: 10px 24px;
+}
+
+/* Success modal styles */
+.so-based-order-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.so-based-order-modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.so-based-order-modal-icon {
+  margin-bottom: 20px;
+}
+
+.so-based-order-modal-title {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.so-based-order-modal-button {
+  background-color: #4361ee;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Disabled button styles */
+.so-based-order-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Custom step icon animations */
+.custom-step-icon {
+  position: relative;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.custom-step-icon.active {
+  transform: scale(1.05);
+}
+
+.custom-step-icon.completed {
+  transform: scale(1);
+}
+
+/* Pulse animation for completed steps */
+.custom-step-icon.completed::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  bottom: -4px;
+  left: -4px;
+  border-radius: 50%;
+  border: 2px solid #00A389;
+  opacity: 0;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+}
+
+/* Accordion Styles */
+.so-based-order-accordion {
+  margin-top: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.so-based-order-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #3F51B5;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.so-based-order-accordion-content {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  padding: 15px;
+}
+
+/* Search Styles */
+.so-based-order-search-container {
+  margin-bottom: 15px;
+}
+
+.so-based-order-search-input {
+  width: 100%;
+  max-width: 250px;
+  height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Table Styles */
+.so-based-order-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.so-based-order-table th {
+  background-color: #f8f9fa;
+  font-weight: 500;
+  color: #333;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.so-based-order-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  color: #333;
+}
+
+.so-based-order-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.so-based-order-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Pagination styles */
+.so-based-order-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0 0;
+  font-size: 14px;
+}
+
+.so-based-order-pagination-count {
+  color: #666;
+}
+
+.so-based-order-pagination-controls {
+  display: flex;
+  align-items: center;
+}
+
+.so-based-order-pagination-info {
+  margin: 0 10px;
+  color: #666;
+}
+
+.so-based-order-pagination-prev,
+.so-based-order-pagination-next {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* Preview step styles */
+.so-based-order-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.so-based-order-preview-header {
+  margin-bottom: 20px;
+}
+
+.so-based-order-preview-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.so-based-order-value {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.so-based-order-preview-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #4361ee;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin: 0 4px 4px 0;
+  font-size: 13px;
+}
+
+.so-based-order-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.so-based-order-preview-table {
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+.so-based-order-no-data {
+  padding: 15px;
+  color: #666;
+  font-style: italic;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* Transporter tag styles for selection */
+.so-based-order-transporter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 38px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: #fff;
+}
+
+.so-based-order-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #4361ee;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin: 2px 4px;
+  font-size: 13px;
+}
+
+.so-based-order-tag-close {
+  margin-left: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.so-based-order-transporter-placeholder {
+  color: #999;
+  padding: 5px;
+}
+
+.so-based-order-transporter-option {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  background-color: #f0f4ff;
+  border: 1px solid #d0d8ff;
+  border-radius: 4px;
+  color: #4361ee;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.so-based-order-transporter-option:hover {
+  background-color: #e0ecff;
+}
+
+.so-based-order-transporter-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visual divider style */
+.so-based-order-divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 20px 0;
+}
+
+/* Time input styling */
+input[type="text"][placeholder="HH:MM:SS"] {
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .so-based-order-form-group {
+    min-width: calc(50% - 20px);
+    max-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .so-based-order-form-group {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .so-based-order-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .so-based-order-button-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .so-based-order-back-button,
+  .so-based-order-next-button {
+    width: 100%;
+  }
+  
+  .so-based-order-preview-table th,
+  .so-based-order-preview-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .so-based-order-value {
+    font-size: 13px;
+  }
+  
+  .so-based-order-preview-tag {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+}
+
+/* Improve focus states for accessibility */
+.so-based-order-input:focus,
+.so-based-order-select:focus,
+.so-based-order-search-input:focus,
+.so-based-order-button:focus,
+.so-based-order-table input[type="checkbox"]:focus {
+  outline: 2px solid #4361ee;
+  outline-offset: 1px;
+}
+
+/* Custom styles for the select input with larger dropdown arrow */
+.so-based-order-select {
+  height: 40px; /* Adjust height */
+  font-size: 16px; /* Adjust font size */
+  padding: 8px 10px; /* Adjust padding */
+  appearance: none; /* Remove default dropdown arrow */
+  background-color: #fff; /* Background color */
+  border: 1px solid #ced4da; /* Border style */
+  border-radius: 4px; /* Border radius */
+  width: 100%;
+  max-width: 400px; /* Adjust max width */
+  position: relative;
+  background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat; /* Remove default background */
+  background-position: right 10px center; /* Position arrow */
+  background-size: 24px; /* Adjust arrow size */
+}
+
+/* Optional: Hover effect to show cursor */
+.so-based-order-select:hover {
+  cursor: pointer;
+}
+
+/* ===== ADDED VALIDATION STYLES ===== */
+
+/* Style for validation errors */
+.is-invalid {
+  border-color: #dc3545 !important;
+  border-width: 2px !important;
+}
+
+/* Error message styling */
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Toast notification styling */
+.Toastify__toast-container {
+  z-index: 9999;
+}
+
+.Toastify__toast {
+  border-radius: 4px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.Toastify__toast--success {
+  background-color: #00A389;
+}
+
+.Toastify__toast--error {
+  background-color: #EF4444;
+}
+
+.Toastify__toast-body {
+  font-size: 14px;
+  font-weight: 500;
+  align-items: center;
+}
+
+/* Style for black placeholder text */
+.black-placeholder::placeholder {
+  color: black !important;
+  opacity: 0.7;
+}
+
+/* Animation for spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+/* Style for error state finish screen */
+.so-based-order-finish-title-error {
+  color: #EF4444;
+}
+
+.so-based-order-error-message {
+  color: #EF4444;
+  margin-bottom: 16px;
+  max-width: 500px;
+  font-size: 14px;
+  line-height: 1.5;
+}
