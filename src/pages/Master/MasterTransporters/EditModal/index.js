@@ -1,4 +1,4 @@
- import React from "react";
+import React from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Form, Row, Col, Label, Input } from "reactstrap";
 
 const EditModal = ({
@@ -25,13 +25,13 @@ const EditModal = ({
         if (!panNumber) return true; // Allow empty for initial state
         const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
         return panRegex.test(panNumber);
-      };
-      
-      const validateGST = (gstNumber) => {
+    };
+
+    const validateGST = (gstNumber) => {
         if (!gstNumber) return true; // Allow empty for initial state
         const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
         return gstRegex.test(gstNumber);
-      };
+    };
 
     return (
         <Modal id="showModal" isOpen={isOpen} toggle={toggle} centered size="lg">
@@ -41,8 +41,6 @@ const EditModal = ({
             <Form className="tablelist-form" onSubmit={handleSubmit}>
                 <ModalBody className="p-3">
                     <div>
-                        <h5 className="modal-title mb-2">Transporter Details</h5>
-
                         {/* ROW 1: Code, Name, Address */}
                         <div className="d-flex mb-2">
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
@@ -55,7 +53,7 @@ const EditModal = ({
                                     id="code"
                                     name="code"
                                     placeholder="Enter Transporter Code"
-                                    value={values.code}
+                                    value={values.code||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -70,7 +68,7 @@ const EditModal = ({
                                     id="name"
                                     name="name"
                                     placeholder="Enter Transporter Name"
-                                    value={values.name}
+                                    value={values.name||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -85,7 +83,7 @@ const EditModal = ({
                                     id="address"
                                     name="address"
                                     placeholder="Enter Address"
-                                    value={values.address}
+                                    value={values.address||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -104,7 +102,7 @@ const EditModal = ({
                                     id="contactPerson"
                                     name="contactPerson"
                                     placeholder="Enter Contact Person"
-                                    value={values.contactPerson}
+                                    value={values.contactPerson||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -119,7 +117,7 @@ const EditModal = ({
                                     id="contactNumber"
                                     name="contactNumber"
                                     placeholder="Enter Phone Number"
-                                    value={values.contactNumber}
+                                    value={values.contactNumber||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -134,7 +132,7 @@ const EditModal = ({
                                     id="contactEmail"
                                     name="contactEmail"
                                     placeholder="Enter Email ID"
-                                    value={values.contactEmail}
+                                    value={values.contactEmail||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -143,17 +141,17 @@ const EditModal = ({
 
                         {/* ROW 3: Mean, Mode, Price */}
                         <div className="d-flex mb-2">
-                          
+
                             <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-                                <Label htmlFor="modeOfTransport" className="form-label mb-1">
+                                <Label className="form-label mb-1">
                                     Mode Of Transport<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="select"
                                     required
-                                    id="modeOfTransport"
-                                    name="modeOfTransport"
-                                    value={values.modeOfTransport}
+                                    id="modeTransport"
+                                    name="modeTransport"
+                                    value={values.modeTransport||""}
                                     onChange={handleInputChange}
                                     className="form-select"
                                 >
@@ -165,31 +163,35 @@ const EditModal = ({
                                     <option value="Multimodal">Multimodal</option>
                                 </Input>
                             </div>
-                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-                                <Label htmlFor="pricePerKm" className="form-label mb-1">
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
+                                <Label className="form-label mb-1">
                                     Price (Per KM)<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="number"
                                     required
-                                    id="pricePerKm"
-                                    name="pricePerKm"
+                                    id="priceKm"
+                                    name="priceKm"
                                     placeholder="Enter Price Per KM"
-                                    value={values.pricePerKm}
+                                    value={values.priceKm ||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
                             </div>
-                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
+                        </div>
+
+                        {/* ROW 4: Term, Tax, Region */}
+                        <div className="d-flex mb-2">
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
                                 <Label htmlFor="termsOfPayment" className="form-label mb-1">
                                     Term Of Payment<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="select"
                                     required
-                                    id="termsOfPayment"
-                                    name="termsOfPayment"
-                                    value={values.termsOfPayment}
+                                    id="termPayment"
+                                    name="termPayment"
+                                    value={values.termPayment||""}
                                     onChange={handleInputChange}
                                     className="form-select"
                                 >
@@ -198,11 +200,6 @@ const EditModal = ({
                                     <option value="Online">Cash</option>
                                 </Input>
                             </div>
-                        </div>
-
-                        {/* ROW 4: Term, Tax, Region */}
-                        <div className="d-flex mb-2">
-                         
                             <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
                                 <Label htmlFor="taxInformation" className="form-label mb-1">
                                     Tax Information<span style={{ color: "red" }}>*</span>
@@ -210,15 +207,15 @@ const EditModal = ({
                                 <Input
                                     type="text"
                                     required
-                                    id="taxInformation"
-                                    name="taxInformation"
+                                    id="taxInfo"
+                                    name="taxInfo"
                                     placeholder="Enter Tax Information"
-                                    value={values.taxInformation}
+                                    value={values.taxInfo||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
                             </div>
-                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
                                 <Label htmlFor="regionLocation" className="form-label mb-1">
                                     Region/Location<span style={{ color: "red" }}>*</span>
                                 </Label>
@@ -228,12 +225,16 @@ const EditModal = ({
                                     id="regionLocation"
                                     name="regionLocation"
                                     placeholder="Enter Region/Location"
-                                    value={values.regionLocation}
+                                    value={values.regionLocation||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
                             </div>
-                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
+                        </div>
+
+                        {/* ROW 5: SLA, GST, PAN */}
+                        <div className="d-flex mb-2">
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
                                 <Label htmlFor="serviceLevelAgreement" className="form-label mb-1">
                                     Service Level Agreement<span style={{ color: "red" }}>*</span>
                                 </Label>
@@ -243,67 +244,65 @@ const EditModal = ({
                                     id="serviceLevelAgreement"
                                     name="serviceLevelAgreement"
                                     placeholder="Enter SLA"
-                                    value={values.serviceLevelAgreement}
+                                    value={values.serviceLevelAgreement||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
                             </div>
+                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
+                                <Label htmlFor="gstnNo" className="form-label mb-1">
+                                    GST No.<span style={{ color: "red" }}>*</span>
+                                </Label>
+                                <Input
+                                    type="text"
+                                    required
+                                    id="gstnNo"
+                                    name="gstnNo"
+                                    placeholder="Enter GST No."
+                                    value={values.gstnNo||""}
+                                    onChange={handleInputChange}
+                                    className={`form-control ${values.gstnNo && !validateGST(values.gstnNo) ? 'is-invalid' : ''}`}
+                                />
+                                {values.gstnNo && !validateGST(values.gstnNo) && (
+                                    <div className="invalid-feedback">
+                                        Invalid GST format. Should be like: 27AAPFU0939F1ZV
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
+                                <Label htmlFor="panNo" className="form-label mb-1">
+                                    PAN No.<span style={{ color: "red" }}>*</span>
+                                </Label>
+                                <Input
+                                    type="text"
+                                    required
+                                    id="panNo"
+                                    name="panNo"
+                                    placeholder="Enter PAN No."
+                                    value={values.panNo||""}
+                                    onChange={handleInputChange}
+                                    className={`form-control ${values.panNo && !validatePAN(values.panNo) ? 'is-invalid' : ''}`}
+                                />
+                                {values.panNo && !validatePAN(values.panNo) && (
+                                    <div className="invalid-feedback">
+                                        Invalid PAN format. Should be like: ABCDE1234F
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        {/* ROW 5: SLA, GST, PAN */}
+                        {/* ROW 6: Bidding, Status, Rating - Reordered as requested */}
                         <div className="d-flex mb-2">
-                         
-                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-    <Label htmlFor="gstnNo" className="form-label mb-1">
-        GST No.<span style={{ color: "red" }}>*</span>
-    </Label>
-    <Input
-        type="text"
-        required
-        id="gstnNo"
-        name="gstnNo"
-        placeholder="Enter GST No."
-        value={values.gstnNo}
-        onChange={handleInputChange}
-        className={`form-control ${values.gstnNo && !validateGST(values.gstnNo) ? 'is-invalid' : ''}`}
-    />
-    {values.gstnNo && !validateGST(values.gstnNo) && (
-        <div className="invalid-feedback">
-            Invalid GST format. Should be like: 27AAPFU0939F1ZV
-        </div>
-    )}
-</div>
-<div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-    <Label htmlFor="panNo" className="form-label mb-1">
-        PAN No.<span style={{ color: "red" }}>*</span>
-    </Label>
-    <Input
-        type="text"
-        required
-        id="panNo"
-        name="panNo"
-        placeholder="Enter PAN No."
-        value={values.panNo}
-        onChange={handleInputChange}
-        className={`form-control ${values.panNo && !validatePAN(values.panNo) ? 'is-invalid' : ''}`}
-    />
-    {values.panNo && !validatePAN(values.panNo) && (
-        <div className="invalid-feedback">
-            Invalid PAN format. Should be like: ABCDE1234F
-        </div>
-    )}
-</div>
-
-<div className="flex-grow-1" style={{ width: '33.33%' }}>
-                                <Label htmlFor="allowedForBidding" className="form-label mb-1">
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
+                                <Label htmlFor="allowedBidding" className="form-label mb-1">
                                     Allowed for Bidding<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="select"
                                     required
-                                    id="allowedForBidding"
-                                    name="allowedForBidding"
-                                    value={values.allowedForBidding}
+                                    id="allowedBidding"
+                                    name="allowedBidding"
+                                    value={values.allowedBidding}
                                     onChange={handleInputChange}
                                     className="form-select"
                                 >
@@ -312,63 +311,58 @@ const EditModal = ({
                                     <option value="No">No</option>
                                 </Input>
                             </div>
+                            <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
+                                {isEdit ? (
+                                    <>
+                                        <Label className="form-label mb-1">Status<span style={{ color: "red" }}>*</span></Label>
+                                        <Input
+                                            name="status"
+                                            type="select"
+                                            className="form-select"
+                                            value={values.status}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                            {status.map((item, key) => (
+                                                <React.Fragment key={key}>
+                                                    {item.options.map((item, key) => (
+                                                        <option value={item.value} key={key}>{item.label}</option>
+                                                    ))}
+                                                </React.Fragment>
+                                            ))}
+                                        </Input>
+                                    </>
+                                ) : (
+                                    <div className="invisible">
+                                        <Label className="form-label mb-1">Placeholder</Label>
+                                        <Input
+                                            type="text"
+                                            className="form-control"
+                                            disabled
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
+                                <Label htmlFor="transporterRating" className="form-label mb-1">
+                                    Rating (auto Calculated)
+                                </Label>
+                                <div className="mt-1">
+                                    <div className="rating-stars">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <span key={star} className="star me-1">
+                                                <i className={`ri-star-${parseInt(values.transporterRating || 0) >= star ? 'fill' : 'line'} text-warning fs-16`}></i>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                 
-                     {/* ROW 6: Bidding, Status, Rating - Reordered as requested */}
-<div className="d-flex mb-2">
-    <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-        {isEdit ? ( 
-            <>
-                <Label className="form-label mb-1">Status<span style={{ color: "red" }}>*</span></Label>
-                <Input
-                    name="status"
-                    type="select"
-                    className="form-select"
-                    value={values.status}
-                    onChange={handleInputChange}
-                    required
-                >
-                    {status.map((item, key) => (
-                        <React.Fragment key={key}>
-                            {item.options.map((item, key) => (
-                                <option value={item.value} key={key}>{item.label}</option>
-                            ))}
-                        </React.Fragment>
-                    ))}
-                </Input>
-            </>
-        ) : (
-            <div className="invisible">
-                <Label className="form-label mb-1">Placeholder</Label>
-                <Input
-                    type="text"
-                    className="form-control"
-                    disabled
-                />
-            </div>
-        )}
-    </div>
-    <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-        <Label htmlFor="transporterRating" className="form-label mb-1">
-            Rating (auto Calculated)
-        </Label>
-        <div className="mt-1">
-            <div className="rating-stars">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} className="star me-1">
-                        <i className={`ri-star-${parseInt(values.transporterRating || 0) >= star ? 'fill' : 'line'} text-warning fs-16`}></i>
-                    </span>
-                ))}
-            </div>
-        </div>
-    </div>
-    <div className="flex-grow-1" style={{ width: '33.33%' }}>
-        {/* Empty div to maintain the grid structure */}
-    </div>
-</div>
-
-                       
+                        {/* Hidden fields to maintain compatibility with backend */}
+                        <input type="hidden" name="ownerPerson" value={values.ownerPerson || values.contactPerson} />
+                        <input type="hidden" name="ownerNumber" value={values.ownerNumber || values.contactNumber} />
+                        <input type="hidden" name="ownerEmail" value={values.ownerEmail || values.contactEmail} />
                     </div>
                     <Row>
                         <Col md={12} className="hstack gap-2 justify-content-end" style={{ marginTop: "30px" }}>

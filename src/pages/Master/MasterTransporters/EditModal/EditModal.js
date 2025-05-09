@@ -183,7 +183,7 @@ const EditModal = ({
                         {/* ROW 4: Term, Tax, Region */}
                         <div className="d-flex mb-2">
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
-                                <Label htmlFor="termsOfPayment" className="form-label mb-1">
+                                <Label htmlFor="termPayment" className="form-label mb-1">
                                     Term Of Payment<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
@@ -201,7 +201,7 @@ const EditModal = ({
                                 </Input>
                             </div>
                             <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-                                <Label htmlFor="taxInformation" className="form-label mb-1">
+                                <Label htmlFor="taxInfo" className="form-label mb-1">
                                     Tax Information<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
@@ -213,7 +213,7 @@ const EditModal = ({
                                     value={values.taxInfo||""}
                                     onChange={handleInputChange}
                                     className="form-control"
-                                />
+                                />  
                             </div>
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
                                 <Label htmlFor="regionLocation" className="form-label mb-1">

@@ -15,6 +15,7 @@ const BidOrderConfirmation = () => {
   };
  
   useEffect(() => {
+    
     document.title = "Bid Management | EPLMS";
     fetchBidNo();
   }, []);

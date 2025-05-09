@@ -50,17 +50,16 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Price (Per KM)</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.priceKm || "10"}</p>
-                        </Col>
-                        <Col md={4}>
-                            <Label className="form-label mb-0 fw-semibold">Term Of Payment</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.termPayment}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.priceKm}</p>
                         </Col>
                     </Row>
 
                     {/* ROW 4: Term, Tax, Region */}
                     <Row className="g-2 mb-2">
-
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Term Of Payment</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.termPayment}</p>
+                        </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Tax Information</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.taxInfo}</p>
@@ -69,15 +68,14 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">Region/Location</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.regionLocation}</p>
                         </Col>
-                        <Col md={4}>
-                            <Label className="form-label mb-0 fw-semibold">Service Level Agreement</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.serviceLevelAgreement}</p>
-                        </Col>
                     </Row>
 
                     {/* ROW 5: SLA, GST, PAN */}
                     <Row className="g-2 mb-2">
-
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Service Level Agreement</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.serviceLevelAgreement}</p>
+                        </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">GST No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.gstnNo}</p>
@@ -86,17 +84,16 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">PAN No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.panNo}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 6: Bidding, Status, Rating */}
+                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Allowed for Bidding</Label>
                             <p className="form-control form-control-sm bg-light mb-0">
                                 {viewData.allowedBidding === true ? 'Yes' : 'No'}
                             </p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 6: Bidding, Status, Rating */}
-                    <Row className="g-2 mb-2">
-
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Status</Label>
                             <p className="form-control form-control-sm bg-light mb-0">
@@ -105,26 +102,39 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                                         viewData.status}
                             </p>
                         </Col>
-
-
-
-
                         <Col md={4}>
-                            <Label className="form-label mb-0 fw-semibold">Rating</Label>
-                            <div className="mt-1">
-                                {/* Star Rating Display */}
-                                <div className="rating-stars">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <span key={star} className="star me-1">
-                                            <i className={`ri-star-${parseInt(viewData.transporterRating || 1) >= star ? 'fill' : 'line'} text-warning fs-16`}></i>
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
+                            <Label className="form-label mb-0 fw-semibold">Owner Email</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerEmail}</p>
                         </Col>
                     </Row>
 
+                    {/* Additional owner information if needed */}
+                    {(viewData.ownerPerson || viewData.ownerNumber || viewData.ownerEmail) && (
+                        <Row className="g-2 mb-2">
+                            <Col md={4}>
+                                <Label className="form-label mb-0 fw-semibold">Owner Person</Label>
+                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerPerson}</p>
+                            </Col>
+                            <Col md={4}>
+                                <Label className="form-label mb-0 fw-semibold">Owner Number</Label>
+                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerNumber}</p>
+                            </Col>
+                            <Col md={4}>
+                                <Label className="form-label mb-0 fw-semibold">Rating</Label>
+                                <div className="mt-1">
+                                    {/* Star Rating Display */}
+                                    <div className="rating-stars">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <span key={star} className="star me-1">
+                                                <i className={`ri-star-${parseInt(viewData.transporterRating || 1) >= star ? 'fill' : 'line'} text-warning fs-16`}></i>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </Col>
 
+                        </Row>
+                    )}
                 </div>
             </ModalBody>
             <ModalFooter>

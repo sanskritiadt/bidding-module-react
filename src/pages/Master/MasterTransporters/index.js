@@ -21,7 +21,7 @@ import ViewModal from "./ViewModal";
 
 const initialValues = {
     name: "",
-    code: "",
+    //  code: "",
     plantCode: "",
     address: "",
     contactPerson: "",
@@ -33,40 +33,38 @@ const initialValues = {
     gstnNo: "",
     panNo: "",
     status: "A",
-    // Added new fields
-
-    modeOfTransport: "",
-    pricePerKm: "",
-    termsOfPayment: "",
+    modeTransport: "",
+    priceKm: "",
+    termPayment: "",
     transporterRating: "",
-    taxInformation: "",
+    taxInfo: "",
     regionLocation: "",
     serviceLevelAgreement: "",
-    allowedForBidding: "Yes",
+    allowedBidding: "Yes",
 };
 
-    // Helper function to map API term payment values to dropdown values
-    const mapTermPaymentValue = (apiValue) => {
-        if (!apiValue) return "";
-        
-        // Map API values to form dropdown options
-        if (apiValue === "45 Days") return "Net45";
-        if (apiValue === "30 Days") return "Net30";
-        if (apiValue === "60 Days") return "Net60";
-        if (apiValue === "Online Payment" || apiValue === "Online") return "Online";
-        
-        // If no exact match, try to extract the days value
-        if (apiValue.includes("Days") || apiValue.includes("days")) {
-            const days = apiValue.match(/\d+/);
-            if (days && days[0]) {
-                return `Net${days[0]}`;
-            }
-        }
-        
-        return "";
-    };
+// Helper function to map API term payment values to dropdown values
+const mapTermPaymentValue = (apiValue) => {
+    if (!apiValue) return "";
 
-    // Helper function to map form dropdown values back to API values
+    // Map API values to form dropdown options
+    if (apiValue === "45 Days") return "Net45";
+    if (apiValue === "30 Days") return "Net30";
+    if (apiValue === "60 Days") return "Net60";
+    if (apiValue === "Online Payment" || apiValue === "Online") return "Online";
+
+    // If no exact match, try to extract the days value
+    if (apiValue.includes("Days") || apiValue.includes("days")) {
+        const days = apiValue.match(/\d+/);
+        if (days && days[0]) {
+            return `Net${days[0]}`;
+        }
+    }
+
+    return "";
+};
+
+// Helper function to map form dropdown values back to API values
 
 
 
@@ -74,12 +72,12 @@ const initialValues = {
 const validatePAN = (panNumber) => {
     const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
     return panRegex.test(panNumber);
-  };
-  
-  const validateGST = (gstNumber) => {
+};
+
+const validateGST = (gstNumber) => {
     const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
     return gstRegex.test(gstNumber);
-  };
+};
 
 
 
@@ -91,6 +89,7 @@ const MasterTransporter = () => {
     const [viewData, setViewData] = useState({});
     const [values, setValues] = useState(initialValues);
     const [CurrentID, setClickedRowId] = useState('');
+    const [code, setCode] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [latestHeader, setLatestHeader] = useState('');
     const [Plant_Code, setPlantCode] = useState('');
@@ -133,8 +132,8 @@ const MasterTransporter = () => {
     };
 
     const getAllDeviceData = (plantcode) => {
-        let plantCode1='N205'
-        axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/all?plantCode=${plantCode1}`, config)
+        // let plantcode1='N205'
+        axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/all?plantCode=${plantcode}`, config)
             .then(res => {
                 const device = res;
                 setDevice(device);
@@ -156,26 +155,29 @@ const MasterTransporter = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Validate PAN and GST
         if (!validatePAN(values.panNo)) {
             toast.error("Invalid PAN Number! Format should be AAAAA0000A", { autoClose: 3000 });
             return;
         }
-        
+
         if (!validateGST(values.gstnNo)) {
             toast.error("Invalid GST Number! Format should be 00AAAAA0000A0Z0", { autoClose: 3000 });
             return;
         }
-    
+
+
+
         try {
             // Create API payload with correct field mappings
             const apiPayload = {
                 ...values,
+                allowedBidding: values.allowedBidding === "Yes",
             };
-    
+
             if (isEdit) {
-                const res = await axios.put(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${CurrentID}`, apiPayload, config)
+                const res = await axios.put(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${code}`, apiPayload, config)
                 console.log(res);
                 toast.success("Transporter Updated Successfully", { autoClose: 3000 });
                 getAllDeviceData(Plant_Code);
@@ -205,54 +207,60 @@ const MasterTransporter = () => {
     };
 
     // Update Data
-   // Update Data
-const handleCustomerClick = useCallback((arg) => {
-    setClickedRowId(arg);
-    setIsEdit(true);
-    toggle();
-    const id = arg;
+    // Update Data
+    const handleCustomerClick = useCallback((arg) => {
+        setClickedRowId(arg);
+        setIsEdit(true);
+        toggle();
+        const id = arg;
 
-    axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${id}`, config)
-        .then(res => {
-            const result = res;
-            setValues({
-                ...values,
-                "name": result.name,
-                "code": result.code,
-                "plantCode": result.Plant_Code,
-                "address": result.address,
-                "contactPerson": result.contactPerson,
-                "contactNumber": result.contactNumber,
-                "contactEmail": result.contactEmail,
-                "ownerPerson": result.ownerPerson,
-                "ownerNumber": result.ownerNumber,
-                "ownerEmail": result.ownerEmail,
-                "gstnNo": result.gstnNo,
-                "panNo": result.panNo,
-                "status": result.status,
-                // Added new fields
-            
-                "modeOfTransport": result.modeTransport || "",
-                "pricePerKm": result.priceKm || "",
-                // Apply mapping for termsOfPayment
-                "termsOfPayment": mapTermPaymentValue(result.termPayment)||"",
-                "transporterRating": result.transporterRating || "",
-                "taxInformation": result.taxInfo || "",
-                "regionLocation": result.regionLocation || "",
-                "serviceLevelAgreement": result.serviceLevelAgreement || "",
-                "allowedForBidding": result.allowedBidding ? "Yes" : "No",
-            });
-        })
-}, [toggle, values, config]);
-
-    // View Data
-   
-    const handleViewClick = useCallback((id) => {
         axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${id}`, config)
             .then(res => {
                 const result = res;
+                setValues({
+                    ...values,
+                    "name": result.name,
+                    "code": result.code,
+
+                    "plantCode": result.Plant_Code,
+                    "address": result.address,
+                    "contactPerson": result.contactPerson,
+                    "contactNumber": result.contactNumber,
+                    "contactEmail": result.contactEmail,
+                    "ownerPerson": result.ownerPerson,
+                    "ownerNumber": result.ownerNumber,
+                    "ownerEmail": result.ownerEmail,
+                    "gstnNo": result.gstnNo,
+                    "panNo": result.panNo,
+                    "status": result.status,
+                    // Added new fields
+
+                    "modeTransport": result.modeTransport || "",
+                    "priceKm": result.priceKm || "",
+                    // Apply mapping for termsOfPayment
+                    "termPayment": mapTermPaymentValue(result.termPayment) || "",
+                    "transporterRating": result.transporterRating || "",
+                    "taxInfo": result.taxInfo || "",
+                    "regionLocation": result.regionLocation || "",
+                    "serviceLevelAgreement": result.serviceLevelAgreement || "",
+                    "allowedBidding": result.allowedBidding === true ? "Yes" : "No",
+
+                });
+                setCode(result.code);
+                //setCode(parseInt(result.code));
+
+            })
+    }, [toggle, values, config]);
+
+    // View Data
+
+    const handleViewClick = useCallback((code) => {
+        axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${code}`, config)
+            .then(res => {
+                const result = res;
                 setViewData(result);
-                
+                //  console.log("allowedBidding===>>>>>>>>>>>>>>>>>>>>>",viewData.allowedBidding);
+
                 setViewModal(true);
             })
             .catch(error => {
@@ -296,7 +304,7 @@ const handleCustomerClick = useCallback((arg) => {
                 filterable: false,
             },
             {
-                Header: "Transporter name",
+                Header: "Transporter Name",
                 accessor: "name",
                 filterable: false,
             },
@@ -316,7 +324,7 @@ const handleCustomerClick = useCallback((arg) => {
                 filterable: false,
             },
             {
-                Header: "Mode OF Transport",
+                Header: "Mode Of Transport",
                 accessor: "modeTransport",
                 filterable: false,
             },
@@ -439,18 +447,18 @@ const handleCustomerClick = useCallback((arg) => {
                                         viewData={viewData}
                                     />
 
-<ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        toastStyle={{ backgroundColor: "white" }}
-      />
+                                    <ToastContainer
+                                        position="top-right"
+                                        autoClose={3000}
+                                        hideProgressBar={false}
+                                        closeOnClick
+                                        rtl={false}
+                                        pauseOnFocusLoss
+                                        draggable
+                                        pauseOnHover
+                                        theme="light"
+                                        toastStyle={{ backgroundColor: "white" }}
+                                    />
                                 </div>
                             </Card>
                         </Col>
