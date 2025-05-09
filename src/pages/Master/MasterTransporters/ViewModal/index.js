@@ -11,10 +11,10 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                 <div>
                     {/* ROW 1: Code, Name, Address */}
                     <Row className="g-2 mb-2">
-                        <Col md={4}>
+                        {/* <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Transporter Code</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.code}</p>
-                        </Col>
+                        </Col> */}
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Transporter Name</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.name}</p>
@@ -23,14 +23,15 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">Address</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.address}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 2: Contact Person, Phone, Email */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Contact Person</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.contactPerson}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 2: Contact Person, Phone, Email */}
+                    <Row className="g-2 mb-2">
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Phone No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.contactNumber}</p>
@@ -39,23 +40,20 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">Email ID</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.contactEmail}</p>
                         </Col>
+
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Mode Of Transport</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.modeTransport}</p>
+                        </Col>
                     </Row>
 
                     {/* ROW 3: Mean, Mode, Price */}
                     <Row className="g-2 mb-2">
 
                         <Col md={4}>
-                            <Label className="form-label mb-0 fw-semibold">Mode Of Transport</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.modeTransport}</p>
-                        </Col>
-                        <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Price (Per KM)</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.priceKm}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 4: Term, Tax, Region */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Term Of Payment</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.termPayment}</p>
@@ -64,14 +62,15 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">Tax Information</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.taxInfo}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 4: Term, Tax, Region */}
+                    <Row className="g-2 mb-2">
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Region/Location</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.regionLocation}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 5: SLA, GST, PAN */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Service Level Agreement</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.serviceLevelAgreement}</p>
@@ -80,14 +79,15 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                             <Label className="form-label mb-0 fw-semibold">GST No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.gstnNo}</p>
                         </Col>
+                    </Row>
+
+                    {/* ROW 5: SLA, GST, PAN */}
+                    <Row className="g-2 mb-2">
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">PAN No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.panNo}</p>
                         </Col>
-                    </Row>
-
-                    {/* ROW 6: Bidding, Status, Rating */}
-                    <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Allowed for Bidding</Label>
                             <p className="form-control form-control-sm bg-light mb-0">
@@ -102,23 +102,30 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                                         viewData.status}
                             </p>
                         </Col>
-                        <Col md={4}>
+                    </Row>
+
+                    {/* ROW 6: Bidding, Status, Rating */}
+                    <Row className="g-2 mb-2">
+
+                        {/* <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Owner Email</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerEmail}</p>
                         </Col>
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Owner Person</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerPerson}</p>
+                        </Col>
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Owner Number</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerNumber}</p>
+                        </Col> */}
                     </Row>
 
                     {/* Additional owner information if needed */}
                     {(viewData.ownerPerson || viewData.ownerNumber || viewData.ownerEmail) && (
                         <Row className="g-2 mb-2">
-                            <Col md={4}>
-                                <Label className="form-label mb-0 fw-semibold">Owner Person</Label>
-                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerPerson}</p>
-                            </Col>
-                            <Col md={4}>
-                                <Label className="form-label mb-0 fw-semibold">Owner Number</Label>
-                                <p className="form-control form-control-sm bg-light mb-0">{viewData.ownerNumber}</p>
-                            </Col>
+
+
                             <Col md={4}>
                                 <Label className="form-label mb-0 fw-semibold">Rating</Label>
                                 <div className="mt-1">

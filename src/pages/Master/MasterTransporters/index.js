@@ -324,7 +324,7 @@ const MasterTransporter = () => {
                 filterable: false,
             },
             {
-                Header: "Mode Of Transport",
+                Header: "Mode of Transport",
                 accessor: "modeTransport",
                 filterable: false,
             },
