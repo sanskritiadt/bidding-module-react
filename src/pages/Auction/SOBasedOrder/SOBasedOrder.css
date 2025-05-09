@@ -29,12 +29,6 @@
 }
 
 .so-based-order-input {
-  height: 38px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%;
-  font-size: 14px;
   color: #000;
 }
 
@@ -89,6 +83,7 @@
   background-color: #f9fbfd;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  overflow-x: auto; /* Add horizontal scroll for small screens */
 }
 
 /* Material-UI v4 specific overrides for green connector lines */
@@ -106,6 +101,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 40px;
+  gap: 15px; /* Add gap for better spacing on small screens */
 }
 
 /* Finish step styles */
@@ -257,6 +253,7 @@
   border: 1px solid #e0e0e0;
   border-top: none;
   padding: 15px;
+  overflow-x: auto; /* Add horizontal scroll for tables on small screens */
 }
 
 /* Search Styles */
@@ -280,6 +277,7 @@
   border-collapse: collapse;
   font-size: 14px;
   background-color: #fff;
+  min-width: 600px; /* Ensure table doesn't get too squished on small screens */
 }
 
 .so-based-order-table th {
@@ -315,6 +313,8 @@
   align-items: center;
   padding: 15px 0 0;
   font-size: 14px;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  gap: 10px; /* Add gap for better spacing when wrapping */
 }
 
 .so-based-order-pagination-count {
@@ -471,15 +471,44 @@ input[type="text"][placeholder="HH:MM:SS"] {
   letter-spacing: 1px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .so-based-order-form-group {
-    min-width: calc(50% - 20px);
-    max-width: calc(50% - 20px);
-  }
+/* Transporter selection dropdown - make it more responsive */
+.so-based-order-dropdown {
+  position: absolute;
+  width: 100%;
+  z-index: 10;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-top: 4px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-@media (max-width: 768px) {
+.so-based-order-dropdown-header {
+  padding: 8px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.so-based-order-dropdown-search {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #000;
+  font-size: 14px;
+  width: 100%;
+}
+
+/* IMPROVED RESPONSIVE STYLES */
+/* Mobile-first approach with progressive enhancement */
+
+/* Extra small devices (phones, 576px and down) */
+@media (max-width: 576px) {
   .so-based-order-form-group {
     min-width: 100%;
     max-width: 100%;
@@ -492,7 +521,6 @@ input[type="text"][placeholder="HH:MM:SS"] {
   
   .so-based-order-button-container {
     flex-direction: column;
-    gap: 10px;
   }
   
   .so-based-order-back-button,
@@ -500,19 +528,110 @@ input[type="text"][placeholder="HH:MM:SS"] {
     width: 100%;
   }
   
-  .so-based-order-preview-table th,
-  .so-based-order-preview-table td {
-    padding: 8px 10px;
+  .so-based-order-section-title {
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .so-based-order-label {
     font-size: 13px;
   }
   
-  .so-based-order-value {
+  .so-based-order-input,
+  .so-based-order-select {
+    font-size: 13px;
+    height: 36px;
+  }
+  
+  .so-based-order-search-input {
+    max-width: 100%;
+  }
+  
+  .so-based-order-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .so-based-order-accordion-header {
+    padding: 12px 15px;
+    font-size: 14px;
+  }
+  
+  .so-based-order-dropdown-item {
+    padding: 8px 6px;
     font-size: 13px;
   }
   
-  .so-based-order-preview-tag {
-    font-size: 12px;
-    padding: 3px 8px;
+  .so-based-order-modal-content {
+    padding: 20px 15px;
+  }
+  
+  .so-based-order-modal-title {
+    font-size: 18px;
+  }
+  
+  /* Make custom step icons smaller on mobile */
+  .custom-step-icon {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Small devices (landscape phones, 576px to 767px) */
+@media (min-width: 577px) and (max-width: 767px) {
+  .so-based-order-form-group {
+    min-width: calc(50% - 10px);
+    max-width: calc(50% - 10px);
+  }
+  
+  .so-based-order-row {
+    gap: 10px;
+  }
+  
+  .so-based-order-search-input {
+    max-width: 100%;
+  }
+}
+
+/* Medium devices (tablets, 768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .so-based-order-form-group {
+    min-width: calc(33.333% - 15px);
+    max-width: calc(33.333% - 15px);
+  }
+}
+
+/* Large devices (desktops, 992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .so-based-order-form-group {
+    min-width: calc(25% - 20px);
+    max-width: calc(25% - 20px);
+  }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .so-based-order-container {
+    max-width: 1200px;
+  }
+}
+
+/* Responsive style for transport dropdown viewer button */
+@media (max-width: 768px) {
+  .so-based-order-transporter-selector {
+    font-size: 13px;
+  }
+  
+  /* Make the view button stack on mobile */
+  .so-based-order-form-group div[style*="display: flex; align-items: center"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  [style*="width: 28px; height: 28px; min-width: 28px;"] {
+    margin-left: 0 !important;
+    margin-top: 10px;
   }
 }
 
@@ -526,22 +645,33 @@ input[type="text"][placeholder="HH:MM:SS"] {
   outline-offset: 1px;
 }
 
+/* Improved handling for date/time inputs on mobile */
+@media (max-width: 576px) {
+  input[type="datetime-local"],
+  input[type="time"] {
+    width: 100%;
+    min-height: 44px; /* Increase touch target size */
+    padding: 8px;
+    font-size: 16px; /* Prevent iOS zoom on focus */
+  }
+}
+
 /* Custom styles for the select input with larger dropdown arrow */
 .so-based-order-select {
-  height: 40px; /* Adjust height */
-  font-size: 16px; /* Adjust font size */
-  padding: 8px 10px; /* Adjust padding */
-  appearance: none; /* Remove default dropdown arrow */
-  background-color: #fff; /* Background color */
-  border: 1px solid #ced4da; /* Border style */
-  border-radius: 4px; /* Border radius */
+  height: 40px;
+  font-size: 16px;
+  padding: 8px 30px 8px 10px; /* Increased right padding for arrow */
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
   width: 100%;
-  max-width: 400px; /* Adjust max width */
+  max-width: 400px;
   position: relative;
   background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat; /* Remove default background */
-  background-position: right 10px center; /* Position arrow */
-  background-size: 24px; /* Adjust arrow size */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 24px;
 }
 
 /* Optional: Hover effect to show cursor */
@@ -549,7 +679,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   cursor: pointer;
 }
 
-/* ===== ADDED VALIDATION STYLES ===== */
+/* ===== VALIDATION STYLES ===== */
 
 /* Style for validation errors */
 .is-invalid {

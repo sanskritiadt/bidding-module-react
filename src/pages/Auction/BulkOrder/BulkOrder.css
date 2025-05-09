@@ -417,3 +417,136 @@
   background-color: #fff !important;
   opacity: 1 !important;
 }
+/* Main container styles - add max-width with percentage */
+.bulk-order-container {
+  max-width: 95%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 15px;
+}
+
+/* Form layout styles - improved responsiveness */
+.bulk-order-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+/* Make form groups more responsive with progressive breakpoints */
+.bulk-order-form-group {
+  flex: 1;
+  min-width: calc(25% - 20px);
+  max-width: 100%;
+}
+
+/* Responsive breakpoints for form groups */
+@media (max-width: 1200px) {
+  .bulk-order-form-group {
+    min-width: calc(33.33% - 20px);
+  }
+}
+
+@media (max-width: 992px) {
+  .bulk-order-form-group {
+    min-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .bulk-order-form-group {
+    min-width: 100%;
+  }
+  
+  .bulk-order-button-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .bulk-order-button-container button {
+    width: 100%;
+  }
+}
+
+/* Improve responsive styles for form elements */
+.bulk-order-input,
+.bulk-order-select,
+.bulk-order-transporter-selector,
+.bulk-order-city-selector,
+.bulk-order-location-selector,
+.bulk-order-material-selector {
+  width: 100%;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 38px;
+}
+
+/* Make modal more responsive */
+.bulk-order-modal-content {
+  width: 95%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+/* Make dropdown more responsive */
+.bulk-order-dropdown {
+  width: 100%;
+  max-height: 60vh;
+}
+
+/* Transporter selection responsive styles */
+@media (max-width: 768px) {
+  /* Adjust transporterViewer positioning to stack instead of being side by side */
+  .bulk-order-form-group [style*="position: relative; display: flex; align-items: center"] {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  /* Move the TransporterViewer below the selector on small screens */
+  .bulk-order-form-group [style*="position: relative; display: flex; align-items: center"] > div:nth-child(2) {
+    margin-top: 10px;
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Stepper responsive adjustments */
+@media (max-width: 600px) {
+  .bulk-order-stepper-container .MuiStepLabel-label {
+    font-size: 12px;
+  }
+  
+  .custom-step-icon {
+    width: 30px !important;
+    height: 30px !important;
+  }
+}
+
+/* Support touch devices better */
+@media (hover: none) {
+  .bulk-order-dropdown-item,
+  .bulk-order-button,
+  .bulk-order-transporter-selector,
+  .bulk-order-city-selector,
+  .bulk-order-location-selector,
+  .bulk-order-material-selector {
+    padding: 12px !important; /* Larger touch targets */
+  }
+  
+  input[type="checkbox"] {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+
+/* Improve preview section on small screens */
+@media (max-width: 768px) {
+  .bulk-order-section-title {
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .bulk-order-value-text {
+    font-size: 13px;
+  }
+}
