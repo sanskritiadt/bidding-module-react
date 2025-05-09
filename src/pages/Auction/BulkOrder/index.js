@@ -2034,9 +2034,6 @@
 // export default BulkOrder;
 
 
-
-
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Form, Input, Label } from "reactstrap";
 import { Stepper, Step, StepLabel, StepConnector } from '@material-ui/core';
@@ -2123,13 +2120,13 @@ const BulkOrder = ({ bidNo }) => {
     "Mumbai"
   ];
 
-  const routeOptions = [
-    "Select",
-    "Route 1",
-    "Route 2",
-    "Route 3",
-    "RN9823"
-  ];
+  // const routeOptions = [
+  //   "Select",
+  //   "Route 1",
+  //   "Route 2",
+  //   "Route 3",
+  //   "RN9823"
+  // ];
 
   const autoAllocateToOptions = [
     "Select",
@@ -2238,6 +2235,121 @@ const BulkOrder = ({ bidNo }) => {
   const [fromLocationSearchTerm, setFromLocationSearchTerm] = useState("");
   const [toLocationSearchTerm, setToLocationSearchTerm] = useState("");
 
+  const [routeOptions, setRouteOptions] = useState([]);
+  const [showRouteDropdown, setShowRouteDropdown] = useState(false);
+  const [routeSearchTerm, setRouteSearchTerm] = useState("");
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+
+ 
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        // Get plantCode from sessionStorage
+        const obj = JSON.parse(sessionStorage.getItem("authUser"));
+        const plantCode = obj?.data?.plantCode || 'N205';
+
+        setLoadingRoutes(true);
+
+        // Use full configuration for debugging
+        const axiosConfig = {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        
+        };
+
+        const response = await axios.get(
+          `${process.env.REACT_APP_LOCAL_URL_8085 || 'http://localhost:8085'}/routes?plantCode=${plantCode}`,
+          axiosConfig
+        );
+
+      console.log("response Route====>>>>>>>>>",response);
+
+        // Initialize route data
+        let routeData = ['Select'];
+
+        // Multiple parsing strategies
+        const parseStrategies = [
+          () => response.data?.data?.map(route => route.routeName),
+          () => response.data?.map(route => route.routeName),
+          () => response.data?.data?.map(route => route.routeCode),
+          () => response.map(route => route.routeName)
+        ];
+
+        // Try each parsing strategy
+        for (let strategy of parseStrategies) {
+          try {
+            const parsedRoutes = strategy();
+            if (parsedRoutes && parsedRoutes.length > 0) {
+              routeData = [ ...parsedRoutes.filter(r => r)];
+              break;
+            }
+          } catch (strategyError) {
+            console.warn("Strategy failed:", strategyError);
+          }
+        }
+
+        console.log("Final Parsed Routes:", routeData);
+
+        // Update route options
+        if (routeData.length > 0) {
+          setRouteOptions(routeData);
+        } else {
+          console.warn("No routes found in the API response");
+          setRouteOptions(['Select']);
+        }
+
+      } catch (error) {
+        console.error("Comprehensive Route Fetch Error:", {
+          message: error.message,
+          response: error.response,
+          request: error.request
+        });
+
+        // Set fallback
+        setRouteOptions(['Select']);
+
+        // Optional: Toast or error notification
+        toast.error("Failed to load routes. Please try again.", {
+          position: "top-right",
+          autoClose: 3000
+        });
+      } finally {
+        setLoadingRoutes(false);
+      }
+    };
+
+    fetchRoutes();
+  }, []); // No dependencies to run once on mount
+
+  // Existing filteredRoutes logic remains the same
+  const filteredRoutes = useMemo(() => {
+    if (!routeSearchTerm || routeSearchTerm.trim() === '') {
+      return routeOptions;
+    }
+
+    const searchTermLower = routeSearchTerm.toLowerCase();
+    return routeOptions.filter(route =>
+      route && route.toLowerCase().includes(searchTermLower)
+    );
+  }, [routeOptions, routeSearchTerm]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showRouteDropdown && !event.target.closest('.route-dropdown-container')) {
+        setShowRouteDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showRouteDropdown]);
 
   const filteredFromLocations = useMemo(() => {
     if (!fromLocationSearchTerm || fromLocationSearchTerm.trim() === '') {
@@ -3921,8 +4033,8 @@ const BulkOrder = ({ bidNo }) => {
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                     // border: "1px solid #ced4da",
-                     border: "1px solid #ddd",
+                      // border: "1px solid #ced4da",
+                      border: "1px solid #ddd",
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff",
@@ -4054,30 +4166,151 @@ const BulkOrder = ({ bidNo }) => {
                 </div>
               </div>
 
-              <div className="bulk-order-form-group">
+              <div className="bulk-order-form-group route-dropdown-container">
                 <Label className="bulk-order-label">
                   Route <span style={{ color: "red" }}>*</span>
                 </Label>
                 <div style={{ position: "relative" }}>
-                  <Input
-                    type="select"
-                    name="route"
-                    value={values.route}
-                    onChange={handleInputChange}
-                    required
-                    className={`bulk-order-select ${errors.route ? "is-invalid" : ""}`}
+                  {/* Main selector that shows the current selection */}
+                  <div
+                    className="bulk-order-route-selector"
+                    onClick={() => setShowRouteDropdown(!showRouteDropdown)}
                     style={{
+                      height: "38px",
                       color: "#000",
-                      borderColor: errors.route ? "#dc3545" : "",
-                      borderWidth: errors.route ? "2px" : ""
+                      display: "flex",
+                      alignItems: "center",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      padding: "0.375rem 0.75rem",
+                      backgroundColor: "#fff",
+
                     }}
                   >
-                    {routeOptions.map((route, index) => (
-                      <option key={index} value={route} style={{ color: "#000" }}>
-                        {route}
-                      </option>
-                    ))}
-                  </Input>
+                    <span className="bulk-order-route-selector-placeholder" style={{ color: "#000" }}>
+                      {values.route || 'Select'}
+                    </span>
+                    <span style={{ marginLeft: "auto" }}>
+                      <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
+                    </span>
+                  </div>
+
+                  {/* Route dropdown with search functionality */}
+                  {showRouteDropdown && (
+                    <div className="bulk-order-dropdown" style={{
+                      position: "absolute",
+                      width: "100%",
+                      zIndex: 10,
+                      backgroundColor: "#fff",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                      marginTop: "4px",
+                      maxHeight: "300px",
+                      overflowY: "auto"
+                    }}>
+                      {/* Search header */}
+                      <div className="bulk-order-dropdown-header" style={{
+                        padding: "8px",
+                        backgroundColor: "#fff",
+                        borderBottom: "1px solid #ddd"
+                      }}>
+                        <input
+                          type="text"
+                          placeholder="Search"
+                          value={routeSearchTerm}
+                          onChange={(e) => setRouteSearchTerm(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          className="bulk-order-dropdown-search"
+                          style={{
+                            width: "100%",
+                            padding: "8px 12px",
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                            color: "#000",
+                            fontSize: "14px"
+                          }}
+                        />
+                      </div>
+
+                      {/* Loading indicator */}
+                      {loadingRoutes && (
+                        <div style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#4361ee"
+                        }}>
+                          <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
+                          <div style={{ marginTop: "8px" }}>Loading routes...</div>
+                        </div>
+                      )}
+
+                      {/* Empty state */}
+                      {!loadingRoutes && filteredRoutes.length === 0 && (
+                        <div style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#666"
+                        }}>
+                          <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
+                          <div style={{ marginTop: "8px" }}>No routes found</div>
+                        </div>
+                      )}
+
+                      {/* Route list items */}
+                      {!loadingRoutes && filteredRoutes.length > 0 && (
+                        <div className="bulk-order-dropdown-content">
+                          {filteredRoutes.map((route, index) => (
+                            <div
+                              key={index}
+                              className="bulk-order-dropdown-item"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                padding: "10px 8px",
+                                borderBottom: "1px solid #eee",
+                                color: "#000",
+                                cursor: "pointer"
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Only set route if it's not the 'Select' option
+                                if (route !== 'Select') {
+                                  setValues(prevValues => ({
+                                    ...prevValues,
+                                    route: route
+                                  }));
+                                  // Clear error if it exists
+                                  if (errors.route) {
+                                    setErrors(prevErrors => {
+                                      const newErrors = { ...prevErrors };
+                                      delete newErrors.route;
+                                      return newErrors;
+                                    });
+                                  }
+                                }
+                                setRouteSearchTerm("");
+                                setShowRouteDropdown(false);
+
+                                // Update transporters if Route Based is selected
+                                if (values.displayToTransporter === 'Route Based') {
+                                  fetchTransportersByFlag('R', route);
+                                }
+                              }}
+                            >
+                              <div style={{
+                                flex: 1,
+                                fontSize: "14px",
+                                paddingLeft: "10px"
+                              }}>
+                                {route}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {errors.route && (
                     <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
                       {errors.route}

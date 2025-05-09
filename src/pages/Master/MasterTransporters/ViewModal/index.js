@@ -43,27 +43,27 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
 
                     {/* ROW 3: Mean, Mode, Price */}
                     <Row className="g-2 mb-2">
-                       
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Mode Of Transport</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.modeOfTransport}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.modeTransport}</p>
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Price (Per KM)</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.pricePerKm || "10"}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.priceKm || "10"}</p>
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Term Of Payment</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.termsOfPayment}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.termPayment}</p>
                         </Col>
                     </Row>
 
                     {/* ROW 4: Term, Tax, Region */}
                     <Row className="g-2 mb-2">
-                     
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Tax Information</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.taxInformation}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.taxInfo}</p>
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Region/Location</Label>
@@ -77,7 +77,7 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
 
                     {/* ROW 5: SLA, GST, PAN */}
                     <Row className="g-2 mb-2">
-                       
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">GST No.</Label>
                             <p className="form-control form-control-sm bg-light mb-0">{viewData.gstnNo}</p>
@@ -88,22 +88,24 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Allowed for Bidding</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.allowedForBidding}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">
+                                {viewData.allowedBidding === true ? 'Yes' : 'No'}
+                            </p>
                         </Col>
                     </Row>
 
                     {/* ROW 6: Bidding, Status, Rating */}
                     <Row className="g-2 mb-2">
-                       
+
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Status</Label>
                             <p className="form-control form-control-sm bg-light mb-0">
-                                {viewData.status === 'A' ? 'Active' : 
-                                viewData.status === 'D' ? 'Deactive' : 
-                                viewData.status}
+                                {viewData.status === 'A' ? 'Active' :
+                                    viewData.status === 'D' ? 'Deactive' :
+                                        viewData.status}
                             </p>
                         </Col>
-                      
+
 
 
 
@@ -122,7 +124,7 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                         </Col>
                     </Row>
 
-                  
+
                 </div>
             </ModalBody>
             <ModalFooter>

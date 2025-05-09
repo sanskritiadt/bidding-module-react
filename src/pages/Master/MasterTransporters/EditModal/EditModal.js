@@ -20,6 +20,19 @@ const EditModal = ({
         },
     ];
 
+
+    const validatePAN = (panNumber) => {
+        if (!panNumber) return true; // Allow empty for initial state
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        return panRegex.test(panNumber);
+    };
+
+    const validateGST = (gstNumber) => {
+        if (!gstNumber) return true; // Allow empty for initial state
+        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        return gstRegex.test(gstNumber);
+    };
+
     return (
         <Modal id="showModal" isOpen={isOpen} toggle={toggle} centered size="lg">
             <ModalHeader className="bg-light p-3" toggle={toggle}>
@@ -28,8 +41,6 @@ const EditModal = ({
             <Form className="tablelist-form" onSubmit={handleSubmit}>
                 <ModalBody className="p-3">
                     <div>
-                        <h5 className="modal-title mb-2">Transporter Details</h5>
-
                         {/* ROW 1: Code, Name, Address */}
                         <div className="d-flex mb-2">
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
@@ -42,7 +53,7 @@ const EditModal = ({
                                     id="code"
                                     name="code"
                                     placeholder="Enter Transporter Code"
-                                    value={values.code}
+                                    value={values.code||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -57,7 +68,7 @@ const EditModal = ({
                                     id="name"
                                     name="name"
                                     placeholder="Enter Transporter Name"
-                                    value={values.name}
+                                    value={values.name||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -72,7 +83,7 @@ const EditModal = ({
                                     id="address"
                                     name="address"
                                     placeholder="Enter Address"
-                                    value={values.address}
+                                    value={values.address||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -91,7 +102,7 @@ const EditModal = ({
                                     id="contactPerson"
                                     name="contactPerson"
                                     placeholder="Enter Contact Person"
-                                    value={values.contactPerson}
+                                    value={values.contactPerson||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -106,7 +117,7 @@ const EditModal = ({
                                     id="contactNumber"
                                     name="contactNumber"
                                     placeholder="Enter Phone Number"
-                                    value={values.contactNumber}
+                                    value={values.contactNumber||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -121,7 +132,7 @@ const EditModal = ({
                                     id="contactEmail"
                                     name="contactEmail"
                                     placeholder="Enter Email ID"
-                                    value={values.contactEmail}
+                                    value={values.contactEmail||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -130,35 +141,17 @@ const EditModal = ({
 
                         {/* ROW 3: Mean, Mode, Price */}
                         <div className="d-flex mb-2">
-                            <div className="flex-grow-1" style={{ width: '33.33%' }}>
-                                <Label htmlFor="meanOfTransport" className="form-label mb-1">
-                                    Mean Of Transport<span style={{ color: "red" }}>*</span>
-                                </Label>
-                                <Input
-                                    type="select"
-                                    required
-                                    id="meanOfTransport"
-                                    name="meanOfTransport"
-                                    value={values.meanOfTransport}
-                                    onChange={handleInputChange}
-                                    className="form-select"
-                                >
-                                    <option value="">Select Mean</option>
-                                    <option value="Truck">Truck</option>
-                                    <option value="Van">Van</option>
-                                    <option value="Container">Container</option>
-                                </Input>
-                            </div>
+
                             <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
-                                <Label htmlFor="modeOfTransport" className="form-label mb-1">
+                                <Label className="form-label mb-1">
                                     Mode Of Transport<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="select"
                                     required
-                                    id="modeOfTransport"
-                                    name="modeOfTransport"
-                                    value={values.modeOfTransport}
+                                    id="modeTransport"
+                                    name="modeTransport"
+                                    value={values.modeTransport||""}
                                     onChange={handleInputChange}
                                     className="form-select"
                                 >
@@ -171,16 +164,16 @@ const EditModal = ({
                                 </Input>
                             </div>
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
-                                <Label htmlFor="pricePerKm" className="form-label mb-1">
+                                <Label className="form-label mb-1">
                                     Price (Per KM)<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="number"
                                     required
-                                    id="pricePerKm"
-                                    name="pricePerKm"
+                                    id="priceKm"
+                                    name="priceKm"
                                     placeholder="Enter Price Per KM"
-                                    value={values.pricePerKm}
+                                    value={values.priceKm ||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -196,17 +189,15 @@ const EditModal = ({
                                 <Input
                                     type="select"
                                     required
-                                    id="termsOfPayment"
-                                    name="termsOfPayment"
-                                    value={values.termsOfPayment}
+                                    id="termPayment"
+                                    name="termPayment"
+                                    value={values.termPayment||""}
                                     onChange={handleInputChange}
                                     className="form-select"
                                 >
                                     <option value="">Select Term</option>
                                     <option value="Online">Online</option>
-                                    <option value="Net30">Net 30</option>
-                                    <option value="Net45">Net 45</option>
-                                    <option value="Net60">Net 60</option>
+                                    <option value="Online">Cash</option>
                                 </Input>
                             </div>
                             <div className="flex-grow-1 mx-2" style={{ width: '33.33%' }}>
@@ -216,10 +207,10 @@ const EditModal = ({
                                 <Input
                                     type="text"
                                     required
-                                    id="taxInformation"
-                                    name="taxInformation"
+                                    id="taxInfo"
+                                    name="taxInfo"
                                     placeholder="Enter Tax Information"
-                                    value={values.taxInformation}
+                                    value={values.taxInfo||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -234,7 +225,7 @@ const EditModal = ({
                                     id="regionLocation"
                                     name="regionLocation"
                                     placeholder="Enter Region/Location"
-                                    value={values.regionLocation}
+                                    value={values.regionLocation||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -253,7 +244,7 @@ const EditModal = ({
                                     id="serviceLevelAgreement"
                                     name="serviceLevelAgreement"
                                     placeholder="Enter SLA"
-                                    value={values.serviceLevelAgreement}
+                                    value={values.serviceLevelAgreement||""}
                                     onChange={handleInputChange}
                                     className="form-control"
                                 />
@@ -268,10 +259,15 @@ const EditModal = ({
                                     id="gstnNo"
                                     name="gstnNo"
                                     placeholder="Enter GST No."
-                                    value={values.gstnNo}
+                                    value={values.gstnNo||""}
                                     onChange={handleInputChange}
-                                    className="form-control"
+                                    className={`form-control ${values.gstnNo && !validateGST(values.gstnNo) ? 'is-invalid' : ''}`}
                                 />
+                                {values.gstnNo && !validateGST(values.gstnNo) && (
+                                    <div className="invalid-feedback">
+                                        Invalid GST format. Should be like: 27AAPFU0939F1ZV
+                                    </div>
+                                )}
                             </div>
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
                                 <Label htmlFor="panNo" className="form-label mb-1">
@@ -283,25 +279,30 @@ const EditModal = ({
                                     id="panNo"
                                     name="panNo"
                                     placeholder="Enter PAN No."
-                                    value={values.panNo}
+                                    value={values.panNo||""}
                                     onChange={handleInputChange}
-                                    className="form-control"
+                                    className={`form-control ${values.panNo && !validatePAN(values.panNo) ? 'is-invalid' : ''}`}
                                 />
+                                {values.panNo && !validatePAN(values.panNo) && (
+                                    <div className="invalid-feedback">
+                                        Invalid PAN format. Should be like: ABCDE1234F
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* ROW 6: Bidding, Status, Rating - Reordered as requested */}
                         <div className="d-flex mb-2">
                             <div className="flex-grow-1" style={{ width: '33.33%' }}>
-                                <Label htmlFor="allowedForBidding" className="form-label mb-1">
+                                <Label htmlFor="allowedBidding" className="form-label mb-1">
                                     Allowed for Bidding<span style={{ color: "red" }}>*</span>
                                 </Label>
                                 <Input
                                     type="select"
                                     required
-                                    id="allowedForBidding"
-                                    name="allowedForBidding"
-                                    value={values.allowedForBidding}
+                                    id="allowedBidding"
+                                    name="allowedBidding"
+                                    value={values.allowedBidding}
                                     onChange={handleInputChange}
                                     className="form-select"
                                 >
@@ -376,3 +377,5 @@ const EditModal = ({
 };
 
 export default EditModal;
+
+

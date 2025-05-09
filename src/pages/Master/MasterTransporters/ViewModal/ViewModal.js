@@ -53,7 +53,7 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Price (Per KM)</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{viewData.priceKm }</p>
+                            <p className="form-control form-control-sm bg-light mb-0">{viewData.priceKm}</p>
                         </Col>
                     </Row>
 
@@ -93,7 +93,9 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                     <Row className="g-2 mb-2">
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Allowed for Bidding</Label>
-                            <p className="form-control form-control-sm bg-light mb-0">{String(viewData.allowedBidding)}</p>
+                            <p className="form-control form-control-sm bg-light mb-0">
+                                {viewData.allowedBidding === true ? 'Yes' : 'No'}
+                            </p>
                         </Col>
                         <Col md={4}>
                             <Label className="form-label mb-0 fw-semibold">Status</Label>
