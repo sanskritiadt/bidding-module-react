@@ -214,7 +214,7 @@ const SOBasedOrder = ({ bidNo }) => {
       const obj = JSON.parse(sessionStorage.getItem("authUser"));
       let plantCode = obj.data.plantCode;
 
-      const apiUrl = `http://localhost:8085/api/transporters/allTransportersByFlag?flag=A&filterParam=${plantCode}`;
+      const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/allTransportersByFlag?flag=A&filterParam=${plantCode}`;
       console.log("Fetching transporters from:", apiUrl);
 
       const response = await fetch(apiUrl, {
@@ -789,7 +789,7 @@ const SOBasedOrder = ({ bidNo }) => {
         console.log("Date format being tested for bid dates:", formatDateForAPI(new Date()));
 
         // API call with enhanced error handling
-        const response = await fetch('http://localhost:8085/biddingMaster/bulk', {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/bulk`, {
           method: 'POST',
           headers: getAuthHeaders(),
           body: JSON.stringify(apiData)

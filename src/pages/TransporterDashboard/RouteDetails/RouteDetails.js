@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+//latest code 
+import React, { useState, useEffect } from "react";
 import { 
   Container, 
   Row, 
@@ -21,92 +22,199 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 // Import Export Modal
 import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
+import Loader from "../../../Components/Common/Loader";
 
 const RouteDetails = () => {
-    // Dummy data based on Figma image
-    const dummyRoutes = [
-        {
-            id: 1,
-            routeCode: "1001",
-            routeName: "Berlin",
-            departureLocation: "Gurugram",
-            destinationLocation: "Ludiyana",
-            disMTce: "984 Km",
-            rType: "Rail",
-            routeType: "Road",
-            transportationGroup: "Truck",
-            deliveryTime: "4",
-            shippingCondition: "SMTdard",
-            routeDeterminateCriteria: "Automatic",
-            intermediateStops: "Mumbai, Delhi",
-            dismtce: "1734",
-            transportationCost: "50,000",
-            carrier: "Berlin Carrier",
-            routeSelection: "Fastest",
-            transportationZone: "Region 1"
-        },
-        {
-            id: 2,
-            routeCode: "1002",
-            routeName: "Hawra",
-            departureLocation: "Noida",
-            destinationLocation: "Hyderabad",
-            disMTce: "234 Km",
-            rType: "Ship"
-        },
-        {
-            id: 3,
-            routeCode: "1003",
-            routeName: "Chennai",
-            departureLocation: "Chennai",
-            destinationLocation: "Tirupati",
-            disMTce: "345Km",
-            rType: "Road"
-        },
-        {
-            id: 4,
-            routeCode: "1004",
-            routeName: "Hyderabad",
-            departureLocation: "Panudherry",
-            destinationLocation: "Ludhiyana",
-            disMTce: "294Km",
-            rType: "Ship"
-        },
-        {
-            id: 5,
-            routeCode: "1005",
-            routeName: "Delhi",
-            departureLocation: "Hyderabad",
-            destinationLocation: "Chennai",
-            disMTce: "93Km",
-            rType: "Rail"
-        }
-    ];
-
-    const [routes] = useState(dummyRoutes);
+    const [routes, setRoutes] = useState([]);
     const [viewModal, setViewModal] = useState(false);
     const [selectedRoute, setSelectedRoute] = useState(null);
     // Export Modal state
     const [isExportCSV, setIsExportCSV] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [loginCode, setLoginCode] = useState('');
+ 
+const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-    const handleViewClick = (routeId) => {
-        const route = routes.find(r => r.id === routeId);
-        setSelectedRoute(route);
-        toggleViewModal();
+ 
+    useEffect(() => {
+        try {
+            const storedData = sessionStorage.getItem("main_menu_login");
+            
+            if (storedData) {
+                const obj = JSON.parse(storedData);
+                
+                // Access login directly from the object as shown in your session storage
+                if (obj && obj.login) {
+                    let Code = obj.login;
+                    setLoginCode(Code);
+                    console.log("here is the Login code found in route details -------->", Code);
+                } else {
+                    console.warn("Login data structure is not as expected");
+                }
+            } else {
+                console.warn("No login data found in session storage");
+            }
+        } catch (error) {
+            console.error("Error accessing login data:", error);
+        }
+    }, []);
+
+    // Fetch data from API when loginCode is available
+    useEffect(() => {
+        if (loginCode) {
+            fetchRoutes();
+        }
+    }, [loginCode]); // <- Now depends on loginCode
+
+    const fetchRoutes = async () => {
+        setLoading(true);
+        try {
+            // Check if loginCode is available
+            if (!loginCode) {
+                console.error("Login code not available");
+                toast.error("Login code not available. Please log in again.");
+                setLoading(false);
+                return;
+            }
+            
+            // Use the login code in the API URL
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/${loginCode}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log("Transporter API Response:", data);
+            
+            // Handle the different response structure
+            if (data && data.data) {
+                // Since this API returns a single transporter object instead of an array,
+                // we need to convert it to an array format for the table
+                const transporterData = data.data;
+                
+                // Create a routes array with the transporter data with proper fallbacks
+                const routesData = [{
+                    id: transporterData.id,
+                    routeCode: transporterData.code || "N/A",
+                    routeName: transporterData.name || "N/A",
+                    plantCode: transporterData.plantCode || "N/A",
+                    routeDestination: transporterData.regionLocation || transporterData.address || "N/A",
+                    
+                    // Contact information
+                    contactPerson: transporterData.contactPerson || "N/A",
+                    contactNumber: transporterData.contactNumber || "N/A",
+                    contactEmail: transporterData.contactEmail || "N/A",
+                    
+                    // Owner information
+                    ownerPerson: transporterData.ownerPerson || "N/A",
+                    ownerNumber: transporterData.ownerNumber || "N/A",
+                    ownerEmail: transporterData.ownerEmail || "N/A",
+                    
+                    // Business information
+                    gstnNo: transporterData.gstnNo || "N/A",
+                    panNo: transporterData.panNo || "N/A",
+                    
+                    // Additional fields
+                    status: transporterData.status || "N/A",
+                    priceKm: transporterData.priceKm || "N/A",
+                    companyCode: transporterData.companyCode || "N/A",
+                    city: transporterData.city || "N/A",
+                    movementCode: transporterData.movementCode || "N/A",
+                    modeTransport: transporterData.modeTransport || "N/A",
+                    termPayment: transporterData.termPayment || "N/A",
+                    transporterRating: transporterData.transporterRating || "N/A",
+                    taxInfo: transporterData.taxInfo || "N/A",
+                    serviceLevelAgreement: transporterData.serviceLevelAgreement || "N/A",
+                    allowedBidding: transporterData.allowedBidding || "N/A",
+                    address: transporterData.address || "N/A"
+                }];
+                
+                console.log("Processed route data:", routesData);
+                setRoutes(routesData);
+                
+                if (data.meta && data.meta.message) {
+                    console.log("API Success Message:", data.meta.message);
+                    toast.success(data.meta.message);
+                }
+            } else {
+                console.error("Invalid data structure:", data);
+                toast.error("Invalid data format received from API");
+            }
+        } catch (error) {
+            console.error("Error fetching transporter data:", error);
+            toast.error("Failed to fetch transporter data. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
+
+
+    const handleView = async (routeId) => {
+        try {
+          setLoading(true);
+          const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${routeId}`, {
+            method: "GET",
+            headers: {
+              Authorization: "Basic YW1hemluOlRFQE0tV0BSSw==",
+               'Content-Type': 'application/json'
+            },
+       
+          });
+      
+          if (!response.ok) {
+            throw new Error("Failed to fetch route details");
+          }
+      
+          const result = await response.json();
+          setSelectedRoute(result?.data); // Set response to state
+          setIsViewModalOpen(true);       // Open the modal
+        } catch (error) {
+          console.error("Fetch error:", error);
+          toast.error("Failed to fetch route data");
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+
+
+
+const handleViewClick = (routeId) => {
+    console.log("Clicked route ID:", routeId);
+    
+    // Find the route directly
+    const route = routes.find(r => String(r.id) === String(routeId));
+    
+    if (route) {
+        // Set selected route and open modal
+        setSelectedRoute(route);
+        setViewModal(true);
+    } else {
+        console.error("Route not found for ID:", routeId);
+        toast.error("Route details not found");
+    }
+};
     const toggleViewModal = () => {
+        // Simply toggle the modal visibility
         setViewModal(!viewModal);
     };
 
-    // NEW: Handle the download functionality
+    // Handle the download functionality
     const handleDownload = (e) => {
         e.preventDefault();
         downloadCSV();
         setIsExportCSV(false);
     };
 
-    // NEW: Download CSV function
+    // Download CSV function
     const downloadCSV = () => {
         if (routes.length === 0) {
             toast.warning("No data available to export", {
@@ -120,10 +228,10 @@ const RouteDetails = () => {
         const headers = [
             "Route Code",
             "Route Name",
-            "Departure Location",
-            "Destination Location",
-            "DisMTce",
-            "R-Type"
+            "Plant Code",
+            "Route Destination",
+            "Contact Person",
+            "Contact Number"
         ].join(',') + '\n';
 
         // Create CSV rows
@@ -131,10 +239,10 @@ const RouteDetails = () => {
             [
                 route.routeCode,
                 route.routeName,
-                route.departureLocation,
-                route.destinationLocation,
-                route.disMTce,
-                route.rType
+                route.plantCode,
+                route.routeDestination,
+                route.contactPerson,
+                route.contactNumber
             ].join(',')
         ).join('\n');
 
@@ -154,7 +262,65 @@ const RouteDetails = () => {
         document.body.removeChild(a);
     };
 
-    // Routes Column based on Figma image
+    const ModalStyles = `
+    /* Reduced vertical spacing between input fields */
+    .compact-modal .form-label {
+      margin-bottom: 2px;
+    }
+    
+    .compact-modal .mb-2 {
+      margin-bottom: 0.5rem !important;
+    }
+    
+    /* Further reduce spacing for view modal */
+    .compact-modal .mb-1 {
+      margin-bottom: 0.25rem !important;
+    }
+    
+    /* Gap between modal header and input fields */
+    .compact-modal .modal-body {
+      padding-top: 1rem;
+    }
+    
+    /* Make form fields more compact in height */
+    .compact-modal .form-control,
+    .compact-modal .form-select {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      min-height: 32px;
+    }
+    
+    /* For View Modal */
+    .compact-modal .form-control-sm {
+      padding-top: 0.15rem;
+      padding-bottom: 0.15rem;
+      min-height: 24px;
+    }
+    
+    /* Reduce spacing between rows */
+    .compact-modal .g-2 {
+      --bs-gutter-y: 0.3rem;
+    }
+    
+    /* Optimize spacing for the Edit Modal */
+    .compact-modal .g-3 {
+      --bs-gutter-y: 0.75rem;
+    }
+    
+    /* Even more compact label in view modal */
+    .compact-modal .fw-semibold.mb-1 {
+      margin-bottom: 0 !important;
+      font-size: 0.85rem;
+    }
+    
+    /* Reduce padding in the form-control-sm elements */
+    .compact-modal .form-control-sm.py-1 {
+      padding-top: 0.1rem !important;
+      padding-bottom: 0.1rem !important;
+    }
+  `;
+
+    // Routes Column based on API response structure
     const columns = React.useMemo(
         () => [
             {
@@ -163,28 +329,28 @@ const RouteDetails = () => {
                 filterable: false,
             },
             {
-                Header: "Route name",
+                Header: "Route Name",
                 accessor: "routeName",
                 filterable: false,
             },
             {
-                Header: "Departure Location",
-                accessor: "departureLocation",
+                Header: "Plant Code",
+                accessor: "plantCode",
                 filterable: false,
             },
             {
-                Header: "Destination Location",
-                accessor: "destinationLocation",
+                Header: "Route Destination",
+                accessor: "routeDestination",
                 filterable: false,
             },
             {
-                Header: "DisMTce",
-                accessor: "disMTce",
+                Header: "Contact Person",
+                accessor: "contactPerson",
                 filterable: false,
             },
             {
-                Header: "R-Type",
-                accessor: "rType",
+                Header: "Contact Number",
+                accessor: "contactNumber",
                 filterable: false,
             },
             {
@@ -195,7 +361,7 @@ const RouteDetails = () => {
                             <Link
                                 to="#"
                                 className="text-info d-inline-block"
-                                onClick={() => handleViewClick(cellProps.row.original.id)}
+                                onClick={() => handleView(cellProps.row.original.id)}
                             >
                                 <i className="ri-eye-line fs-16"></i>
                             </Link>
@@ -211,6 +377,7 @@ const RouteDetails = () => {
 
     return (
         <React.Fragment>
+            <style>{ModalStyles}</style>
             <div className="page-content">
                 <Container fluid>
                     <BreadCrumb title="Transporter Route Details" pageTitle="Transporter Route Details" />
@@ -234,19 +401,33 @@ const RouteDetails = () => {
                                     </Row>
                                 </CardHeader>
                                 <div className="card-body pt-0">
-                                    <div>
-                                        <TableContainer
-                                            columns={columns}
-                                            data={routes}
-                                            isGlobalFilter={true}
-                                            isAddUserList={false}
-                                            customPageSize={5}
-                                            className="custom-header-css"
-                                            theadClass="text-muted"
-                                            SearchPlaceholder='Search...'
-                                        />
-                                    </div>
-                                    <ToastContainer closeButton={false} limit={1} />
+                                    {loading ? (
+                                        <Loader />
+                                    ) : (
+                                        <div>
+                                            <TableContainer
+                                                columns={columns}
+                                                data={routes}
+                                                isGlobalFilter={true}
+                                                isAddUserList={false}
+                                                customPageSize={5}
+                                                className="custom-header-css"
+                                                theadClass="text-muted"
+                                                SearchPlaceholder='Search...'
+                                            />
+                                        </div>
+                                    )}
+                                <ToastContainer closeButton={false} limit={1}
+                                         position="top-right"
+                                         autoClose={3000}
+                                         hideProgressBar={false}
+                                         closeOnClick
+                                         rtl={false}
+                                         pauseOnFocusLoss
+                                         draggable
+                                         pauseOnHover
+                                         theme="light"
+                                         toastStyle={{ backgroundColor: "white" }} />
                                 </div>
                             </Card>
                         </Col>
@@ -254,124 +435,141 @@ const RouteDetails = () => {
                 </Container>
             </div>
 
-            {/* Route Details Modal */}
-            <Modal isOpen={viewModal} toggle={toggleViewModal} centered size="lg">
-                <ModalHeader toggle={toggleViewModal}>
-                    Route Details
-                </ModalHeader>
-                <ModalBody>
-                    {selectedRoute && (
-                        <div>
-                            <Row className="mb-3">
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Route Code</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.routeCode}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Route Name</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.routeName}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Departure Location</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.departureLocation}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Destination Location</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.destinationLocation}</div>
-                                    </div>
-                                </Col>
-                            </Row>
-                            
-                            <Row className="mb-3">
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Route Type</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.routeType || "Road"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Transportation Group</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.transportationGroup || "Truck"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Delivery Time (Hours)</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.deliveryTime || "4"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Shipping Condition</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.shippingCondition || "SMTdard"}</div>
-                                    </div>
-                                </Col>
-                            </Row>
-                            
-                            <Row className="mb-3">
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Route Determinate Criteria</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.routeDeterminateCriteria || "Automatic"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Intermediate Stops</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.intermediateStops || "Mumbai, Delhi"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">DISMTCE (KM)</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.dismtce || "1734"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Transportation Cost</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.transportationCost || "50,000"}</div>
-                                    </div>
-                                </Col>
-                            </Row>
-                            
-                            <Row className="mb-3">
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Carrier</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.carrier || "Berlin Carrier"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Route Selection</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.routeSelection || "Fastest"}</div>
-                                    </div>
-                                </Col>
-                                <Col md={3}>
-                                    <div className="form-group">
-                                        <Label className="form-label">Transportation Zone</Label>
-                                        <div className="border-bottom pb-2">{selectedRoute.transportationZone || "Region 1"}</div>
-                                    </div>
-                                </Col>
-                            </Row>
-                        </div>
-                    )}
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="secondary" onClick={toggleViewModal}>
-                        Cancel
-                    </Button>
-                </ModalFooter>
-            </Modal>
+  {/* Route Details Modal */}
+{/* Route Details Modal */}
+<Modal isOpen={isViewModalOpen} toggle={() => setIsViewModalOpen(false)}>
+<ModalHeader toggle={() => setIsViewModalOpen(false)}>View Route</ModalHeader>
+    
+    <ModalBody className="p-3">
+        {selectedRoute ? (
+            <div>
+                {/* Row 1: Basic Route Information */}
+                <Row className="g-2 mb-2">
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Code</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeCode || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Name</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeName || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Plant Code</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.plantCode || ""}</p>
+                    </Col>
+                </Row>
+
+                {/* Row 2: Route Details */}
+                <Row className="g-2 mb-2">
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Destination</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeDestination || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Type</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeType || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Transportation Type</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.modeTransport || ""}</p>
+                    </Col>
+                </Row>
+
+                {/* Row 3: Delivery Information */}
+                <Row className="g-2 mb-2">
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Delivery Date</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">
+                            {selectedRoute.deliveryDate ? new Date(selectedRoute.deliveryDate).toLocaleString() : ""}
+                        </p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Shipping Type</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.shippingType || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Determination</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeDetermination || ""}</p>
+                    </Col>
+                </Row>
+
+                {/* Row 4: Route Details */}
+                <Row className="g-2 mb-2">
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Intermediate Stops</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.intermediateStops || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Distance</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeDistance || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Transportation Cost</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.transportationCost || ""}</p>
+                    </Col>
+                </Row>
+
+                {/* Row 5: Additional Information */}
+                <Row className="g-2 mb-2">
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Carrier</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.carrier || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Route Selection</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.routeSelection || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Transportation Zone</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.transportationZone || ""}</p>
+                    </Col>
+                </Row>
+
+                {/* Row 6: Final Details */}
+                <Row className="g-2 mb-2">
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Shipping Point</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.shippingPoint || ""}</p>
+                    </Col>
+                    <Col md={4}>
+                        <Label className="form-label mb-0 fw-semibold">Status</Label>
+                        <p className="form-control form-control-sm bg-light mb-0">
+                            {selectedRoute.status === 'A' ? 'Active' : 
+                             selectedRoute.status === 'D' ? 'Deactive' : 
+                             selectedRoute.status || ""}
+                        </p>
+                    </Col>
+                    {/* You can add another field here if needed */}
+                </Row>
+
+                {/* Contact Information if available */}
+                {selectedRoute.contactPerson && (
+                    <Row className="g-2 mb-2">
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Contact Person</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.contactPerson || ""}</p>
+                        </Col>
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Contact Number</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.contactNumber || ""}</p>
+                        </Col>
+                        <Col md={4}>
+                            <Label className="form-label mb-0 fw-semibold">Contact Email</Label>
+                            <p className="form-control form-control-sm bg-light mb-0">{selectedRoute.contactEmail || ""}</p>
+                        </Col>
+                    </Row>
+                )}
+            </div>
+        ) : (
+            <div className="text-center">
+                <p>No route data available</p>
+            </div>
+        )}
+    </ModalBody>
+    <ModalFooter>
+        <button type="button" className="btn btn-light btn-sm" onClick={toggleViewModal}>Close</button>
+    </ModalFooter>
+</Modal>
 
             {/* Export CSV Modal */}
             {isExportCSV && (

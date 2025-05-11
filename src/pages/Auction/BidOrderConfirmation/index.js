@@ -31,7 +31,7 @@ const BidOrderConfirmation = () => {
         method: 'get',
 
 
-        url: `http://localhost:8085/biddingMaster/getBidNo?plantCode=${plantcode}`,
+        url: `${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getBidNo?plantCode=${plantcode}`,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='

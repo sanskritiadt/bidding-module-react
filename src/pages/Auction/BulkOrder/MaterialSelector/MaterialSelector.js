@@ -45,7 +45,7 @@ const MaterialSelector = ({ value, onChange, required }) => {
         
         // Make API request
         const response = await fetch(
-          `http://localhost:8085/materials?plantCode=${plantCode}`,
+          `${process.env.REACT_APP_LOCAL_URL_8082}/materials?plantCode=${plantCode}`,
           {
             method: 'GET',
             headers: getAuthHeaders()

@@ -392,7 +392,7 @@ import ViewAllBids from "../pages/Auction/DashBoard/AllBids";
 import TransporterDashboard from "../pages/TransporterDashboard/DashBoard";
 import ViewTransporterBids from '../pages/TransporterDashboard/DashBoard/AllBids'
 import RouteDetails from "../pages/TransporterDashboard/RouteDetails/RouteDetails";
-
+import SlotMaster from "../pages/Master/MasterSlot";
 
   
 const authProtectedRoutes = [
@@ -433,6 +433,8 @@ const authProtectedRoutes = [
   { path: "/plants", component: <MasterPlants /> },
   { path: "/transporter", component: <MasterTransporter /> },
   { path: "/route", component: <MasterRoute /> },
+  { path: "/slot", component: <SlotMaster /> },
+
   { path: "/roles", component: <MasterRoles /> },
   { path: "/vehicle", component: <MasterVehicle /> },
   { path: "/device", component: <MasterDevice /> },

@@ -317,6 +317,46 @@
         }
     }
 }
+.for-truck-css{
+    line-height: 0;
+    position: relative;
+    padding-top: 11px !important;
+    top: 6px;
+    left: 11px;
+    font-size: 22px !important;
+}
+.new-custom-forbadge{
+    width: 61px !important;
+    height: 22px !important;
+    gap: 10px;
+    border-radius: 4px;
+    padding-top: 4px;
+    padding-right: 8px;
+    color:#fff !important;
+    padding-bottom: 4px;
+    font-size: 13px !important;
+    padding-left: 8px;
+    background: #0F8704;
+}
+#event-modal {
+    .event-details1 {
+        display: flex;
+    }
+ 
+    .view-event {
+        .event-form {
+            display: none;
+        }
+ 
+        #event-category-tag {
+            display: none;
+        }
+ 
+        .event-details1 {
+            display: none;
+        }
+    }
+}
 
 .fc-daygrid-event-harness {
     .fc-daygrid-event {
