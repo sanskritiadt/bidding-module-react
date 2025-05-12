@@ -290,15 +290,15 @@ const Navdata = () => {
         isMultiLevel
     ]);
 
-    const menuItems = Ar;
-    /* const menuItems = [
+    // const menuItems = Ar;
+     const menuItems = [
          {
              label: "Menu",
              isHeader: true,
          },
          {
              id: "dashboard",
-             label: "Dashboards",
+             label: "Demo",
              icon: "ri-dashboard-2-line",
              link: "/",
              stateVariables: isDashboard,
@@ -311,244 +311,126 @@ const Navdata = () => {
              subItems: [
                  {
                      id: "dashboard-seq",
-                     label: "Sequence Dashbaord",
-                     link: "/charts-echarts",
+                     label: " Create Bid",
+                     link: "/bid-order-confirmation",
                      parentId: "dashboard",
                  },
                  {
-                     id: "dashboard-gate",
-                     label: "Gate In Dashboard",
-                     //link: "/charts-chartjs",
-                   //  link: '/apps-job-details',
-                     link : "/apps-job-companies-lists",
-                     parentId: "dashboard",
-                 },{
-                     id: "dashboard-gate",
-                     label: "Gate Out Dashboard",
-                     
-                    // link: "/charts-chartjs",
-                     link: "/apps-tasks-list-view",
-                     parentId: "dashboard",
-                 },
+                    id: "transporter",
+                    label: "Transporter Master",
+                    link: "/transporter",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "route",
+                    label: "Route Master",
+                    link: "/route",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "transporter plant mapping",
+                    label: "Transporter Plant Mapping",
+                    link: "/plant-mapping",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "transporter route mapping",
+                    label: "Transporter Route Mapping",
+                    link: "/route-mapping",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "slot master",
+                    label: "Slot Master",
+                    link: "/slot",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "transporter route details",
+                    label: "Transporter Route Details",
+                    link: "/transporter-route-details",
+                    parentId: "dashboard",
+                },
+             
+             
              ],
-         },
-         {
-             id: "apps",
-             label: "Master",
-             icon: "ri-apps-2-line",
-             link: "/#",
-             click: function (e) {
-                 e.preventDefault();
-                 setIsApps(!isApps);
-                 setIscurrentState('Apps');
-                 updateIconSidebar(e);
-             },
-             stateVariables: isApps,
-             subItems: [
-                 {
-                     id: "customer",
-                     label: "Customer Master",
-                     link: "/customer-master",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "device",
-                     label: "Device Master",
-                     link: "/device",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "deviceType",
-                     label: "Device Type Master",
-                     link: "/deviceType",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "department",
-                     label: "Department Master",
-                     link: "/department",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "cluster",
-                     label: "Cluster Master",
-                     link: "/cluster",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "company",
-                     label: "Company Master",
-                     link: "/company",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "commomConstant",
-                     label: "Common Constants Master",
-                     link: "/commonConstant",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "commomShift",
-                     label: "Common Shift Master",
-                     link: "/commomShift",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "material",
-                     label: "Material Master",
-                     link: "/material",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "material-types",
-                     label: "Material Type Master",
-                     link: "/material-types",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "driver-masters",
-                     label: "Driver Master",
-                     link: "/driver",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "roles-master",
-                     label: "Role Master",
-                     link: "/roles",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "plants-master",
-                     label: "Plant Master",
-                     link: "/plants",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "main-menu",
-                     label: "Main Menu Master",
-                     link: "/main-menu",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "sub-menu",
-                     label: "Sub Menu Master",
-                     link: "/sub-menu",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "movements",
-                     label: "Movement Master",
-                     link: "/movements",
-                     parentId: "apps",
-                 },
-                 // {
-                 //     id: "transporterMaster",
-                 //     label: "Transporter Master",
-                 //     link: "/transporter-master",
-                 //     parentId: "apps",
-                 // },
-                 {
-                     id: "vehicle",
-                     label: "Vehicle Master",
-                     link: "/vehicle",
-                     parentId: "apps",
-                 },                
-                 {
-                     id: "stage",
-                     label: "Stage Master",
-                     link: "/stage",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "vehicleMap",
-                     label: "Vehicle Tag Mapping",
-                     link: "/vehicle-tag-mapping",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "module",
-                     label: "Module Master",
-                     link: "/module-master",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "plan",
-                     label: "Plan Master",
-                     link: "/plan-master",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "interface",
-                     label: "Interface Master",
-                     link: "/interface",
-                     parentId: "apps",
-                 },                
-                 {
-                     id: "documentTypeMaster",
-                     label: "Document Type Master",
-                     link: "/document-type-mastrer",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "stageLocation",
-                     label: "Stage Location Master",
-                     link: "/stage-location",
-                     parentId: "apps",
-                 },
-                 {
-                     id: "users",
-                     label: "User Master",
-                     link: "/users",
-                     parentId: "apps",
-                 },
-             ],
-         },{
-             id: "reports",
-             label: "Reports",
-             icon: "ri-apps-2-line",
-             link: "/#",
-             click: function (e) {
-                 e.preventDefault();
-                 setIsReport(!isReport);
-                 setIscurrentState('Report');
-                 updateIconSidebar(e);
-             },
-             stateVariables: isReport,
-             subItems: [
-                 {
-                     id: "csr",
-                     label: "CSR Report",
-                     link: "/report-csr",
-                     parentId: "reports",
-                 },
-                 {
-                     id: "pmr",
-                     label: "PMR Report",
-                     link: "/report-pmr",
-                     parentId: "reports",
-                 },
-                 {
-                     id: "tag-mapping",
-                     label: "TAG Mapping",
-                     link: "/tagMapping",
-                     parentId: "reports",
-                 },
-                 {
-                     id: "tolerance",
-                     label: "Tolerance Report",
-                     link: "/tolerance",
-                     parentId: "reports",
-                 },
-                 {
-                     id: "weight-approve",
-                     label: "Weight Approve",
-                     link: "/weight-approve",
-                     parentId: "reports",
-                 },
-             ],
-         },
-         
-    ];*/
+         }
+        //  {
+        //      id: "apps",
+        //      label: "Master",
+        //      icon: "ri-apps-2-line",
+        //      link: "/#",
+        //      click: function (e) {
+        //          e.preventDefault();
+        //          setIsApps(!isApps);
+        //          setIscurrentState('Apps');
+        //          updateIconSidebar(e);
+        //      },
+        //      stateVariables: isApps,
+        //      subItems: [
+           
+        //          {
+        //             id: "transporter",
+        //             label: "Transporter Master",
+        //             link: "/transporter",
+        //             parentId: "apps",
+        //         },
+        //         {
+        //             id: "route",
+        //             label: "Route Master",
+        //             link: "/route",
+        //             parentId: "apps",
+        //         },
+
+        //      ],
+        //  },{
+        //      id: "reports",
+        //      label: "Mapping",
+        //      icon: "ri-apps-2-line",
+        //      link: "/#",
+        //      click: function (e) {
+        //          e.preventDefault();
+        //          setIsReport(!isReport);
+        //          setIscurrentState('Report');
+        //          updateIconSidebar(e);
+        //      },
+        //      stateVariables: isReport,
+        //      subItems: [
+        //          {
+        //              id: "csr",
+        //              label: "Transporter Plant Mapping",
+        //              link: "/plant-mapping",
+        //              parentId: "reports",
+        //          },
+        //          {
+        //              id: "pmr",
+        //              label: " Transporter Route Mapping",
+        //              link: "/route-mapping",
+        //              parentId: "reports",
+        //          },
+        //         //  {
+        //         //      id: "tag-mapping",
+        //         //      label: "TAG Mapping",
+        //         //      link: "/tagMapping",
+        //         //      parentId: "reports",
+        //         //  },
+        //         //  {
+        //         //      id: "tolerance",
+        //         //      label: "Tolerance Report",
+        //         //      link: "/tolerance",
+        //         //      parentId: "reports",
+        //         //  },
+        //         //  {
+        //         //      id: "weight-approve",
+        //         //      label: "Weight Approve",
+        //         //      link: "/weight-approve",
+        //         //      parentId: "reports",
+        //         //  },
+        //      ],
+        //  },
+       
+        
+    ];
     return <React.Fragment>{menuItems}</React.Fragment>;
 };
 export default Navdata;

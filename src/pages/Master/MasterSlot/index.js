@@ -95,7 +95,7 @@ const SlotMaster = () => {
   }));
 
   useEffect(() => {
-    debugger
+   
     getSlotData();
     const obj = JSON.parse(sessionStorage.getItem("authUser"));
     let plantcode = obj.data.plantCode;
@@ -232,7 +232,7 @@ const SlotMaster = () => {
   }
 
   const deleteSlotMasterData = () => {
-    debugger
+   
     axios.delete(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/delete/${event.id}`, config)
       .then(res => {
         const result = res;
@@ -376,7 +376,7 @@ const SlotMaster = () => {
   
   const submitEventData = async (e) => {
     e.preventDefault();
-    debugger;
+   
 
     const id = document.getElementById("update_event_id").value;
     console.log("id_val",id);
@@ -567,7 +567,7 @@ const SlotMaster = () => {
    * Handling click on event on calendar
    */
   const handleEventClick = async (arg) => {
-    debugger;
+   
     const event = arg.event;
 
     

@@ -130,7 +130,7 @@ const MasterRoute = () => {
     useEffect(() => {
         try {
             const obj = JSON.parse(sessionStorage.getItem("authUser"));
-            let plantcode =  "PL002"; // Default to PL002 if not found
+            let plantcode = obj.data.plantCode;
             setPlantCode(plantcode);
             getAllRouteData(plantcode);
         } catch (error) {

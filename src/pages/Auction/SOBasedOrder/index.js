@@ -778,7 +778,7 @@ const SOBasedOrder = ({ bidNo }) => {
           };
         });
 
-        const apiData = {
+        const apiData = {  
           bulk: false,
           biddings: biddingObjects
         };
