@@ -144,7 +144,8 @@ const SOBasedOrder = ({ bidNo }) => {
       let plantCode = obj?.data?.plantCode || '';
 
       // Create API URL with optional filters
-      const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/salesorder_allocation?plant=${plantCode}&page=${currentPage}&limit=${ordersPerPage}&search=${searchTerm}`;
+    //  const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/salesorder_allocation?plant=${plantCode}&page=${currentPage}&limit=${ordersPerPage}&search=${searchTerm}`;
+      const apiUrl = `http://10.6.0.5:8081/salesorder_allocation?plant=${plantCode}&page=${currentPage}&limit=${ordersPerPage}&search=${searchTerm}`;
       console.log("Fetching sales orders from:", apiUrl);
 
       const response = await fetch(apiUrl, {
@@ -215,6 +216,7 @@ const SOBasedOrder = ({ bidNo }) => {
       let plantCode = obj.data.plantCode;
 
       const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/allTransportersByFlag?flag=A&filterParam=${plantCode}`;
+      
       console.log("Fetching transporters from:", apiUrl);
 
       const response = await fetch(apiUrl, {
@@ -241,7 +243,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
         // Update the state
         setTransporterOptions(mappedTransporters);
-        setShowTransporterDropdown(false);
+        setShowTransporterDropdown(true);
       } else {
         toast.info("No transporters found", { autoClose: 3000 });
       }

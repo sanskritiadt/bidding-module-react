@@ -172,28 +172,82 @@ const RouteMapping = () => {
     };
 
     // Handle view routes for a transporter
+    // const handleViewRoutes = async (transporterCode) => {
+    //     setIsViewRoutesLoading(true);
+    //     try {
+    //         // Use the transporter code directly in the API URL
+    //       //  const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transportersRouteMap/transporterCode?transporterCode=${transporterCode}`, 
+    //       const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/transportercode/${transporterCode}`, 
+    //             {
+    //             method: 'GET',
+    //             headers: getAuthHeaders()
+    //         });
+            
+    //         // If API call is successful, use the returned data
+    //         if (response.ok) {
+    //             const result = await response.json();
+    //             console.log("View routes API response:", result);
+                
+    //             if (result.data && Array.isArray(result.data)) {
+    //                 // Transform the data to match the expected structure for the view modal
+    //                 const transformedData = result.data.map(item => ({
+    //                     routeCode: item.routeCode || "",
+    //                     departureLocation: item.departureLocation || "",
+    //                     destinationLocation: item.destinationLocation || "",
+    //                     routeType: item.routeType || "",
+    //                     distance: item.distance || ""
+    //                 }));
+    //                 setViewRouteData(transformedData);
+    //             } else {
+    //                 console.warn("Invalid data structure in route response");
+    //                 setViewRouteData([]);
+    //             }
+    //         } else {
+    //             console.error(`Failed to fetch routes for transporter. Status: ${response.status}`);
+    //             setViewRouteData([]);
+    //             toast.warning("No routes found for this transporter.", {
+    //                 position: "top-right",
+    //                 autoClose: 3000,
+    //             });
+    //         }
+            
+    //         setCurrentTransporterCode(transporterCode);
+    //         setIsViewRouteModalOpen(true);
+    //     } catch (error) {
+    //         console.error("Error fetching routes for transporter:", error);
+    //         setViewRouteData([]);
+    //         setCurrentTransporterCode(transporterCode);
+    //         setIsViewRouteModalOpen(true);
+    //         toast.error("Error fetching routes for this transporter.", {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //         });
+    //     } finally {
+    //         setIsViewRoutesLoading(false);
+    //     }
+    // };
+
     const handleViewRoutes = async (transporterCode) => {
         setIsViewRoutesLoading(true);
         try {
-            // Use the transporter code directly in the API URL
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transportersRouteMap/transporterCode?transporterCode=${transporterCode}`, {
-                method: 'GET',
-                headers: getAuthHeaders()
-            });
-            
-            // If API call is successful, use the returned data
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/transportercode/${transporterCode}`, 
+                {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+    
             if (response.ok) {
                 const result = await response.json();
                 console.log("View routes API response:", result);
-                
-                if (result.data && Array.isArray(result.data)) {
+    
+                if (result.datalist && Array.isArray(result.datalist)) {
                     // Transform the data to match the expected structure for the view modal
-                    const transformedData = result.data.map(item => ({
+                    const transformedData = result.datalist.map(item => ({
                         routeCode: item.routeCode || "",
-                        departureLocation: item.departureLocation || "",
-                        destinationLocation: item.destinationLocation || "",
+                        departureLocation: item.routeName || "", // assuming this is your desired label
+                        destinationLocation: item.routeDestination || "",
                         routeType: item.routeType || "",
-                        distance: item.distance || ""
+                        distance: item.routeDistance || ""
                     }));
                     setViewRouteData(transformedData);
                 } else {
@@ -208,7 +262,7 @@ const RouteMapping = () => {
                     autoClose: 3000,
                 });
             }
-            
+    
             setCurrentTransporterCode(transporterCode);
             setIsViewRouteModalOpen(true);
         } catch (error) {
@@ -224,7 +278,7 @@ const RouteMapping = () => {
             setIsViewRoutesLoading(false);
         }
     };
-
+    
     // Columns for transporters table
     const columns = useMemo(
         () => [
