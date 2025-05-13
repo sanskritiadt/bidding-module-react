@@ -51,6 +51,7 @@ const MasterRoute = () => {
     const [latestHeader, setLatestHeader] = useState('');
     const [Plant_Code, setPlantCode] = useState('');
     const [routeCode,setRouteCode]=useState(null);
+  
 
     const toggle = useCallback(() => {
         if (modal) {
@@ -297,6 +298,7 @@ const handleCustomerClick = useCallback(async (id) => {
             status: routeData.status || "A",
         });
            setRouteCode(data.data.routeCode);
+           setRouteCode(data.data.routeCode);
         
         // Show success message if available
         if (data.meta && data.meta.message) {
@@ -329,6 +331,7 @@ const handleViewClick = useCallback(async (id) => {
         }
 
         const data = await response.json();
+     
      
         console.log("Route details:", data);
         

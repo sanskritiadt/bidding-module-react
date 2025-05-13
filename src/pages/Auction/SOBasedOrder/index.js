@@ -814,7 +814,7 @@ const SOBasedOrder = ({ bidNo }) => {
           position: "top-right",
           style: {
             background: "white",
-          
+            
           }
         });
 
@@ -2206,21 +2206,17 @@ const SOBasedOrder = ({ bidNo }) => {
       </Form>
 
       {/* Add ToastContainer for notifications */}
-      <ToastContainer
-        closeButton={false}
-        limit={1}
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        toastStyle={{ backgroundColor: "white" }}
-      />
-
+      <ToastContainer closeButton={false} limit={1}
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            toastStyle={{ backgroundColor: "white" }} />
       {/* Show success modal */}
       {showSuccessModal && <SuccessModal />}
     </>
