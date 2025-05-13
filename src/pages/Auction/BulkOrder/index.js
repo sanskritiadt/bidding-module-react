@@ -2779,3 +2779,5 @@ const BulkOrder = ({ bidNo }) => {
 };
 
 export default BulkOrder;
+
+
