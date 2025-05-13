@@ -50,6 +50,7 @@ const MasterRoute = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [latestHeader, setLatestHeader] = useState('');
     const [Plant_Code, setPlantCode] = useState('');
+    const [routeCode,setRouteCode]=useState(null);
 
     const toggle = useCallback(() => {
         if (modal) {
@@ -80,7 +81,8 @@ const MasterRoute = () => {
             console.log("Fetching routes for plant code:", plantCode);
             
             // Make direct fetch call to ensure we get raw response
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes?plantCode=${plantCode}`, {
+           // const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes?plantCode=${plantCode}`, {
+                const response = await fetch(`http://localhost:8085/routes?plantCode=${plantCode}`, { 
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -174,8 +176,9 @@ const handleSubmit = async (e) => {
     try {
         if (isEdit) {
             // Update existing route
-            console.log("Updating route with ID:", CurrentID);
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${CurrentID}`, {
+            console.log("Updating route with routeCode:=================>>>>>>>>", routeCode);
+           // const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${routeCode}`, {
+             const response = await fetch(`http://localhost:8085/routes/${routeCode}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -200,7 +203,8 @@ const handleSubmit = async (e) => {
         } else {
             // Create new route
             console.log("Creating new route");
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
+          //  const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
+            const response = await fetch(`http://localhost:8085/routes`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -252,8 +256,9 @@ const handleCustomerClick = useCallback(async (id) => {
     setIsEdit(true);
     
     try {
-        console.log("Fetching details for route ID:", id);
-        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
+       
+       // const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
+         const response = await fetch(`http://localhost:8085/routes/id/${id}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -291,6 +296,7 @@ const handleCustomerClick = useCallback(async (id) => {
             shippingPoint: routeData.shippingPoint || "",
             status: routeData.status || "A",
         });
+           setRouteCode(data.data.routeCode);
         
         // Show success message if available
         if (data.meta && data.meta.message) {
@@ -323,6 +329,7 @@ const handleViewClick = useCallback(async (id) => {
         }
 
         const data = await response.json();
+     
         console.log("Route details:", data);
         
         // Check response structure - use the data property if available

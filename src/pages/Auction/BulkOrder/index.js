@@ -198,7 +198,7 @@ const BulkOrder = ({ bidNo }) => {
   const [routeSearchTerm, setRouteSearchTerm] = useState("");
   const [loadingRoutes, setLoadingRoutes] = useState(false);
 
- 
+
 
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -217,7 +217,7 @@ const BulkOrder = ({ bidNo }) => {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-        
+
         };
 
         const response = await axios.get(
@@ -225,7 +225,7 @@ const BulkOrder = ({ bidNo }) => {
           axiosConfig
         );
 
-      console.log("response Route====>>>>>>>>>",response);
+        console.log("response Route====>>>>>>>>>", response);
 
         // Initialize route data
         let routeData = ['Select'];
@@ -243,7 +243,7 @@ const BulkOrder = ({ bidNo }) => {
           try {
             const parsedRoutes = strategy();
             if (parsedRoutes && parsedRoutes.length > 0) {
-              routeData = [ ...parsedRoutes.filter(r => r)];
+              routeData = [...parsedRoutes.filter(r => r)];
               break;
             }
           } catch (strategyError) {
@@ -568,22 +568,22 @@ const BulkOrder = ({ bidNo }) => {
         ...prevValues,
         selectTransporter: []
       }));
-
+      const obj = JSON.parse(sessionStorage.getItem("authUser"));
+      let plantCode1 = obj.data.plantCode;
       if (value === 'All') {
-        const obj = JSON.parse(sessionStorage.getItem("authUser"));
-        let plantCode1 = obj.data.plantCode;
+
 
         fetchTransportersByFlag('A', plantCode1);
       }
       else if (value === 'Route Based') {
-        if (values.route && values.route !== 'Select') {
-          fetchTransportersByFlag('R', values.route);
-        }
+
+        fetchTransportersByFlag('R', plantCode1);
+
       }
       else if (value === 'Plant Based') {
-        if (values.fromLocation && values.fromLocation !== 'Select') {
-          fetchTransportersByFlag('P', values.fromLocation);
-        } 
+
+        fetchTransportersByFlag('P', plantCode1);
+
       }
     }
 

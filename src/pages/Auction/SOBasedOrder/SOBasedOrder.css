@@ -707,8 +707,15 @@ input[type="text"][placeholder="HH:MM:SS"] {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.Toastify__toast--success {
-  background-color: #00A389;
+/* .Toastify__toast--success {
+ 
+   background-color: #fff !important;
+  opacity: 1 !important;
+} */
+
+.custom-toast-error {
+  background-color: #fff !important;
+  opacity: 1 !important;
 }
 
 .Toastify__toast--error {

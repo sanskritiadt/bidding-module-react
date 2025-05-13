@@ -156,17 +156,6 @@ const MasterTransporter = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate PAN and GST
-        if (!validatePAN(values.panNo)) {
-            toast.error("Invalid PAN Number! Format should be AAAAA0000A", { autoClose: 3000 });
-            return;
-        }
-
-        if (!validateGST(values.gstnNo)) {
-            toast.error("Invalid GST Number! Format should be 00AAAAA0000A0Z0", { autoClose: 3000 });
-            return;
-        }
-
 
 
         try {
@@ -221,7 +210,6 @@ const MasterTransporter = () => {
                     ...values,
                     "name": result.name,
                     "code": result.code,
-
                     "plantCode": result.Plant_Code,
                     "address": result.address,
                     "contactPerson": result.contactPerson,
@@ -233,11 +221,8 @@ const MasterTransporter = () => {
                     "gstnNo": result.gstnNo,
                     "panNo": result.panNo,
                     "status": result.status,
-                    // Added new fields
-
                     "modeTransport": result.modeTransport || "",
                     "priceKm": result.priceKm || "",
-                    // Apply mapping for termsOfPayment
                     "termPayment": mapTermPaymentValue(result.termPayment) || "",
                     "transporterRating": result.transporterRating || "",
                     "taxInfo": result.taxInfo || "",
