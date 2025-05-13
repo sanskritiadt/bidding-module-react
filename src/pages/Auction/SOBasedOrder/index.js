@@ -243,7 +243,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
         // Update the state
         setTransporterOptions(mappedTransporters);
-        setShowTransporterDropdown(true);
+      
       } else {
         toast.info("No transporters found", { autoClose: 3000 });
       }

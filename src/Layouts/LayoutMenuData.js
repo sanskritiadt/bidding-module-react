@@ -351,7 +351,12 @@ const Navdata = () => {
                     link: "/transporter-route-details",
                     parentId: "dashboard",
                 },
-             
+                {
+                    id: "Logistics Dashboard",
+                    label: "Logistics Dashboard",
+                    link: "/auction-dashboard",
+                    parentId: "dashboard",
+                },
              
              ],
          }

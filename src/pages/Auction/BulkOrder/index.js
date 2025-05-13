@@ -386,10 +386,7 @@ const BulkOrder = ({ bidNo }) => {
     return filtered;
   }, [citiesData, citySearchTerm]);
 
-  // CHANGE 5: Add a useEffect to log when filteredCities changes
-  useEffect(() => {
-    console.log("Filtered cities result:", filteredCities);
-  }, [filteredCities]);
+
 
 
   const [showCityDropdown, setShowCityDropdown] = useState(false);

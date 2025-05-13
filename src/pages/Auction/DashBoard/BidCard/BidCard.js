@@ -166,7 +166,7 @@ const BidCard = () => {
   useEffect(() => {
     const fetchMinimalBids = async () => {
       try {
-        const response = await fetch('http://localhost:8085/biddingMaster/getMinimalBids', {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getMinimalBids`, {
           method: 'GET',
           headers: {
             'accept': 'application/json',

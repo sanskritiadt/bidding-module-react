@@ -136,13 +136,14 @@ const RouteMapping = () => {
             
             if (response.ok) {
                 const result = await response.json();
+
                 if (result.data && Array.isArray(result.data)) {
                     // Map the API response to match the expected format for the table
                     const mappedRoutes = result.data.map(route => ({
                         id: route.id,
                         routeCode: route.routeCode || "",
-                        departureLocation: "", // This field is not in the API response, showing blank
-                        destinationLocation: "", // This field is not in the API response, showing blank
+                        departureLocation: route.routeDetermination, 
+                        destinationLocation: route.routeDestination, 
                         routeType: route.routeType || "",
                         distance: route.routeDistance || "",
                     }));
