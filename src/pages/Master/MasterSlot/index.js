@@ -126,7 +126,7 @@ const SlotMaster = () => {
   const CustomOption = (props) => {
     const { data } = props;
     const isChecked = props.selectProps.selectedValues.includes(data.value);
-  
+
     return (
       <components.Option {...props}>
         <input
@@ -140,7 +140,7 @@ const SlotMaster = () => {
       </components.Option>
     );
   };
-  
+
 
   // const handleCheckboxChange = (value) => {
   //   setSelectedValues((prev) =>
@@ -188,7 +188,7 @@ const SlotMaster = () => {
       }
       return updatedSelectedTransporters;
     });
-  };  
+  };
 
   const config = {
     headers: {
@@ -232,7 +232,7 @@ const SlotMaster = () => {
   }
 
   const deleteSlotMasterData = () => {
-   
+    
     axios.delete(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/delete/${event.id}`, config)
       .then(res => {
         const result = res;
@@ -243,11 +243,82 @@ const SlotMaster = () => {
 
       });
   }
+  const [OpenModal, setOpenModal] = useState(false);
+  const [eventList, seteventList] = useState([]);
+  const [eventDate, seteventDate] = useState({});
+  const [eventState, seteventState] = useState({});
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+  };
+  const multipleEventData = (eventList, dateStr) => {
+    console.log("Events for date", dateStr, eventList);
+    const formattedDate = formatDate(dateStr);
+    seteventDate(formattedDate);
+    seteventList(eventList);
+    // setSelectedDateEvents(eventList); // or however you're managing modal data
+    setOpenModal(true);
+  };
 
-  const multipleEventData = () => {
 
-    alert("Multiple data is coming");
-  }
+
+
+  const submitMultiEvent = async (id) => {
+ 
+    const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${id}`, config);
+    const st_date = res.slotDateFromFormatted;
+    const ed_date = res.slotDateToFormatted;
+
+    const selectedTransportersFromRes = transporterdata
+      .filter(item => res.transporterNames.includes(item.name.trim()))
+      .map(item => ({
+        value: item.code,
+        label: `${item.name.trim()} (${item.code})`
+      }));
+    setSelectedTransporters(selectedTransportersFromRes);
+
+    const r_date =
+      ed_date == null
+        ? str_dt(st_date)
+        : str_dt(st_date) + " to " + str_dt(ed_date);
+    const er_date =
+      ed_date == null
+        ? date_r(st_date)
+        : date_r(st_date) + " to " + date_r(ed_date);
+        setSlotDateFrom(date_r(res.slotDateFromFormatted));
+        setSlotDateTo(date_r(res.slotDateToFormatted));
+        setSelectedValues(selectedTransportersFromRes.map(item => item.value));
+    setEvent({
+      id: res.id,
+      title: res.title,
+      start: res.start,
+      end: res.end,
+      location: res.location,
+      description: res.description,
+      defaultDate: er_date,
+      slotDateFromFormatted: res.slotDateFromFormatted,
+      endTimeFormatted: res.endTimeFormatted,
+      startTimeFormatted: res.startTimeFormatted,
+      slotDateToFormatted: res.slotDateToFormatted,
+      materialName: res.materialName,
+      status: res.status,
+      plantName: res.plantName,
+      noOfTtRq: res.noOfTtRq,
+      pendingTruckCount: res.pendingTruckCount,
+      materialCode: res.materialCode,
+      maxTtCommitTr: res.maxTtCommitTr,
+      plantCode: res.plantCode,
+      transporterNames: res.transporterNames.join(","),
+      remarks: res.remarks,
+      startTime: res.startTimeFormatted,
+      endTime: res.endTimeFormatted,
+      state: res.state,
+    });
+
+    setslotModalSize(false);
+    setIsEdit(false);
+    setIsEditButton(true);
+    toggle();
+  };
 
 
   const [values, setValues] = useState([]);
@@ -255,13 +326,13 @@ const SlotMaster = () => {
   const [SlotError, setSlotError] = useState(false);
   // const handleInputChange = (e) => {
   //   const { name, value } = e.target;
-  
+
   //   // Ensure only the changed field is updated and the other fields are preserved
   //   setValues((prevValues) => ({
   //     ...prevValues,
   //     [name]: value || value.valueAsNumber,  // Update the specific field
   //   }));
-  
+
   //   setEvent((prevEvent) => ({
   //     ...prevEvent,
   //     [name]: value || value.valueAsNumber,  // Update the specific field
@@ -297,7 +368,7 @@ const SlotMaster = () => {
 
   // const submitEventData = async (e) => {
   //   e.preventDefault();
-  //   debugger;
+  //   ;
   //   const totalData = {
   //     ...values,
   //     "transporterCodes": selectedValues,
@@ -317,7 +388,7 @@ const SlotMaster = () => {
   //   } else {
   //     setSlotError(false);
   //   }
-    
+
   //   const res = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/create`, totalData, config)
   //   if (res.status.msg === 'SlotMaster Created Successfully') {
   //     toast.success("Slot Booked Successfully", { autoClose: 3000 });
@@ -373,13 +444,13 @@ const SlotMaster = () => {
     return `${year}-${month}-${paddedDay}`;
   }
 
-  
+
   const submitEventData = async (e) => {
     e.preventDefault();
    
 
     const id = document.getElementById("update_event_id").value;
-    console.log("id_val",id);
+    console.log("id_val", id);
     console.log(values);
     const totalData = {
       ...values,
@@ -389,7 +460,7 @@ const SlotMaster = () => {
       "slotDateFrom": formatDateToYYYYMMDD(values.slotDateFrom),
       "slotDateTo": formatDateToYYYYMMDD(values.slotDateTo),
     };
-  
+
     // Validation for transporter codes
     if (!Array.isArray(selectedValues) || selectedValues.length === 0) {
       setTransporterError(true);
@@ -399,7 +470,7 @@ const SlotMaster = () => {
     }
 
     alert(values.slotDateFrom);
-  
+
     // Validation for slot dates
     // if (values.slotDateFrom === "") {
     //   setSlotError(true);
@@ -407,12 +478,12 @@ const SlotMaster = () => {
     // } else {
     //   setSlotError(false);
     // }
-  
+
     // If there is an existing slot ID, use PUT, otherwise use POST to create
     const url = id ? `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/updateSlot/${id}` : `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/create`;
-  
+
     const method = id ? 'put' : 'post';
-  
+
     try {
       const res = await axios({
         method: method,
@@ -422,7 +493,7 @@ const SlotMaster = () => {
       });
 
       console.log(res);
-  
+
       if (res.status === 200 && res.message === 'Slot master created successfully') {
         toast.success("Slot Booked Successfully", { autoClose: 3000 });
         getSlotData();
@@ -462,9 +533,11 @@ const SlotMaster = () => {
    */
   const toggle = () => {
     if (modal) {
+      setSelectedTransporters([]);
       if (!slotModalSize) {
         setValues([]);
         setSelectedValues([]);
+        setSelectedTransporters([]);
         setTransporterError(false);
         setSlotError(false);
       }
@@ -478,6 +551,16 @@ const SlotMaster = () => {
     }
   };
 
+  const openModal = () => {
+    if (OpenModal) {
+      setOpenModal(false);
+      // setModal(true);
+    } else {
+      setOpenModal(true);
+      //  setModal(false);
+    }
+  };
+
   const slotModal = () => {
     if (modalSlot) {
       setmodalSlot(false);
@@ -488,12 +571,12 @@ const SlotMaster = () => {
       //  setModal(false);
     }
   };
-  
+
   const fetchTruckData = async () => {
 
     const id_param = document.getElementById("id_param").value;
     try {
-     const response = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlotTr/${id_param}`,config); // replace with actual API URL
+      const response = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlotTr/${id_param}`, config); // replace with actual API URL
       setTruckData(response.transporter); // adjust if response structure differs
     } catch (error) {
       console.error("Error fetching truck data:", error);
@@ -567,13 +650,24 @@ const SlotMaster = () => {
    * Handling click on event on calendar
    */
   const handleEventClick = async (arg) => {
-   
+ 
     const event = arg.event;
 
-    
+
     const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${event.id}`, config);
     const st_date = res.slotDateFromFormatted;
     const ed_date = res.slotDateToFormatted;
+
+    const selectedTransportersFromRes = transporterdata
+      .filter(item => res.transporterNames.includes(item.name.trim()))
+      .map(item => ({
+        value: item.code,
+        label: `${item.name.trim()} (${item.code})`
+      }));
+    setSelectedTransporters(selectedTransportersFromRes);
+    
+    
+
     const r_date =
       ed_date == null
         ? str_dt(st_date)
@@ -582,6 +676,9 @@ const SlotMaster = () => {
       ed_date == null
         ? date_r(st_date)
         : date_r(st_date) + " to " + date_r(ed_date);
+        setSlotDateFrom(date_r(res.slotDateFromFormatted));
+        setSlotDateTo(date_r(res.slotDateToFormatted));
+        setSelectedValues(selectedTransportersFromRes.map(item => item.value));
     setEvent({
       id: res.id,
       title: res.title,
@@ -647,13 +744,15 @@ const SlotMaster = () => {
       console.log(values);
       const totalData = {
         ...values,
-        "startTime": values.startTime,
-        "endTime": values.endTime,
+        // "startTime": values.startTime,
+        // "endTime": values.endTime,
         "transporterCodes": selectedValues,
-        "slotDateFrom": formatDateToYYYYMMDD(values.slotDateFrom),
-        "slotDateTo": formatDateToYYYYMMDD(values.slotDateTo),
+        // "slotDateFrom": formatDateToYYYYMMDD(values.slotDateFrom),
+        "slotDateFrom": slotDateFrom,
+        "slotDateTo": slotDateTo,
+        // "slotDateTo": formatDateToYYYYMMDD(values.slotDateTo),
       };
-    
+      console.log(totalData);
       // Validation for transporter codes
       if (!Array.isArray(selectedValues) || selectedValues.length === 0) {
         setTransporterError(true);
@@ -662,18 +761,18 @@ const SlotMaster = () => {
         setTransporterError(false);
       }
       // Validation for slot dates
-      if (values.slotDateFrom === "") {
+      if (slotDateFrom === "") {
         setSlotError(true);
         return;
       } else {
         setSlotError(false);
       }
-    
+
       // If there is an existing slot ID, use PUT, otherwise use POST to create
       const url = event.id ? `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/updateSlot/${event.id}` : `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/create`;
-    
+
       const method = event.id ? 'put' : 'post';
-    
+
       try {
         const res = axios({
           method: method,
@@ -697,19 +796,20 @@ const SlotMaster = () => {
         console.error("Error during API request:", error);
         toast.error("Something went wrong. Please try again!", { autoClose: 3000 });
       }
-      
+
       validation.resetForm();
-      
+
       setSelectedDay(null);
       setSelectedNewDay(null);
       toggle();
     },
   });
-  
+
   const [selectedValues, setSelectedValues] = useState([]);
   const [selectedTransporters, setSelectedTransporters] = useState([]); // array of full option objects
-  
+
   useEffect(() => {
+    
     if (
       event?.transporterNames?.length > 0 &&
       transporterdata.length > 0 &&
@@ -721,15 +821,16 @@ const SlotMaster = () => {
           value: item.code,
           label: `${item.name.trim()} (${item.code})`,
         }));
-  
+
       setSelectedTransporters(preselected);
       setSelectedValues(preselected.map(opt => opt.value));
     } else {
       setSelectedTransporters([]);
       setSelectedValues([]);
     }
-  }, [event, transporterdata]);
-  
+  }, [transporterdata]);
+  // }, [event, transporterdata]);
+
 
   // const selectedTransporters = transporterdata
   // .filter(item => validation.values.transporterNames.includes(item.name.trim()))
@@ -946,13 +1047,16 @@ const SlotMaster = () => {
     return {
       id: item.id,
       title: item.plantName,
+      state: item.state,
+      maxTtCommitTr: item.maxTtCommitTr,
+      noOfTtRq : item.noOfTtRq,
       // start: `2025-04-${day}`,
       // end: `2025-04-${nextDay}`,
       start: item.slotDateFrom,
       end: addOneDay(item.slotDateTo),
       allDay: true,
       extendedProps: {
-        materialId: item.plantName,
+        materialId: item.plantName,        
       },
     };
   });
@@ -997,7 +1101,7 @@ const SlotMaster = () => {
           <img src={iconClass} />
         </div>
         <div className="flex-grow-1">
-          <p className="d-block mb-0 text-black" style={{fontWeight: 500,fontSize: "14px"}}>{text}</p>
+          <p className="d-block mb-0 text-black" style={{ fontWeight: 500, fontSize: "14px" }}>{text}</p>
         </div>
       </div>
     </div>
@@ -1010,7 +1114,7 @@ const SlotMaster = () => {
           <img src={iconClass} />
         </div>
         <div className="flex-grow-1">
-          <span class="new-custom-forbadge" style={{fontWeight: 500,fontSize: "14px"}}>{text}</span>
+          <span class="new-custom-forbadge" style={{ fontWeight: 500, fontSize: "14px" }}>{text}</span>
         </div>
       </div>
     </div>
@@ -1018,7 +1122,7 @@ const SlotMaster = () => {
 
   const format = (value, fallback = 'N/A') => {
     return value !== undefined && value !== null && value !== '' ? value : fallback;
-  };  
+  };
 
   document.title = "Slot Master | EPLMS";
   return (
@@ -1086,11 +1190,40 @@ const SlotMaster = () => {
                           eventClick={handleEventClick}
                           drop={onDrop}
                           dayMaxEvents={2}
+                          // moreLinkClick={(info) => {
+                          //   multipleEventData();
+                          //   // Prevent default popup (optional)
+                          //   return "none";
+                          // }}
                           moreLinkClick={(info) => {
-                            multipleEventData();
-                            // Prevent default popup (optional)
-                            return "none";
+                            
+                            const clickedDateStr = info.date; // e.g., '2025-05-12'
+                            const clickedDate = new Date(clickedDateStr);
+                            clickedDate.setHours(0, 0, 0, 0); // normalize
+
+                            // Filter only events that occur on the clicked date
+                            const eventsForDate = events1.filter(event => {
+                              const startDate = new Date(event.start);
+                              const endDate = new Date(event.end);
+
+                              // Normalize
+                              startDate.setHours(0, 0, 0, 0);
+                              endDate.setHours(0, 0, 0, 0);
+
+                              // Check if clicked date is within the range [start, end)
+                              return clickedDate >= startDate && clickedDate < endDate;
+                            });
+
+                            // Optional: show a warning if no events exist on that day
+                            if (eventsForDate.length === 0) {
+                              toast.warning("No events on this day.", { autoClose: 3000 });
+                              return "none";
+                            }
+                            multipleEventData(eventsForDate, clickedDateStr); // pass data to your modal/dialog
+
+                            return "none"; // prevent FullCalendar default popup
                           }}
+
                           moreLinkDidMount={(info) => {
                             info.el.innerText = "View All";
 
@@ -1142,7 +1275,7 @@ const SlotMaster = () => {
                 </ModalHeader> */}
                 {/* {!!isEdit ? "Edit Slot" : "Add New Slot"} */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0px 0px 12px 20px' }}>
-                  <h4 className="mt-4 fw-bold" style={{ color: '#000', margin: 0 }}>{slotModalSize ? `${event.plantCode}` : 'Add New Slot'}</h4>
+                  <h4 className="mt-4 fw-bold" style={{ color: '#000', margin: 0 }}>{slotModalSize ? event?.plantName || '' : event?.id ? 'Update Slot' : 'Add New Slot'}</h4>
                   <button type="button" className="btn-close mt-4 slotCloseModal" onClick={() => toggle()} aria-label="Close"></button>
                 </div>
 
@@ -1305,19 +1438,19 @@ const SlotMaster = () => {
 
                     <div className="event-details">
                       <InfoRow iconClass={A1} text={format(event?.transporterNames)} />
-                      
+
                       <InfoRow
                         iconClass={A2}
                         text={
                           <>
-                            {format(event?.noOfTtRq)} Truck Required{" / "} {format(event?.pendingTruckCount)} Pending{" "}  
+                            {format(event?.noOfTtRq)} Truck Required{" / "} {format(event?.pendingTruckCount)} Pending{" "}
                             <i className="ri-eye-fill text-success fs-18 for-truck-css" onClick={slotModal} style={{ lineHeight: 0 }}></i>
                           </>
                         }
                       />
 
                       <InfoRow iconClass={A3} text={`Max. ${format(event?.maxTtCommitTr)} Truck Per Transporter`} />
-                      <InfoRow iconClass={A4} text={format(event?.slotDateFromFormatted) +" to "+ format(event?.slotDateToFormatted)} />
+                      <InfoRow iconClass={A4} text={format(event?.slotDateFromFormatted) + " to " + format(event?.slotDateToFormatted)} />
                       <InfoRow iconClass={A5} text={`${format(event?.startTimeFormatted)} to ${format(event?.endTimeFormatted)}`} />
                       <InfoRow iconClass={A6} text={format(event?.state)} />
                       <InfoRow iconClass={A7} text={format(event?.materialName)} />
@@ -1406,7 +1539,7 @@ const SlotMaster = () => {
                                 );
                               }
                             }}
-                            
+
                           />
                           <span style={{ color: "red", animation: "blink 1s infinite" }}>{TransporterError ? "Select Aleast one Transporter" : ""}</span>
                         </div>
@@ -1518,57 +1651,65 @@ const SlotMaster = () => {
                       <Col md={4} className="mt-3">
                         <Label htmlFor="validationDefault04" style={{ fontSize: 'medium' }} className="form-label fw-bold">Start Time</Label><span style={{ color: "red" }}>*</span>
                         <div className="">
-                        <Flatpickr
-                          className="form-control slotmasterCss"
-                          name="startTime"
-                          options={{
-                            enableTime: true,
-                            noCalendar: true,
-                            dateFormat: "h:i", // 12-hour with AM/PM
-                            time_24hr: true,
-                            enableSeconds: false,
-                          }}
-                          value={validation.values.startTime}
-                          onChange={(date) => {
-                           // validation.setFieldValue("startTime", formatTime(date[0]));
-                            handleInputChange({
-                              target: {
-                                name: 'startTime',
-                                value: date[0], // Send the selected date (time) to the input change handler
-                              },
-                            });
-                          }}
-                        />
+                          <Flatpickr
+                            className="form-control slotmasterCss"
+                            name="startTime"
+                            options={{
+                              enableTime: true,
+                              noCalendar: true,
+                              dateFormat: "h:i K", // 12-hour with AM/PM
+                              time_24hr: true,
+                              enableSeconds: false,
+                            }}
+                            value={validation.values.startTime}
+                            // onChange={(date) => {
+                            //   validation.setFieldValue("startTime", formatTime(date[0]));
+                            //   handleInputChange({
+                            //     target: {
+                            //       name: 'startTime',
+                            //       value: date[0], // Send the selected date (time) to the input change handler
+                            //     },
+                            //   });
+                            // }}
+                            onChange={(date) => {
+                              const formattedTime = formatTime(date[0]);
+                              validation.setFieldValue("startTime", formattedTime);
+                            }}
+                          />
 
                         </div>
                       </Col>
                       <Col md={4} className="">
                         <Label htmlFor="validationDefault04" style={{ fontSize: 'medium' }} className="form-label fw-bold">End Time</Label><span style={{ color: "red" }}>*</span>
                         <div className="">
-                        <Flatpickr
-                          className="form-control slotmasterCss"
-                          name="endTime"
-                          options={{
-                            enableTime: true,
-                            noCalendar: true,
-                            dateFormat: "h:i", // 12-hour with AM/PM
-                            time_24hr: true,
-                            enableSeconds: false
-                          }}
-                          value={validation.values.endTime}
-                          onChange={(date) => {
-                            //validation.setFieldValue("endTime", formatTime(date[0]));
-                            handleInputChange({
-                              target: {
-                                name: 'endTime',
-                                value: date[0], // Send the selected date (time) to the input change handler
-                              },
-                            });
-                          }}
-                        />
-                                                </div>
-                                              </Col>
-                                              <Col lg={4} className="">
+                          <Flatpickr
+                            className="form-control slotmasterCss"
+                            name="endTime"
+                            options={{
+                              enableTime: true,
+                              noCalendar: true,
+                              dateFormat: "h:i K", // 12-hour with AM/PM
+                              time_24hr: true,
+                              enableSeconds: false
+                            }}
+                            value={validation.values.endTime}
+                            // onChange={(date) => {
+                            //   validation.setFieldValue("endTime", formatTime(date[0]));
+                            //   handleInputChange({
+                            //     target: {
+                            //       name: 'endTime',
+                            //       value: date[0], // Send the selected date (time) to the input change handler
+                            //     },
+                            //   });
+                            // }}
+                            onChange={(date) => {
+                              const formattedTime = formatTime(date[0]);
+                              validation.setFieldValue("endTime", formattedTime);
+                            }}
+                          />
+                        </div>
+                      </Col>
+                      <Col lg={4} className="">
                         <div>
                           <Label className="form-label fw-bold" style={{ fontSize: 'medium' }}  >Remarks</Label><span style={{ color: "red" }}>*</span>
                           <Input type="text" required className="form-control slotmasterCss"
@@ -1577,7 +1718,7 @@ const SlotMaster = () => {
                             placeholder="Enter Remarks"
                             value={validation.values.remarks}
                             title={validation.values.remarks}
-                            onChange={handleInputChange}
+                            onChange={validation.handleChange}
                           />
                         </div>
                       </Col>
@@ -1664,7 +1805,7 @@ const SlotMaster = () => {
                         className="btn btn-success mt-3"
                         id="btn-save-event"
                         style={{ background: '#1511a2f0' }}
-                        //onClick={submitEventData}
+                      // onClick={submitEventData}
                       >
                         {!!isEdit ? "Edit Event" : "Submit"}
                       </button>
@@ -1707,6 +1848,48 @@ const SlotMaster = () => {
         {/* </Form> */}
       </Modal>
 
+
+      <Modal isOpen={OpenModal} id="event-modal" centered size={'md'} >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0px 0px 12px 20px' }}>
+          <h4 className="mt-4 fw-bold" style={{ color: '#000', margin: 0 }}>{eventDate}</h4>
+          <button type="button" className="btn-close mt-4 slotCloseModal" onClick={() => openModal()} aria-label="Close"></button>
+        </div>
+
+
+
+        <hr className="headingnewSlot"></hr>
+        <ModalBody>
+          {
+            eventList.map((item,index)=>(
+              <div key={index} className="card d-flex flex-row shadow-sm border-0" style={{ maxWidth: '500px' }}>
+              <div style={{
+                backgroundColor: "rgb(10 179 156)",
+                width: "5px",
+                borderTopLeftRadius: "5px",
+                borderBottomLeftRadius: "5px",
+              }}></div>
+  
+              <div className="d-flex flex-column justify-content-center align-items-center px-3 text-center"style={{width: "173px",fontSize:'large',color:'black' }}>
+                <small className="fw-semibold">{formatDate(item.start)} - </small>
+                <small className="fw-semibold">{formatDate(item.end)}</small>
+              </div>
+  
+              <div className="border-start px-3 py-2 w-100">
+                <div style={{display:'flex'}}>
+                <h6 className="fw-bold mb-2" style={{color:'black'}}>{item.title}</h6>
+                <button className="btn btn-success btn-sm" type="button" style={{marginLeft: 'auto'}} onClick={() => submitMultiEvent(item.id)}>Edit</button>
+                </div>
+                
+                <p className="mb-1"><i className="bi bi-truck"></i> {item.noOfTtRq} Truck Required</p>
+                <p className="mb-1"><i className="bi bi-geo-alt"></i> {item.state}</p>
+                <p className="mb-0"><i className="bi bi-layers"></i>Max. {item.maxTtCommitTr} Truck Per Transporter</p>
+              </div>
+            </div>
+            ))
+          }
+         
+        </ModalBody>
+      </Modal>
 
 
     </React.Fragment >

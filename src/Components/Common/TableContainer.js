@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
+
 import {
   useTable,
   useGlobalFilter,
@@ -10,7 +11,7 @@ import {
   usePagination,
   useRowSelect
 } from "react-table";
-import { Table, Row, Col, Button, Input, CardBody, Nav, NavItem, NavLink, } from "reactstrap";
+import { Table, Row, Col, Button, Input, Card, CardBody, Nav, NavItem, NavLink, } from "reactstrap";
 import { Filter, DefaultColumnFilter } from "./filters";
 import {
   ProductsGlobalFilter,
@@ -268,7 +269,8 @@ const TableContainer = ({
       defaultColumn: { Filter: DefaultColumnFilter },
       initialState: {
         pageIndex: 0,
-        pageSize: customPageSize,
+        pageSize: 5,
+        // pageSize: customPageSize,
         selectedRowIds: 0,
         sortBy: [{ desc: true }],
       },
@@ -437,37 +439,37 @@ const TableContainer = ({
           </Col>
         )}
 
-        {
-          window.location.pathname === "/sequencing-IB" || window.location.pathname === "/sequencing-OB" ? '' :
-            <section ref={ref}>
-              <div >
-                <Nav className="nav-tabs nav-tabs-custom nav-success tog_con" role="tablist" style={{ border: "solid 1px lightgray", borderRadius: "4px", position: "absolute", top: "-47px", right: "20px" }}>
+        {/* {
+            window.location.pathname === "/sequencing-IB" || window.location.pathname === "/sequencing-OB" ? '' :
+              <section ref={ref}>
+                <div >
+                  <Nav className="nav-tabs nav-tabs-custom nav-success tog_con" role="tablist" style={{ border: "solid 1px lightgray", borderRadius: "4px", position: "absolute", top: "-47px", right: "20px" }}>
 
-                  <NavItem>
-                    <NavLink><span className="buttonForToggle text-end" onClick={() => setOpen(!open)}><i className="ri-menu-2-line" /></span></NavLink>
-                  </NavItem>
-                </Nav>
-              </div>
-              {open && (
-                <div className="commonThemeClass" style={{ right: "20px", left: "unset", top: "0px", borderRadius: "5px" }}>
-                  <span className="form-check form-switch form-switch-success mb-3">
-                    <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...getToggleHideAllColumnsProps()} />Toggle All
-                  </span>
-                  {
-                    allColumns .filter((col) => !col.disableHiding)
-                    .map(column => (
-                      (column.Header !== "" ?
-                        <span key={column.id} className="form-check form-switch form-switch-success mb-3">
-                          <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...column.getToggleHiddenProps()} />
-                          {column.Header}
-                        </span> : "")
-                    ))
-
-                  }
+                    <NavItem>
+                      <NavLink><span className="buttonForToggle text-end" onClick={() => setOpen(!open)}><i className="ri-menu-2-line" /></span></NavLink>
+                    </NavItem>
+                  </Nav>
                 </div>
-              )}
-            </section>
-        }
+                {open && (
+                  <div className="commonThemeClass" style={{ right: "20px", left: "unset", top: "0px", borderRadius: "5px" }}>
+                    <span className="form-check form-switch form-switch-success mb-3">
+                      <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...getToggleHideAllColumnsProps()} />Toggle All
+                    </span>
+                    {
+                      allColumns.filter((col) => !col.disableHiding)
+                        .map(column => (
+                          (column.Header !== "" ?
+                            <span key={column.id} className="form-check form-switch form-switch-success mb-3">
+                              <input className="form-check-input" type="checkbox" role="switch" id="SwitchCheck3" {...column.getToggleHiddenProps()} />
+                              {column.Header}
+                            </span> : "")
+                        ))
+
+                    }
+                  </div>
+                )}
+              </section>
+          } */}
 
         {/* <div >
               <Button color="warning" className="btn-icon" outline onClick={() => { ActiveDeactiveTab(); }}> <i className="ri-menu-2-line" /> </Button>
@@ -510,98 +512,75 @@ const TableContainer = ({
       <div className={`${divClass} res_tab_con`} >
 
         <Table hover {...getTableProps()} className={tableClass}>
-        <thead className={theadClass}>
-  {headerGroups.map((headerGroup) => (
-    <tr className={trClass} key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
-      {headerGroup.headers.map((column) => (
-        <th 
-          key={column.id} 
-          className={thClass} 
-        
-          {...column.getSortByToggleProps()}
-        >
-          {column.render("Header")}
-          {generateSortingIndicator(column)}
-        </th>
-      ))}
-    </tr>
-  ))}
-</thead>
+          <thead className={theadClass}>
+            {headerGroups.map((headerGroup) => (
+              <tr className={trClass} key={headerGroup.id}  {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
+                  <th key={column.id} className={thClass} {...column.getSortByToggleProps()}>
+                    {column.render("Header")}
+                    {generateSortingIndicator(column)}
+                    {/* <Filter column={column} /> */}
+                  </th>
+                ))}
+              </tr>
+            ))}
+
+          </thead>
 
           <tbody {...getTableBodyProps()}>
             {(
               page.length > 0 && page.map(row => {
                 prepareRow(row);
                 //console.log("fetch-row", trClass);
-                if (trClass === "test-color-change") {
-                  if (row.original.queueType === "WQ") {
-                    row.original.color = "lightyellow";
-                  }
-                  if (row.original.queueType === "RQ") {
-                    row.original.color = "lightgreen";
-                  }
-                  if (row.original.queueType === "WQC") {
-                    row.original.color = "lightblue";
-                  }
-                  if (row.original.queueType === "RQC") {
-                    row.original.color = "lightgrey";
-                  }
-                }
-                else if (trClass === "ob_table_row") {
-                  if (row.original.colour === true) {
-                    row.original.color = "lightsteelblue";
-                  }
-                }
-                else if (trClass === "CSR_PMR_CLASS") {
-                  if (row.original.YI === "B") {
-                    row.original.color = "green";
-                  }
-                }
                 return (
                   <Fragment key={row.getRowProps().key}>
-                    {trClass === "test-color-change" ?
-                      <tr style={{ background: row.original.queueType !== undefined ? row.original.color : "" }}  >
-                        {row.cells.map((cell) => {
-                          return (
-                            <td key={cell.id} {...cell.getCellProps()}>
-                              {cell.render("Cell")}
-                            </td>
-                          );
-                        })}
+
+                    <tr /*style={{background : row.original.queueType !== undefined ? (row.original.queueType === "WQ" ? "lightyellow" : "lightgreen") : "" }} */ >
+                      {row.cells.map((cell) => {
+                        return (
+                          <td key={cell.id} {...cell.getCellProps()}>
+                            {cell.render("Cell")}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    {row.isExpanded && (
+                      <tr>
+                        <td colSpan={columns.length}>
+                          <div className="bg-light p-2">
+                            {/* Replace with desired expanded content */}
+                            {/* <strong>Details:</strong> {row.values.name} */}
+                            <Row>
+                               <Col lg={3}>
+                            <div>
+                              <Card className="mb-1 ribbon-box ribbon-fill ribbon-sm shadow_light">
+                                <div className={`ribbon ribbon-info element ${data.locationName}`} data-value={data.locationName}> <i className="ri-truck-line" ></i> </div>
+                                <CardBody style={{ padding: "10px 0px 5px 0", textAlign: "center" }}>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h6 className="fs-12 mb-1">{'HR34GH1234'} | {'40MT'}</h6>
+                                  </div>
+                                </CardBody>
+                              </Card>
+                            </div>
+                            </Col>
+                            <Col lg={3}>
+                            <div>
+                              <Card className="mb-1 ribbon-box ribbon-fill ribbon-sm shadow_light">
+                                <div className={`ribbon ribbon-info element ${data.locationName}`} data-value={data.locationName}> <i className="ri-truck-line" ></i> </div>
+                                <CardBody style={{ padding: "10px 0px 5px 0", textAlign: "center" }}>
+                                  <div className="flex-grow-1 ms-3">
+                                    <h6 className="fs-12 mb-1">{'HP34GH9994'} | {'60MT'}</h6>
+                                  </div>
+                                </CardBody>
+                              </Card>
+                            </div>
+                            </Col>
+                            </Row>
+                            
+                          </div>
+                        </td>
                       </tr>
-                      :
-                      trClass === "ob_table_row" ?
-                        <tr style={{ background: row.original.colour !== undefined ? row.original.color : "" }}  >
-                          {row.cells.map((cell) => {
-                            return (
-                              <td key={cell.id} {...cell.getCellProps()}>
-                                {cell.render("Cell")}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                        :
-                        trClass === "CSR_PMR_CLASS" ?
-                          <tr style={{ background: row.original.colour !== undefined ? row.original.color : "" }}  >
-                            {row.cells.map((cell) => {
-                              return (
-                                <td key={cell.id} {...cell.getCellProps()}>
-                                  {cell.render("Cell")}
-                                </td>
-                              );
-                            })}
-                          </tr>
-                          :
-                          <tr /*style={{background : row.original.queueType !== undefined ? (row.original.queueType === "WQ" ? "lightyellow" : "lightgreen") : "" }} */ >
-                            {row.cells.map((cell) => {
-                              return (
-                                <td key={cell.id} {...cell.getCellProps()}>
-                                  {cell.render("Cell")}
-                                </td>
-                              );
-                            })}
-                          </tr>
-                    }
+                    )}
                   </Fragment>
                 );
               }

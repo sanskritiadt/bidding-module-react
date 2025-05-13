@@ -491,7 +491,7 @@ const BulkOrder = ({ bidNo }) => {
       let plantcode = obj.data.plantCode;
 
 
-      const apiUrl = `http://localhost:8085/api/transporters/allTransportersByFlag?flag=${flag}&filterParam=${plantcode}`;
+      const apiUrl =  `${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/allTransportersByFlag?flag=${flag}&filterParam=${plantcode}`;
       console.log("Fetching transporters from:", apiUrl);
 
       const response = await fetch(apiUrl, {
@@ -533,25 +533,95 @@ const BulkOrder = ({ bidNo }) => {
   };
 
 
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   // Update the values state
+  //   setValues(prevValues => {
+  //     const newValues = {
+  //       ...prevValues,
+  //       [name]: value === 'Select' ? '' : value
+  //     };
+
+  //     // These console logs will help debug
+  //     if (name === 'displayToTransporter' || name === 'route' || name === 'fromLocation') {
+  //       console.log(`Changed ${name} to "${value}"`);
+  //       console.log(`Current values: fromLocation=${newValues.fromLocation}, route=${newValues.route}, displayToTransporter=${newValues.displayToTransporter}`);
+  //     }
+
+  //     return newValues;
+  //   });
+
+  //   // Clear the error for this field if it exists
+  //   if (errors[name]) {
+  //     setErrors(prevErrors => {
+  //       const newErrors = { ...prevErrors };
+  //       delete newErrors[name];
+  //       return newErrors;
+  //     });
+  //   }
+
+  //   // Handle special case for Display To Transporter dropdown
+  //   if (name === 'displayToTransporter') {
+  //     // Reset selected transporters when changing display mode
+  //     setValues(prevValues => ({
+  //       ...prevValues,
+  //       selectTransporter: []
+  //     }));
+
+  //     if (value === 'All') {
+  //       const obj = JSON.parse(sessionStorage.getItem("authUser"));
+  //       let plantCode1 = obj.data.plantCode;
+
+  //       fetchTransportersByFlag('A', plantCode1);
+  //     }
+  //     else if (value === 'Route Based') {
+  //       if (values.route && values.route !== 'Select') {
+  //         fetchTransportersByFlag('R', values.route);
+  //       }
+  //     }
+  //     else if (value === 'Plant Based') {
+  //       if (values.fromLocation && values.fromLocation !== 'Select') {
+  //         fetchTransportersByFlag('P', values.fromLocation);
+  //       } 
+  //     }
+  //   }
+
+  //   // Update related fields for Route changes
+  //   if (name === 'route' && values.displayToTransporter === 'Route Based') {
+  //     if (value && value !== 'Select') {
+  //       fetchTransportersByFlag('R', value);
+  //     }
+  //   }
+
+  //   // Update related fields for From Location changes
+  //   if (name === 'fromLocation' && values.displayToTransporter === 'Plant Based') {
+  //     if (value && value !== 'Select') {
+  //       fetchTransportersByFlag('P', value);
+  //     }
+  //   }
+  // };
+
+  // Create a config similar to your existing config
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+ 
     // Update the values state
     setValues(prevValues => {
       const newValues = {
         ...prevValues,
         [name]: value === 'Select' ? '' : value
       };
-
+ 
       // These console logs will help debug
       if (name === 'displayToTransporter' || name === 'route' || name === 'fromLocation') {
         console.log(`Changed ${name} to "${value}"`);
         console.log(`Current values: fromLocation=${newValues.fromLocation}, route=${newValues.route}, displayToTransporter=${newValues.displayToTransporter}`);
       }
-
+ 
       return newValues;
     });
-
+ 
     // Clear the error for this field if it exists
     if (errors[name]) {
       setErrors(prevErrors => {
@@ -560,7 +630,7 @@ const BulkOrder = ({ bidNo }) => {
         return newErrors;
       });
     }
-
+ 
     // Handle special case for Display To Transporter dropdown
     if (name === 'displayToTransporter') {
       // Reset selected transporters when changing display mode
@@ -568,32 +638,32 @@ const BulkOrder = ({ bidNo }) => {
         ...prevValues,
         selectTransporter: []
       }));
-
+      const obj = JSON.parse(sessionStorage.getItem("authUser"));
+      let plantCode1 = obj.data.plantCode;
       if (value === 'All') {
-        const obj = JSON.parse(sessionStorage.getItem("authUser"));
-        let plantCode1 = obj.data.plantCode;
-
+ 
+ 
         fetchTransportersByFlag('A', plantCode1);
       }
       else if (value === 'Route Based') {
-        if (values.route && values.route !== 'Select') {
-          fetchTransportersByFlag('R', values.route);
-        }
+ 
+        fetchTransportersByFlag('R', plantCode1);
+ 
       }
       else if (value === 'Plant Based') {
-        if (values.fromLocation && values.fromLocation !== 'Select') {
-          fetchTransportersByFlag('P', values.fromLocation);
-        } 
+ 
+        fetchTransportersByFlag('P', plantCode1);
+ 
       }
     }
-
+ 
     // Update related fields for Route changes
     if (name === 'route' && values.displayToTransporter === 'Route Based') {
       if (value && value !== 'Select') {
         fetchTransportersByFlag('R', value);
       }
     }
-
+ 
     // Update related fields for From Location changes
     if (name === 'fromLocation' && values.displayToTransporter === 'Plant Based') {
       if (value && value !== 'Select') {
@@ -601,8 +671,8 @@ const BulkOrder = ({ bidNo }) => {
       }
     }
   };
-
-  // Create a config similar to your existing config
+  
+  
   const config = {
     headers: {
       'Content-Type': 'application/json',
