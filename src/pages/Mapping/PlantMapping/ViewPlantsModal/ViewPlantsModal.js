@@ -391,12 +391,12 @@ const ViewPlantsModal = ({
                   color: 'black'
                 }}>
                   <tr>
-                    <th style={{ padding: '10px 15px' }}>Company Code</th>
+                 
                     <th style={{ padding: '10px 15px' }}>Plant Code</th>
                     <th style={{ padding: '10px 15px' }}>Plant name</th>
                     <th style={{ padding: '10px 15px' }}>Address</th>
                     <th style={{ padding: '10px 15px' }}>Contact Person</th>
-                    <th style={{ padding: '10px 15px' }}>Contact number</th>
+                    <th style={{ padding: '10px 15px' }}>Phone Number</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -405,7 +405,7 @@ const ViewPlantsModal = ({
                       <tr key={index} style={{ 
                         backgroundColor: 'white' 
                       }}>
-                        <td style={{ padding: '10px 15px' }}>{plant.companyCode || "-"}</td>
+                      
                         <td style={{ padding: '10px 15px' }}>{plant.plantCode || "-"}</td>
                         <td style={{ padding: '10px 15px' }}>{plant.plantName || "-"}</td>
                         <td style={{ padding: '10px 15px' }}>{plant.address || "-"}</td>
