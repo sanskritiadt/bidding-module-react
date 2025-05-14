@@ -51,7 +51,7 @@
 //     const [latestHeader, setLatestHeader] = useState('');
 //     const [Plant_Code, setPlantCode] = useState('');
 //     const [routeCode,setRouteCode]=useState(null);
-  
+
 
 //     const toggle = useCallback(() => {
 //         if (modal) {
@@ -74,13 +74,13 @@
 //         setLatestHeader(HeaderName);
 //     }, []);
 
-   
+
 
 //     const getAllRouteData = async (plantCode) => {
 //         setLoading(true);
 //         try {
 //             console.log("Fetching routes for plant code:", plantCode);
-            
+
 //             // Make direct fetch call to ensure we get raw response
 //             const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes?plantCode=${plantCode}`, {
 //                 //const response = await fetch(`http://localhost:8085/routes?plantCode=${plantCode}`, { 
@@ -90,16 +90,16 @@
 //                     'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
 //                 }
 //             });
-            
+
 //             // Check if response is OK
 //             if (!response.ok) {
 //                 throw new Error(`HTTP error! Status: ${response.status}`);
 //             }
-            
+
 //             // Parse JSON response
 //             const data = await response.json();
 //             console.log("API Response data:", data);
-            
+
 //             // Handle the data based on its structure
 //             if (Array.isArray(data)) {
 //                 console.log("API returned an array with", data.length, "items");
@@ -109,7 +109,7 @@
 //             else if (data && data.data && Array.isArray(data.data)) {
 //                 console.log("API returned structured data with", data.data.length, "items");
 //                 setRoutes(data.data);
-                
+
 //                 if (data.meta && data.meta.message) {
 //                    // toast.success(data.meta.message, { autoClose: 3000 });
 //                 } else {
@@ -129,7 +129,7 @@
 //             setLoading(false);
 //         }
 //     };
-  
+
 //     useEffect(() => {
 //         try {
 //             const obj = JSON.parse(sessionStorage.getItem("authUser"));
@@ -194,7 +194,7 @@
 
 //             const data = await response.json();
 //             console.log("Update response:", data);
-            
+
 //             // Check for success in meta object
 //             if (data && data.meta && data.meta.message) {
 //                 toast.success(data.meta.message, { autoClose: 3000 });
@@ -220,7 +220,7 @@
 
 //             const data = await response.json();
 //             console.log("Create response:", data);
-            
+
 //             // Check for success in meta object
 //             if (data && data.meta && data.meta.message) {
 //                 toast.success(data.meta.message, { autoClose: 3000 });
@@ -228,10 +228,10 @@
 //                 toast.success("Route Added Successfully", { autoClose: 3000 });
 //             }
 //         }
-        
+
 //         // Refresh the data after submission
 //         getAllRouteData(Plant_Code);
-        
+
 //         // Close the modal
 //         toggle();
 //     } catch (error) {
@@ -248,16 +248,16 @@
 //     };
 
 //     // Update Data
- 
+
 // // Updated handleCustomerClick to match the API field names
 
 // // 4. Update the handleCustomerClick to fetch the current data before editing
 // const handleCustomerClick = useCallback(async (id) => {
 //     setClickedRowId(id);
 //     setIsEdit(true);
-    
+
 //     try {
-       
+
 //         const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
 //         // const response = await fetch(`http://localhost:8085/routes/id/${id}`, {
 //             method: 'GET',
@@ -273,10 +273,10 @@
 
 //         const data = await response.json();
 //         console.log("Route details for editing:", data);
-        
+
 //         // Check response structure and get the route data
 //         const routeData = data.data || data;
-        
+
 //         // Set form values with the fetched data
 //         setValues({
 //             routeCode: routeData.routeCode || "",
@@ -299,12 +299,12 @@
 //         });
 //            setRouteCode(data.data.routeCode);
 //            setRouteCode(data.data.routeCode);
-        
+
 //         // Show success message if available
 //         if (data.meta && data.meta.message) {
 //           //  toast.success(data.meta.message, { autoClose: 3000 });
 //         }
-        
+
 //         toggle();
 //     } catch (error) {
 //         console.error("Error fetching route details for editing:", error);
@@ -331,14 +331,14 @@
 //         }
 
 //         const data = await response.json();
-     
-     
+
+
 //         console.log("Route details:", data);
-        
+
 //         // Check response structure - use the data property if available
 //         if (data && data.data) {
 //             setViewData(data.data);
-            
+
 //             // Show success message if available
 //             if (data.meta && data.meta.message) {
 //              //   toast.success(data.meta.message, { autoClose: 3000 });
@@ -347,7 +347,7 @@
 //             // Fallback if response is not wrapped in data property
 //             setViewData(data);
 //         }
-        
+
 //         setViewModal(true);
 //     } catch (error) {
 //         console.error("Error fetching route details:", error);
@@ -386,7 +386,7 @@
 //         if (contentType && contentType.indexOf("application/json") !== -1) {
 //             data = await response.json();
 //             console.log("Delete response:", data);
-            
+
 //             // Use success message from API if available
 //             if (data && data.meta && data.meta.message) {
 //                 toast.success(data.meta.message, { autoClose: 3000 });
@@ -397,9 +397,9 @@
 //             console.log("Delete successful (no response body)");
 //             toast.success("Route Deleted Successfully", { autoClose: 3000 });
 //         }
-        
+
 //         setDeleteModal(false);
-        
+
 //         // Refresh data after deletion
 //         getAllRouteData(Plant_Code);
 //     } catch (error) {
@@ -476,21 +476,21 @@
 //   .compact-modal .form-label {
 //     margin-bottom: 2px;
 //   }
-  
+
 //   .compact-modal .mb-2 {
 //     margin-bottom: 0.5rem !important;
 //   }
-  
+
 //   /* Further reduce spacing for view modal */
 //   .compact-modal .mb-1 {
 //     margin-bottom: 0.25rem !important;
 //   }
-  
+
 //   /* Gap between modal header and input fields */
 //   .compact-modal .modal-body {
 //     padding-top: 1rem;
 //   }
-  
+
 //   /* Make form fields more compact in height */
 //   .compact-modal .form-control,
 //   .compact-modal .form-select {
@@ -498,30 +498,30 @@
 //     padding-bottom: 0.25rem;
 //     min-height: 32px;
 //   }
-  
+
 //   /* For View Modal */
 //   .compact-modal .form-control-sm {
 //     padding-top: 0.15rem;
 //     padding-bottom: 0.15rem;
 //     min-height: 24px;
 //   }
-  
+
 //   /* Reduce spacing between rows */
 //   .compact-modal .g-2 {
 //     --bs-gutter-y: 0.3rem;
 //   }
-  
+
 //   /* Optimize spacing for the Edit Modal */
 //   .compact-modal .g-3 {
 //     --bs-gutter-y: 0.75rem;
 //   }
-  
+
 //   /* Even more compact label in view modal */
 //   .compact-modal .fw-semibold.mb-1 {
 //     margin-bottom: 0 !important;
 //     font-size: 0.85rem;
 //   }
-  
+
 //   /* Reduce padding in the form-control-sm elements */
 //   .compact-modal .form-control-sm.py-1 {
 //     padding-top: 0.1rem !important;
@@ -612,7 +612,7 @@
 //         ],
 //         []
 //     );
-    
+
 //     // Export Modal
 //     const [isExportCSV, setIsExportCSV] = useState(false);
 
@@ -1184,8 +1184,8 @@ const MasterRoute = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [latestHeader, setLatestHeader] = useState('');
     const [Plant_Code, setPlantCode] = useState('');
-    const [routeCode,setRouteCode]=useState(null);
-  
+    const [routeCode, setRouteCode] = useState(null);
+
     // Validation functions
     const validateRouteName = (name) => {
         if (!name) return true; // Allow empty initially
@@ -1262,13 +1262,13 @@ const MasterRoute = () => {
         setLatestHeader(HeaderName);
     }, []);
 
-   
+
 
     const getAllRouteData = async (plantCode) => {
         setLoading(true);
         try {
             console.log("Fetching routes for plant code:", plantCode);
-            
+
             // Make direct fetch call to ensure we get raw response
             const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes?plantCode=${plantCode}`, {
                 //const response = await fetch(`http://localhost:8085/routes?plantCode=${plantCode}`, { 
@@ -1278,30 +1278,30 @@ const MasterRoute = () => {
                     'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
                 }
             });
-            
+
             // Check if response is OK
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            
+
             // Parse JSON response
             const data = await response.json();
             console.log("API Response data:", data);
-            
+
             // Handle the data based on its structure
             if (Array.isArray(data)) {
                 console.log("API returned an array with", data.length, "items");
                 setRoutes(data);
-               // toast.success("Routes fetched successfully", { autoClose: 3000 });
-            } 
+                // toast.success("Routes fetched successfully", { autoClose: 3000 });
+            }
             else if (data && data.data && Array.isArray(data.data)) {
                 console.log("API returned structured data with", data.data.length, "items");
                 setRoutes(data.data);
-                
+
                 if (data.meta && data.meta.message) {
-                   // toast.success(data.meta.message, { autoClose: 3000 });
+                    // toast.success(data.meta.message, { autoClose: 3000 });
                 } else {
-                  //  toast.success("Routes fetched successfully", { autoClose: 3000 });
+                    //  toast.success("Routes fetched successfully", { autoClose: 3000 });
                 }
             }
             else {
@@ -1317,7 +1317,7 @@ const MasterRoute = () => {
             setLoading(false);
         }
     };
-  
+
     useEffect(() => {
         try {
             const obj = JSON.parse(sessionStorage.getItem("authUser"));
@@ -1357,77 +1357,77 @@ const MasterRoute = () => {
         });
     };
 
- // 1. Replace your handleSubmit function with this:
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Form values:", values);
+    // 1. Replace your handleSubmit function with this:
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Form values:", values);
 
-    try {
-        if (isEdit) {
-            // Update existing route
-            console.log("Updating route with routeCode:=================>>>>>>>>", routeCode);
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${routeCode}`, {
-          //   const response = await fetch(`http://localhost:8085/routes/${routeCode}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
-                },
-                body: JSON.stringify(values)
-            });
+        try {
+            if (isEdit) {
+                // Update existing route
+                console.log("Updating route with routeCode:=================>>>>>>>>", routeCode);
+                const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${routeCode}`, {
+                    //   const response = await fetch(`http://localhost:8085/routes/${routeCode}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+                    },
+                    body: JSON.stringify(values)
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
-            const data = await response.json();
-            console.log("Update response:", data);
-            
-            // Check for success in meta object
-            if (data && data.meta && data.meta.message) {
-                toast.success(data.meta.message, { autoClose: 3000 });
+                const data = await response.json();
+                console.log("Update response:", data);
+
+                // Check for success in meta object
+                if (data && data.meta && data.meta.message) {
+                    toast.success(data.meta.message, { autoClose: 3000 });
+                } else {
+                    toast.success("Route Updated Successfully", { autoClose: 3000 });
+                }
             } else {
-                toast.success("Route Updated Successfully", { autoClose: 3000 });
-            }
-        } else {
-            // Create new route - remove routeCode from values for new creation
-            const { routeCode, ...newRouteValues } = values;
-            console.log("Creating new route");
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
-           // const response = await fetch(`http://localhost:8085/routes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
-                },
-                body: JSON.stringify(newRouteValues)
-            });
+                // Create new route - remove routeCode from values for new creation
+                const { routeCode, ...newRouteValues } = values;
+                console.log("Creating new route");
+                const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
+                    // const response = await fetch(`http://localhost:8085/routes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+                    },
+                    body: JSON.stringify(newRouteValues)
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Create response:", data);
+
+                // Check for success in meta object
+                if (data && data.meta && data.meta.message) {
+                    toast.success(data.meta.message, { autoClose: 3000 });
+                } else {
+                    toast.success("Route Added Successfully", { autoClose: 3000 });
+                }
             }
 
-            const data = await response.json();
-            console.log("Create response:", data);
-            
-            // Check for success in meta object
-            if (data && data.meta && data.meta.message) {
-                toast.success(data.meta.message, { autoClose: 3000 });
-            } else {
-                toast.success("Route Added Successfully", { autoClose: 3000 });
-            }
+            // Refresh the data after submission
+            getAllRouteData(Plant_Code);
+
+            // Close the modal
+            toggle();
+        } catch (error) {
+            console.error("API error:", error);
+            toast.error(`Operation failed: ${error.message}`, { autoClose: 3000 });
         }
-        
-        // Refresh the data after submission
-        getAllRouteData(Plant_Code);
-        
-        // Close the modal
-        toggle();
-    } catch (error) {
-        console.error("API error:", error);
-        toast.error(`Operation failed: ${error.message}`, { autoClose: 3000 });
-    }
-};
+    };
 
 
     // Add Data
@@ -1437,112 +1437,112 @@ const handleSubmit = async (e) => {
     };
 
     // Update Data
- 
-// Updated handleCustomerClick to match the API field names
 
-// 4. Update the handleCustomerClick to fetch the current data before editing
-const handleCustomerClick = useCallback(async (id) => {
-    setClickedRowId(id);
-    setIsEdit(true);
-    
-    try {
-       
-        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
-        // const response = await fetch(`http://localhost:8085/routes/id/${id}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
+    // Updated handleCustomerClick to match the API field names
+
+    // 4. Update the handleCustomerClick to fetch the current data before editing
+    const handleCustomerClick = useCallback(async (id) => {
+        setClickedRowId(id);
+        setIsEdit(true);
+
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
+                // const response = await fetch(`http://localhost:8085/routes/id/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+            const data = await response.json();
+            console.log("Route details for editing:", data);
 
-        const data = await response.json();
-        console.log("Route details for editing:", data);
-        
-        // Check response structure and get the route data
-        const routeData = data.data || data;
-        
-        // Set form values with the fetched data
-        setValues({
-            routeCode: routeData.routeCode || "",
-            routeName: routeData.routeName || "",
-            plantCode: routeData.plantCode || Plant_Code,
-            routeDestination: routeData.routeDestination || "",
-            routeType: routeData.routeType || "",
-            transportationType: routeData.transportationType || "",
-            deliveryDate: routeData.deliveryDate || "",
-            shippingType: routeData.shippingType || "",
-            routeDetermination: routeData.routeDetermination || "",
-            intermediateStops: routeData.intermediateStops || "",
-            routeDistance: routeData.routeDistance || "",
-            transportationCost: routeData.transportationCost || "",
-            carrier: routeData.carrier || "",
-            routeSelection: routeData.routeSelection || "",
-            transportationZone: routeData.transportationZone || "",
-            shippingPoint: routeData.shippingPoint || "",
-            status: routeData.status || "A",
-        });
-           setRouteCode(data.data.routeCode);
-           setRouteCode(data.data.routeCode);
-        
-        // Show success message if available
-        if (data.meta && data.meta.message) {
-          //  toast.success(data.meta.message, { autoClose: 3000 });
+            // Check response structure and get the route data
+            const routeData = data.data || data;
+
+            // Set form values with the fetched data
+            setValues({
+                routeCode: routeData.routeCode || "",
+                routeName: routeData.routeName || "",
+                plantCode: routeData.plantCode || Plant_Code,
+                routeDestination: routeData.routeDestination || "",
+                routeType: routeData.routeType || "",
+                transportationType: routeData.transportationType || "",
+                deliveryDate: routeData.deliveryDate || "",
+                shippingType: routeData.shippingType || "",
+                routeDetermination: routeData.routeDetermination || "",
+                intermediateStops: routeData.intermediateStops || "",
+                routeDistance: routeData.routeDistance || "",
+                transportationCost: routeData.transportationCost || "",
+                carrier: routeData.carrier || "",
+                routeSelection: routeData.routeSelection || "",
+                transportationZone: routeData.transportationZone || "",
+                shippingPoint: routeData.shippingPoint || "",
+                status: routeData.status || "A",
+            });
+            setRouteCode(data.data.routeCode);
+            setRouteCode(data.data.routeCode);
+
+            // Show success message if available
+            if (data.meta && data.meta.message) {
+                //  toast.success(data.meta.message, { autoClose: 3000 });
+            }
+
+            toggle();
+        } catch (error) {
+            console.error("Error fetching route details for editing:", error);
+            toast.error(`Failed to fetch route details: ${error.message}`, { autoClose: 3000 });
         }
-        
-        toggle();
-    } catch (error) {
-        console.error("Error fetching route details for editing:", error);
-        toast.error(`Failed to fetch route details: ${error.message}`, { autoClose: 3000 });
-    }
-}, [toggle, Plant_Code]);
+    }, [toggle, Plant_Code]);
     // View Data
 
 
-// 3. Update your handleViewClick function to fetch detailed information
-const handleViewClick = useCallback(async (id) => {
-    try {
-        console.log("Fetching details for route ID:", id);
-        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
-            }
-        });
+    // 3. Update your handleViewClick function to fetch detailed information
+    const handleViewClick = useCallback(async (id) => {
+        try {
+            console.log("Fetching details for route ID:", id);
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
+                }
+            });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-     
-     
-        console.log("Route details:", data);
-        
-        // Check response structure - use the data property if available
-        if (data && data.data) {
-            setViewData(data.data);
-            
-            // Show success message if available
-            if (data.meta && data.meta.message) {
-             //   toast.success(data.meta.message, { autoClose: 3000 });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        } else {
-            // Fallback if response is not wrapped in data property
-            setViewData(data);
+
+            const data = await response.json();
+
+
+            console.log("Route details:", data);
+
+            // Check response structure - use the data property if available
+            if (data && data.data) {
+                setViewData(data.data);
+
+                // Show success message if available
+                if (data.meta && data.meta.message) {
+                    //   toast.success(data.meta.message, { autoClose: 3000 });
+                }
+            } else {
+                // Fallback if response is not wrapped in data property
+                setViewData(data);
+            }
+
+            setViewModal(true);
+        } catch (error) {
+            console.error("Error fetching route details:", error);
+            toast.error(`Failed to fetch route details: ${error.message}`, { autoClose: 3000 });
         }
-        
-        setViewModal(true);
-    } catch (error) {
-        console.error("Error fetching route details:", error);
-        toast.error(`Failed to fetch route details: ${error.message}`, { autoClose: 3000 });
-    }
-}, []);
+    }, []);
 
     // Delete Data
     const onClickDelete = (id) => {
@@ -1551,52 +1551,52 @@ const handleViewClick = useCallback(async (id) => {
     };
 
 
-// 2. Replace your handleDeleteCustomer function with this:
-const handleDeleteCustomer = async (e) => {
-    e.preventDefault();
+    // 2. Replace your handleDeleteCustomer function with this:
+    const handleDeleteCustomer = async (e) => {
+        e.preventDefault();
 
-    try {
-        console.log("Deleting route with ID:", CurrentID);
-        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${CurrentID}`, {
-            method: 'DELETE',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+        try {
+            console.log("Deleting route with ID:", CurrentID);
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${CurrentID}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+            // Check if there's a response body
+            let data;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                data = await response.json();
+                console.log("Delete response:", data);
 
-        // Check if there's a response body
-        let data;
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
-            data = await response.json();
-            console.log("Delete response:", data);
-            
-            // Use success message from API if available
-            if (data && data.meta && data.meta.message) {
-                toast.success(data.meta.message, { autoClose: 3000 });
+                // Use success message from API if available
+                if (data && data.meta && data.meta.message) {
+                    toast.success(data.meta.message, { autoClose: 3000 });
+                } else {
+                    toast.success("Route Deleted Successfully", { autoClose: 3000 });
+                }
             } else {
+                console.log("Delete successful (no response body)");
                 toast.success("Route Deleted Successfully", { autoClose: 3000 });
             }
-        } else {
-            console.log("Delete successful (no response body)");
-            toast.success("Route Deleted Successfully", { autoClose: 3000 });
+
+            setDeleteModal(false);
+
+            // Refresh data after deletion
+            getAllRouteData(Plant_Code);
+        } catch (error) {
+            console.error("Delete error:", error);
+            toast.error(`Failed to delete route: ${error.message}`, { autoClose: 3000 });
+            setDeleteModal(false);
         }
-        
-        setDeleteModal(false);
-        
-        // Refresh data after deletion
-        getAllRouteData(Plant_Code);
-    } catch (error) {
-        console.error("Delete error:", error);
-        toast.error(`Failed to delete route: ${error.message}`, { autoClose: 3000 });
-        setDeleteModal(false);
-    }
-};
+    };
 
 
     const status = [
@@ -1652,15 +1652,15 @@ const handleDeleteCustomer = async (e) => {
         },
     ];
 
-// Add this custom style to your component
-const CustomHeaderStyle = `
+    // Add this custom style to your component
+    const CustomHeaderStyle = `
   .text-nowrap-headers th {
     white-space: nowrap !important;
   }
 `;
 
-// Add these additional styles to your ModalStyles
-const ModalStyles = `
+    // Add these additional styles to your ModalStyles
+    const ModalStyles = `
   /* Reduced vertical spacing between input fields */
   .compact-modal .form-label {
     margin-bottom: 2px;
@@ -1726,7 +1726,7 @@ const ModalStyles = `
                 accessor: "routeCode",
                 filterable: false,
             },
-            {   
+            {
                 Header: "Route Name",
                 accessor: "routeName",
                 filterable: false,
@@ -1801,7 +1801,7 @@ const ModalStyles = `
         ],
         []
     );
-    
+
     // Export Modal
     const [isExportCSV, setIsExportCSV] = useState(false);
 
@@ -1879,15 +1879,15 @@ const ModalStyles = `
                                         </ModalHeader>
                                         <Form className="tablelist-form" onSubmit={handleSubmit}>
                                             <ModalBody style={{ padding: '1.5rem 1rem 0.5rem' }}>
-                                                <Row style={{ margin: '-0.35rem -0.5rem' }}> 
+                                                <Row style={{ margin: '-0.35rem -0.5rem' }}>
                                                     {/* Route Code only shown in Edit mode */}
                                                     {isEdit && (
-                                                        <Col md={4} style={{ padding: '0.15rem 0.5rem' }}> 
+                                                        <Col md={4} style={{ padding: '0.15rem 0.5rem' }}>
                                                             <Label htmlFor="routeCode" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                                 Route Code
                                                             </Label>
-                                                            <Input 
-                                                                type="text" 
+                                                            <Input
+                                                                type="text"
                                                                 className="form-control"
                                                                 name="routeCode"
                                                                 id="routeCode"
@@ -1904,9 +1904,9 @@ const ModalStyles = `
                                                         <Label htmlFor="routeName" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Name<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.routeName && !validateRouteName(values.routeName) ? 'is-invalid' : ''}`}
                                                             name="routeName"
                                                             id="routeName"
@@ -1926,9 +1926,9 @@ const ModalStyles = `
                                                         <Label htmlFor="routeDestination" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Destination<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.routeDestination && !validateDestination(values.routeDestination) ? 'is-invalid' : ''}`}
                                                             name="routeDestination"
                                                             id="routeDestination"
@@ -1989,9 +1989,9 @@ const ModalStyles = `
                                                         <Label htmlFor="deliveryDate" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Delivery Date<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="datetime-local" 
-                                                            required 
+                                                        <Input
+                                                            type="datetime-local"
+                                                            required
                                                             className="form-control"
                                                             name="deliveryDate"
                                                             id="deliveryDate"
@@ -2004,9 +2004,9 @@ const ModalStyles = `
                                                         <Label htmlFor="shippingType" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Shipping Type<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.shippingType && !validateShippingType(values.shippingType) ? 'is-invalid' : ''}`}
                                                             name="shippingType"
                                                             id="shippingType"
@@ -2046,9 +2046,9 @@ const ModalStyles = `
                                                         <Label htmlFor="intermediateStops" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Intermediate Stops<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.intermediateStops && !validateIntermediateStops(values.intermediateStops) ? 'is-invalid' : ''}`}
                                                             name="intermediateStops"
                                                             id="intermediateStops"
@@ -2067,9 +2067,9 @@ const ModalStyles = `
                                                         <Label htmlFor="routeDistance" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Distance<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.routeDistance && !validateDistance(values.routeDistance) ? 'is-invalid' : ''}`}
                                                             name="routeDistance"
                                                             id="routeDistance"
@@ -2088,9 +2088,9 @@ const ModalStyles = `
                                                         <Label htmlFor="transportationCost" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Transportation Cost<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.transportationCost && !validateCost(values.transportationCost) ? 'is-invalid' : ''}`}
                                                             name="transportationCost"
                                                             id="transportationCost"
@@ -2109,9 +2109,9 @@ const ModalStyles = `
                                                         <Label htmlFor="carrier" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Carrier<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.carrier && !validateCarrier(values.carrier) ? 'is-invalid' : ''}`}
                                                             name="carrier"
                                                             id="carrier"
@@ -2139,7 +2139,7 @@ const ModalStyles = `
                                                             onChange={handleInputChange}
                                                             required
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
-                                                            >
+                                                        >
                                                             {routeSelections.map((item, key) => (
                                                                 <React.Fragment key={key}>
                                                                     {item.options.map((item, key) => (<option value={item.value} key={key}>{item.label}</option>))}
@@ -2151,9 +2151,9 @@ const ModalStyles = `
                                                         <Label htmlFor="transportationZone" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Transportation Zone<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.transportationZone && !validateTransportationZone(values.transportationZone) ? 'is-invalid' : ''}`}
                                                             name="transportationZone"
                                                             id="transportationZone"
@@ -2172,9 +2172,9 @@ const ModalStyles = `
                                                         <Label htmlFor="shippingPoint" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Shipping Point<span style={{ color: "red" }}>*</span>
                                                         </Label>
-                                                        <Input 
-                                                            type="text" 
-                                                            required 
+                                                        <Input
+                                                            type="text"
+                                                            required
                                                             className={`form-control ${values.shippingPoint && !validateShippingPoint(values.shippingPoint) ? 'is-invalid' : ''}`}
                                                             name="shippingPoint"
                                                             id="shippingPoint"
@@ -2227,7 +2227,7 @@ const ModalStyles = `
                                         <ModalHeader className="bg-light p-2" toggle={toggleView}>
                                             Route Details
                                         </ModalHeader>
-                                        <ModalBody style={{ padding: '1.5rem 1rem 0.5rem' }}>  
+                                        <ModalBody style={{ padding: '1.5rem 1rem 0.5rem' }}>
                                             <Row style={{ marginTop: '-0.25rem', marginBottom: '-0.25rem' }}>
                                                 <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                     <div>
@@ -2342,17 +2342,18 @@ const ModalStyles = `
                                         </ModalFooter>
                                     </Modal>
                                     <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        toastStyle={{ backgroundColor: "white" }}
-      />
+                                        position="top-right"
+                                        autoClose={3000}
+                                        hideProgressBar={false}
+                                        closeOnClick
+                                        rtl={false}
+                                        pauseOnFocusLoss
+                                        draggable
+                                        pauseOnHover
+                                        theme="light"
+
+                                        toastStyle={{ backgroundColor: "white" }}
+                                    />
                                 </div>
                             </Card>
                         </Col>
