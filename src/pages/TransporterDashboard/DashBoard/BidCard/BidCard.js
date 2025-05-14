@@ -1,7 +1,3 @@
-
-
-
-// BidCard.js
 import React, { useState, useEffect } from "react";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import './BidCard.css';
@@ -120,35 +116,13 @@ const BidCard = () => {
     );
   }
 
-  // If no data from API, use default data from the image
+  // If no data from API, show a message or empty state
   if (!minimalBids || minimalBids.length === 0) {
-    const defaultBids = [
-      { bidNo: "BID-NE205-001", time: "9d :6h" },
-      { bidNo: "-----", time: "9d :6h" },
-      { bidNo: "-----", time: "9d :6h" },
-      { bidNo: "-----", time: "5d :0h" },
-      { bidNo: "-----", time: "5d :0h" },
-      { bidNo: "-----", time: "5d :0h" }
-    ];
-    
     return (
       <Row className="bidding-cards-container">
-        {defaultBids.map((card, index) => (
-          <Col key={index} md={2} sm={4} xs={6} className="mb-3">
-            <Card className="bidding-card">
-              <div className="bidding-number">
-                Bid No. : {card.bidNo}
-              </div>
-              <CardBody className="bidding-card-body">
-                <div className="bidding-time-circle">
-                  <div className="bidding-time-label">Time</div>
-                  <div className="bidding-time-label">Remaining</div>
-                  <div className="bidding-time-value">{card.time}</div>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        ))}
+        <Col xs={12} className="text-center">
+          <div className="p-3">No bids available at this time.</div>
+        </Col>
       </Row>
     );
   }
@@ -161,4 +135,3 @@ const BidCard = () => {
 }
 
 export default BidCard;
-

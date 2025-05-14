@@ -695,7 +695,7 @@ const TransporterDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get('http://10.6.0.5:8085/biddingMaster/all', config);
+      const response = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/all`, config);
       setBidData(response);
     } catch (err) {
       setError("Failed to fetch bid data. Please try again.");
@@ -771,7 +771,7 @@ const TransporterDashboard = () => {
       },
       {
         Header: "Route",
-        accessor: row => `${row.fromLocation} to ${row.toLocation}`,
+        accessor: row => `${row.route}`,
       },
       {
         Header: "Bulker Order",
