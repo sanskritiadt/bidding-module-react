@@ -73,7 +73,7 @@ const SalesOrderModal = ({ isOpen, toggle, bidNo }) => {
       const password = process.env.REACT_APP_API_PASSWORD;
       const basicAuth = 'Basic ' + btoa(username + ':' + password);
      // const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getSoDetails?biddingOrderNo=${bidNo}`, {
-      const response = await fetch(`http://localhost:8085/biddingMaster/getSoDetails?biddingOrderNo=${bidNo}`, {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getSoDetails?biddingOrderNo=${bidNo}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',

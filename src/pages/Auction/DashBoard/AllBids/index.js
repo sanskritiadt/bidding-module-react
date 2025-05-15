@@ -12,11 +12,8 @@ import BidCard from "./BidCard/BideCard";
 import BidViewModal from "./BidViewModal/BidViewModal";
 import BidHistoryModal from "./BidHistoryModal/BidHistoryModal";
 
-// Import constants
-import { sampleData } from "./BidConstants/bidConstants";
-
 const ViewAllBids = () => {
-    const [bids, setBids] = useState(sampleData); // Using sample data for UI testing
+    const [bids, setBids] = useState([]);
     const [viewModal, setViewModal] = useState(false);
     const [historyModal, setHistoryModal] = useState(false);
     const [viewData, setViewData] = useState({});
@@ -27,6 +24,8 @@ const ViewAllBids = () => {
     const [Plant_Code, setPlantCode] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     
     // Export Modal
     const [isExportCSV, setIsExportCSV] = useState(false);
@@ -52,21 +51,71 @@ const ViewAllBids = () => {
         setLatestHeader(HeaderName);
     }, []);
 
+    // Get status based on date comparison
+    const getStatus = (bidFrom, bidTo) => {
+        const now = new Date();
+        const start = new Date(bidFrom);
+        const end = new Date(bidTo);
+
+        if (now < start) return "To Be Started";
+        if (now >= start && now <= end) return "Running";
+        return "Completed";
+    };
+
+    // Fetch bid data from API
     useEffect(() => {
-        // In a real application, you would get the plant code from session storage
-        // For UI testing, we'll use a dummy value
-        try {
-            const obj = JSON.parse(sessionStorage.getItem("authUser"));
-            let plantcode = obj?.data?.plantCode || "PLANT001";
-            setPlantCode(plantcode);
-            // Using sample data directly
-            setBids(sampleData);
-        } catch (error) {
-            // Fallback for testing
-            setPlantCode("PLANT001");
-            setBids(sampleData);
-        }
+        fetchBidData();
     }, []);
+
+    const fetchBidData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            
+            // Basic authentication setup
+            const username = process.env.REACT_APP_API_USER_NAME;
+            const password = process.env.REACT_APP_API_PASSWORD;
+            const basicAuth = 'Basic ' + btoa(username + ':' + password);
+            
+            // Get transporter code - you might need to adjust this based on your auth implementation
+            const authUser = JSON.parse(sessionStorage.getItem("authUser") || '{}');
+            const transporterCode = authUser?.data?.transporterCode || 'T-000008';
+            
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${transporterCode}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': basicAuth
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            
+            // Access the data correctly from the API response
+            if (responseData && responseData.data && Array.isArray(responseData.data)) {
+                // Add status to each bid based on date comparison
+                const bidsWithStatus = responseData.data.map(bid => ({
+                    ...bid,
+                    status: getStatus(bid.bidFrom, bid.bidTo)
+                }));
+                setBids(bidsWithStatus);
+            } else {
+                console.log('Unexpected API response structure:', responseData);
+                setBids([]);
+            }
+        } catch (err) {
+            console.error('API Error:', err);
+            setError("Failed to fetch bid data. Please try again.");
+            setBids([]);
+            toast.error("Failed to fetch bid data. Please try again.", { autoClose: 3000 });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Handle search input change
     const handleSearchChange = (e) => {
@@ -90,9 +139,9 @@ const ViewAllBids = () => {
     });
 
     // View Data
-    const handleViewClick = useCallback((id) => {
-        // Find the bid in the sample data
-        const selectedBid = bids.find(bid => bid.id === id);
+    const handleViewClick = useCallback((bidNo) => {
+        // Find the bid in the fetched data
+        const selectedBid = bids.find(bid => bid.biddingOrderNo === bidNo);
         if (selectedBid) {
             setViewData(selectedBid);
             setViewModal(true);
@@ -102,11 +151,11 @@ const ViewAllBids = () => {
     }, [bids]);
 
     // History Data
-    const handleHistoryClick = useCallback((id) => {
-        // Find the bid in the sample data
-        const selectedBid = bids.find(bid => bid.id === id);
+    const handleHistoryClick = useCallback((bidNo) => {
+        // Find the bid in the fetched data
+        const selectedBid = bids.find(bid => bid.biddingOrderNo === bidNo);
         if (selectedBid) {
-            setSelectedBidNo(selectedBid.bidNo);
+            setSelectedBidNo(selectedBid.biddingOrderNo);
             setHistoryModal(true);
         } else {
             toast.error("Bid details not found", { autoClose: 3000 });
@@ -123,11 +172,31 @@ const ViewAllBids = () => {
         e.preventDefault();
 
         try {
-            // For UI testing - update the bids state directly
+            // For now, just update the local state
+            // In production, you would make an API call here
             const updatedBids = bids.filter(bid => bid.id !== CurrentID);
             setBids(updatedBids);
             toast.success("Bid Deleted Successfully", { autoClose: 3000 });
             setDeleteModal(false);
+            
+            // Uncomment and adjust when you have a delete API endpoint
+            // const username = process.env.REACT_APP_API_USER_NAME;
+            // const password = process.env.REACT_APP_API_PASSWORD;
+            // const basicAuth = 'Basic ' + btoa(username + ':' + password);
+            
+            // const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8085}/biddingMaster/delete/${CurrentID}`, {
+            //     method: 'DELETE',
+            //     headers: {
+            //         'Authorization': basicAuth
+            //     }
+            // });
+            
+            // if (response.ok) {
+            //     toast.success("Bid Deleted Successfully", { autoClose: 3000 });
+            //     fetchBidData(); // Refresh the data
+            // } else {
+            //     throw new Error('Delete failed');
+            // }
         } catch (e) {
             toast.error("Something went wrong!", { autoClose: 3000 });
             setDeleteModal(false);
@@ -158,7 +227,7 @@ const ViewAllBids = () => {
                                     <Row className="align-items-center">
                                         <Col>
                                             <div className="d-flex align-items-center justify-content-between">
-                                            <div style={{ width: "600px" }}>
+                                                <div style={{ width: "600px" }}>
                                                     <h5 className="card-title mb-0 p-2 bg-light">Bids Management</h5>
                                                 </div>
                                                 <div className="d-flex">
@@ -194,13 +263,28 @@ const ViewAllBids = () => {
                                     <div>
                                         {/* Card view for bids */}
                                         <div className="bid-cards-container">
-                                            {filteredBids && filteredBids.length ? (
+                                            {loading ? (
+                                                <div className="text-center py-5">
+                                                    <div className="spinner-border" role="status">
+                                                        <span className="sr-only">Loading...</span>
+                                                    </div>
+                                                    <p className="mt-2">Loading bid data...</p>
+                                                </div>
+                                            ) : error ? (
+                                                <div className="text-center text-danger py-5">
+                                                    <i className="ri-error-warning-line fs-1 mb-3"></i>
+                                                    <p>{error}</p>
+                                                    <button className="btn btn-primary btn-sm" onClick={fetchBidData}>
+                                                        Retry
+                                                    </button>
+                                                </div>
+                                            ) : filteredBids && filteredBids.length ? (
                                                 filteredBids.map(bid => (
                                                     <BidCard 
                                                         key={bid.id} 
                                                         bid={bid} 
-                                                        handleViewClick={() => handleViewClick(bid.id)}
-                                                        handleHistoryClick={() => handleHistoryClick(bid.id)}
+                                                        handleViewClick={() => handleViewClick(bid.biddingOrderNo)}
+                                                        handleHistoryClick={() => handleHistoryClick(bid.biddingOrderNo)}
                                                     />
                                                 ))
                                             ) : (
