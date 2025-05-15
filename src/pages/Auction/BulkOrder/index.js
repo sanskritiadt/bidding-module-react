@@ -822,13 +822,13 @@ const BulkOrder = ({ bidNo }) => {
 
         if (!cities.length) {
           console.log("Fallback cities used");
-          setCitiesData(["UJJAIN", "INDORE"]);
+         // setCitiesData(["UJJAIN", "INDORE"]);
         } else {
           setCitiesData(cities);
         }
       } catch (error) {
         console.error("Error fetching cities:", error);
-        setCitiesData(["UJJAIN", "INDORE"]);
+      //  setCitiesData(["UJJAIN", "INDORE"]);
       } finally {
         setLoadingCities(false);
       }
