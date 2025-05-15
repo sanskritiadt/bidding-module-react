@@ -314,63 +314,7 @@
       if (bidNo) {
         // Sample data with all specified columns
         const data = [
-          {
-            id: 1,
-            salesOrderNo: "SO23456",
-            validityStartDate: "18/02/2025 01:00",
-            validityEndDate: "10/02/2025 05:00",
-            orderQty: "100 Tan",
-            remainingQty: "80 Tan",
-            orderType: "Ship",
-            blockedSold: "No",
-            cityDesc: "Mumbai",
-            countryDesc: "India",
-            distributionChannel: "Road",
-            routeCode: "RN102",
-            routeDesc: "Mumbai Route",
-            shipToParty: "SHIP1",
-            shipToPartyName: "Ship Party Name 1",
-            shipToRegion: "West",
-            division: "Transport"
-          },
-          {
-            id: 2,
-            salesOrderNo: "SO45734",
-            validityStartDate: "18/02/2025 01:00",
-            validityEndDate: "10/02/2025 05:00",
-            orderQty: "200 Tan",
-            remainingQty: "134 Tan",
-            orderType: "Ship",
-            blockedSold: "Yes",
-            cityDesc: "Delhi",
-            countryDesc: "India",
-            distributionChannel: "Air",
-            routeCode: "RN103",
-            routeDesc: "Delhi Route",
-            shipToParty: "SHIP2",
-            shipToPartyName: "Ship Party Name 2",
-            shipToRegion: "North",
-            division: "Logistics"
-          },
-          {
-            id: 3,
-            salesOrderNo: "SO89342",
-            validityStartDate: "18/02/2025 01:00",
-            validityEndDate: "10/02/2025 05:00",
-            orderQty: "250 Tan",
-            remainingQty: "125 Tan",
-            orderType: "Ship",
-            blockedSold: "No",
-            cityDesc: "Chennai",
-            countryDesc: "India",
-            distributionChannel: "Sea",
-            routeCode: "RN108",
-            routeDesc: "Chennai Route",
-            shipToParty: "SHIP3",
-            shipToPartyName: "Ship Party Name 3",
-            shipToRegion: "South",
-            division: "Distribution"
-          }
+        
         ];
         setSalesOrderData(data);
         setFilteredData(data);
