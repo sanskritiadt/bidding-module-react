@@ -11,192 +11,6 @@ import BidCard from "./BidCard/BidCard";
 import "./DashBoard.css";
 import CancelBidModal from "./CancelBidModal/CancelBidModal";
 import BidConfirmationModal from "./BidConfirmationModal/BidConfirmationModal";
-// Modal Component
-// const CancelBidModal = ({ isOpen, toggle, bidNo, onCancelBid }) => {
-//   const [remark, setRemark] = useState("");
-
-//   const handleCancelBid = () => {
-//     onCancelBid(bidNo, remark);
-//     setRemark("");
-//     toggle();
-//   };
-
-//   return (
-//     <Modal isOpen={isOpen} toggle={toggle} centered>
-//       <ModalHeader toggle={toggle}>
-//         Cancel Bid
-//       </ModalHeader>
-//       <ModalBody>
-//         <Form>
-//           <FormGroup>
-//             <Label for="remark">Add Remark <span className="text-danger">*</span></Label>
-//             <Input
-//               type="textarea"
-//               id="remark"
-//               placeholder="Remark"
-//               value={remark}
-//               onChange={(e) => setRemark(e.target.value)}
-//               rows={5}
-//             />
-//           </FormGroup>
-//         </Form>
-//       </ModalBody>
-//       <ModalFooter>
-//         <Button color="primary" onClick={handleCancelBid}>
-//           Cancel Bid
-//         </Button>
-//       </ModalFooter>
-//     </Modal>
-//   );
-// };
-
-// Bid Confirmation Modal Component (keeping your original implementation)
-// const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
-//   const transporters = [
-//     {
-//       rank: "1st",
-//       name: "RAJ ENTERPRISE",
-//       auctionType: "Reversal Bid",
-//       ceilingPrice: "10,00,000",
-//       givenPrice: "7,00,000",
-//       deliveredBefore: "1 Day",
-//       multipleOrders: "Yes",
-//       rating: 4.5,
-//     },
-//     {
-//       rank: "2nd",
-//       name: "R AND B TRANSPORT",
-//       auctionType: "Reversal Bid",
-//       ceilingPrice: "9,00,000",
-//       givenPrice: "5,00,000",
-//       deliveredBefore: "5 Day",
-//       multipleOrders: "No",
-//       rating: 5,
-//     },
-//     {
-//       rank: "3rd",
-//       name: "NEHA ROADLINE",
-//       auctionType: "Reversal Bid",
-//       ceilingPrice: "3,00,000",
-//       givenPrice: "1,45,000",
-//       deliveredBefore: "2 Day",
-//       multipleOrders: "No",
-//       rating: 1,
-//     },
-//     {
-//       rank: "4Th",
-//       name: "M2 VENTURES",
-//       auctionType: "Reversal Bid",
-//       ceilingPrice: "15,00,000",
-//       givenPrice: "9,00,000",
-//       deliveredBefore: "3 Day",
-//       multipleOrders: "Yes",
-//       rating: 3,
-//     },
-//     {
-//       rank: "5Th",
-//       name: "BHARAT ROADWAYS",
-//       auctionType: "Reversal Bid",
-//       ceilingPrice: "5,00,000",
-//       givenPrice: "3,00,000",
-//       deliveredBefore: "2 Day",
-//       multipleOrders: "Yes",
-//       rating: 2,
-//     }
-//   ];
-
-//   const renderRating = (rating) => {
-//     const fullStars = Math.floor(rating);
-//     const hasHalfStar = rating % 1 >= 0.5;
-//     const stars = [];
-
-//     let starColor = "text-warning";
-//     if (rating <= 2) {
-//       starColor = "text-danger";
-//     } else if (rating >= 4) {
-//       starColor = "text-success";
-//     }
-
-//     for (let i = 0; i < fullStars; i++) {
-//       stars.push(<i key={`full-${i}`} className={`ri-star-fill ${starColor}`}></i>);
-//     }
-
-//     if (hasHalfStar) {
-//       stars.push(<i key="half" className={`ri-star-half-fill ${starColor}`}></i>);
-//     }
-
-//     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-//     for (let i = 0; i < emptyStars; i++) {
-//       stars.push(<i key={`empty-${i}`} className={`ri-star-line ${starColor}`}></i>);
-//     }
-
-//     return stars;
-//   };
-
-//   return (
-//     <Modal isOpen={isOpen} toggle={toggle} centered size="xl" className="bid-confirmation-modal">
-//       <ModalHeader toggle={toggle} className="border-0">
-//         <div className="bid-confirmation-title">Bid Confirmation - {bidNo}</div>
-//       </ModalHeader>
-//       <ModalBody>
-//         <div className="bid-table-container">
-//           <table className="table table-striped table-bordered mb-0">
-//             <thead className="bg-primary sticky-header" style={{ color: "black" }}>
-//               <tr>
-//                 <th>Rank</th>
-//                 <th>
-//                   Transporter name
-//                   <i className="ri-arrow-up-down-line ms-1"></i>
-//                 </th>
-//                 <th>Auction Type</th>
-//                 <th>Ceiling Price</th>
-//                 <th>Given Price</th>
-//                 <th>Delivered Before</th>
-//                 <th>Multiple Orders</th>
-//                 <th>Transporter Rating</th>
-//                 <th>Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {transporters.map((transporter, index) => (
-//                 <tr key={index}>
-//                   <td>{transporter.rank}</td>
-//                   <td>
-//                     {transporter.name}
-//                     <i className="ri-add-line ms-2 text-primary"></i>
-//                   </td>
-//                   <td>{transporter.auctionType}</td>
-//                   <td>{transporter.ceilingPrice}</td>
-//                   <td>{transporter.givenPrice}</td>
-//                   <td>{transporter.deliveredBefore}</td>
-//                   <td>{transporter.multipleOrders}</td>
-//                   <td className="text-center">
-//                     {renderRating(transporter.rating)}
-//                   </td>
-//                   <td>
-//                     <div className="d-flex gap-1">
-//                       <Button color="success" size="sm" className="action-btn">
-//                         Assign
-//                       </Button>
-//                       <Button color="danger" size="sm" className="action-btn">
-//                         Reject
-//                       </Button>
-//                     </div>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       </ModalBody>
-//       <ModalFooter className="justify-content-end">
-//         <Button color="light" onClick={toggle} className="bid-cancel-btn">
-//           Cancel
-//         </Button>
-//       </ModalFooter>
-//     </Modal>
-//   );
-// };
 
 const AuctionDashboard = () => {
   document.title = "Dashboard | EPLMS";
@@ -213,6 +27,7 @@ const AuctionDashboard = () => {
   const [bidToConfirm, setBidToConfirm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  //const[biddingOrderNo,setBiddingOrderNo]=useState("");
 
   // Helper function to format date
   const formatDate = (dateString) => {
@@ -270,6 +85,9 @@ const AuctionDashboard = () => {
       // Access the data correctly from the API response
       if (responseData && responseData.data && Array.isArray(responseData.data)) {
         setBidData(responseData.data);
+       // setBiddingOrderNo(responseData.data.biddingOrderNo);
+       //console.log("biddingOrderNo=========>>>>>>>>",biddingOrderNo);
+
       } else {
         console.log('Unexpected API response structure:', responseData);
         setBidData([]);
@@ -299,11 +117,37 @@ const AuctionDashboard = () => {
     setIsBidConfirmationModalOpen(true);
   };
 
-  const handleCancelBid = (bidNo, remark) => {
-    console.log(`Bid ${bidNo} cancelled with remark: ${remark}`);
-    fetchBidData();
-  };
+const handleCancelBid = async (bidNo, remark) => {
+  try {
+    const username = process.env.REACT_APP_API_USER_NAME;
+    const password = process.env.REACT_APP_API_PASSWORD;
+    const basicAuth = 'Basic ' + btoa(username + ':' + password);
+    
+    const response = await fetch(
+      `${process.env.REACT_APP_LOCAL_URL_8085}/biddingMaster/cancelBidByBidNumber?bidNumber=${bidNo}&remarks=${encodeURIComponent(remark)}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': basicAuth
+        }
+      }
+    );
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log(`Bid ${bidNo} cancelled successfully`);
+    
+    // Refresh the bid data after successful cancellation
+    fetchBidData();
+  } catch (error) {
+    console.error('Error cancelling bid:', error);
+    // You might want to show an error message to the user here
+  }
+};
   // Status badge helper function
   const getStatusBadge = (item) => {
     const status = getStatus(item.bidFrom, item.bidTo);
