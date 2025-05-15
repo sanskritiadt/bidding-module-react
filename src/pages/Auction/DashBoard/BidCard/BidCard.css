@@ -110,3 +110,15 @@
       height: 75px; 
     }
   }
+  .bidding-card.expired {
+  opacity: 0.6;
+}
+
+.bidding-time-circle.expired {
+  background-color: #999;
+  border-color: #999;
+}
+
+.bidding-time-circle.expired .bidding-time-value {
+  color: #fff;
+}
