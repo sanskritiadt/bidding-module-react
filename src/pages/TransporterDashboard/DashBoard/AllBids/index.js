@@ -22,7 +22,6 @@ const ViewTransporterBids = () => {
     const [CurrentID, setClickedRowId] = useState('');
     const [deleteModal, setDeleteModal] = useState(false);
     const [latestHeader, setLatestHeader] = useState('');
-    const [Plant_Code, setPlantCode] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [loading, setLoading] = useState(true);

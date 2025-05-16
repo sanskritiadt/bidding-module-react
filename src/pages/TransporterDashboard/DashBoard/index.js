@@ -220,7 +220,7 @@ const BidConfirmationModal = ({ isOpen, toggle, bidData }) => {
                 <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                 Processing...
               </>
-            ) : success ? "Bid Placed!" : "Place Bid"}
+            ) : success ? "Bid Placed!" : "Start Bid"}
           </Button>
         </div>
       </ModalBody>

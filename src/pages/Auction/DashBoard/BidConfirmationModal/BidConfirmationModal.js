@@ -217,6 +217,7 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
  
       const response = await fetch(
         `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/getBidDataByBidNo?biddingNumber=${bidNo}`,
+        `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/getBidDataByBidNo?biddingNumber=${bidNo}`,
         {
           method: 'GET',
           headers: {
@@ -225,11 +226,11 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
           }
         }
       );
- 
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
- 
+
       const data = await response.json();
  
       // Map the API response to the expected format
@@ -301,35 +302,35 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
       maximumFractionDigits: 2
     }).format(amount);
   };
- 
+
   const renderRating = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const stars = [];
- 
+
     let starColor = "text-warning";
     if (rating <= 2) {
       starColor = "text-danger";
     } else if (rating >= 4) {
       starColor = "text-success";
     }
- 
+
     for (let i = 0; i < fullStars; i++) {
       stars.push(<i key={`full-${i}`} className={`ri-star-fill ${starColor}`}></i>);
     }
- 
+
     if (hasHalfStar) {
       stars.push(<i key="half" className={`ri-star-half-fill ${starColor}`}></i>);
     }
- 
+
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(<i key={`empty-${i}`} className={`ri-star-line ${starColor}`}></i>);
     }
- 
+
     return stars;
   };
- 
+
   return (
     <Modal isOpen={isOpen} toggle={toggle} centered size="xl" className="bid-confirmation-modal">
       <ModalHeader toggle={toggle} className="border-0">
@@ -421,5 +422,5 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
     </Modal>
   );
 };
- 
+
 export default BidConfirmationModal;
