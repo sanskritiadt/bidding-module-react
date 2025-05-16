@@ -1,6 +1,5 @@
 import React, { Fragment, useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
-
 import {
   useTable,
   useGlobalFilter,
@@ -11,7 +10,7 @@ import {
   usePagination,
   useRowSelect
 } from "react-table";
-import { Table, Row, Col, Button, Input, Card, CardBody, Nav, NavItem, NavLink, } from "reactstrap";
+import { Table, Row, Col, Button, Input, CardBody, Nav, NavItem, NavLink, } from "reactstrap";
 import { Filter, DefaultColumnFilter } from "./filters";
 import {
   ProductsGlobalFilter,
@@ -439,7 +438,7 @@ const TableContainer = ({
           </Col>
         )}
 
-        {/* {
+          {/* {
             window.location.pathname === "/sequencing-IB" || window.location.pathname === "/sequencing-OB" ? '' :
               <section ref={ref}>
                 <div >
@@ -534,49 +533,22 @@ const TableContainer = ({
                 //console.log("fetch-row", trClass);
                 return (
                   <Fragment key={row.getRowProps().key}>
-
+                    
                     <tr /*style={{background : row.original.queueType !== undefined ? (row.original.queueType === "WQ" ? "lightyellow" : "lightgreen") : "" }} */ >
-                      {row.cells.map((cell) => {
-                        return (
-                          <td key={cell.id} {...cell.getCellProps()}>
-                            {cell.render("Cell")}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {row.isExpanded && (
+                        {row.cells.map((cell) => {
+                          return (
+                            <td key={cell.id} {...cell.getCellProps()}>
+                              {cell.render("Cell")}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                      {row.isExpanded && (
                       <tr>
                         <td colSpan={columns.length}>
                           <div className="bg-light p-2">
                             {/* Replace with desired expanded content */}
-                            {/* <strong>Details:</strong> {row.values.name} */}
-                            <Row>
-                               <Col lg={3}>
-                            <div>
-                              <Card className="mb-1 ribbon-box ribbon-fill ribbon-sm shadow_light">
-                                <div className={`ribbon ribbon-info element ${data.locationName}`} data-value={data.locationName}> <i className="ri-truck-line" ></i> </div>
-                                <CardBody style={{ padding: "10px 0px 5px 0", textAlign: "center" }}>
-                                  <div className="flex-grow-1 ms-3">
-                                    <h6 className="fs-12 mb-1">{'HR34GH1234'} | {'40MT'}</h6>
-                                  </div>
-                                </CardBody>
-                              </Card>
-                            </div>
-                            </Col>
-                            <Col lg={3}>
-                            <div>
-                              <Card className="mb-1 ribbon-box ribbon-fill ribbon-sm shadow_light">
-                                <div className={`ribbon ribbon-info element ${data.locationName}`} data-value={data.locationName}> <i className="ri-truck-line" ></i> </div>
-                                <CardBody style={{ padding: "10px 0px 5px 0", textAlign: "center" }}>
-                                  <div className="flex-grow-1 ms-3">
-                                    <h6 className="fs-12 mb-1">{'HP34GH9994'} | {'60MT'}</h6>
-                                  </div>
-                                </CardBody>
-                              </Card>
-                            </div>
-                            </Col>
-                            </Row>
-                            
+                            <strong>Details:</strong> {row.values.name}
                           </div>
                         </td>
                       </tr>

@@ -12,6 +12,11 @@ import avatar10 from "../../assets/images/users/avatar-10.jpg";
 import bgImage1 from "../../assets/images/small/img-7.jpg";
 import bgImage2 from "../../assets/images/small/img-4.jpg";
 
+
+import img1 from "../../assets/images/clarity_assign-user-solid.png";
+import img2 from "../../assets/images/fluent_handshake-32-filled.png";
+import img3 from "../../assets/images/icon-park-solid_transporter.png";
+
 const taskWidgets1 = [
     {
         id: 1,
@@ -121,6 +126,95 @@ const taskWidgets = [
         prefix: "",
         suffix: "",
     },
+];
+
+// const taskWidgetsBid = [
+//     {
+//         id: 1,
+//         label: "Assigned Transporter",
+//         counter: "14.84",
+//         badge: "ri-arrow-up-line",
+//         badgeClass: "success",
+//         percentage: "0.63 %",
+//         icon: "ri-delete-bin-line",
+//         iconClass: "danger",
+//         decimals: 2,
+//         prefix: "",
+//         suffix: "",
+//         img:img1,
+//     },{
+//         id: 2,
+//         label: "Order Committed",
+//         counter: "234",
+//         badge: "ri-arrow-up-line",
+//         badgeClass: "success",
+//         percentage: "17.32 %",
+//         icon: "ri-ticket-2-line",
+//         iconClass: "info",
+//         decimals: 1,
+//         prefix: "",
+//         suffix: "",
+//         img:img2,
+//     },
+//     {
+//         id: 3,
+//         label: "Order Fulfilled",
+//         counter: "64.5",
+//         badge: "ri-arrow-down-line",
+//         badgeClass: "danger",
+//         percentage: "0.87 %",
+//         icon: "mdi mdi-timer-sand",
+//         iconClass: "warning",
+//         decimals: 1,
+//         prefix: "",
+//         suffix: "",
+//         img:img3,
+//     }
+// ];
+
+const taskWidgetsBid = (data) => [
+    {
+      id: 1,
+      label: "Assigned Transporter",
+      counter: data.assignedTransporter.toFixed(2),
+      badge: "ri-arrow-up-line",
+      badgeClass: "success",
+      percentage: "0.63 %",
+      icon: "ri-delete-bin-line",
+      iconClass: "danger",
+      decimals: 2,
+      prefix: "",
+      suffix: "",
+      img: img1,
+    },
+    {
+      id: 2,
+      label: "Order Committed",
+      counter: data.orderCommitted.toFixed(1),
+      badge: "ri-arrow-up-line",
+      badgeClass: "success",
+      percentage: "17.32 %",
+      icon: "ri-ticket-2-line",
+      iconClass: "info",
+      decimals: 1,
+      prefix: "",
+      suffix: "",
+      img: img2,
+    },
+    {
+      id: 3,
+      label: "Order Fulfilled",
+      counter: data.orderFulfilled.toFixed(1),
+      badge: "ri-arrow-down-line",
+      badgeClass: "danger",
+      percentage: "0.87 %",
+      icon: "mdi mdi-timer-sand",
+      iconClass: "warning",
+      decimals: 1,
+      prefix: "",
+      suffix: "",
+      img: img3,
+    }
 ];
 
 const allTask = [
@@ -570,4 +664,4 @@ const kanbanBoardData = [
     },
 ];
 
-export { taskWidgets,taskWidgets1, allTask, kanbanBoardData };
+export { taskWidgets,taskWidgetsBid,taskWidgets1, allTask, kanbanBoardData };

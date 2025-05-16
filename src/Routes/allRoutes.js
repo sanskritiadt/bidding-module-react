@@ -394,8 +394,15 @@ import ViewTransporterBids from '../pages/TransporterDashboard/DashBoard/AllBids
 import RouteDetails from "../pages/TransporterDashboard/RouteDetails/RouteDetails";
 import SlotMaster from "../pages/Master/MasterSlot";
 
+import SlocMaster from "../pages/Master/SlocMaster";
+import QuotaManagement from "../pages/QuotaManagement/index"; 
+import OrderManagement from "../pages/QuotaManagement/OrderManagement";
+
   
 const authProtectedRoutes = [
+  { path: "/sloc-master", component: <SlocMaster/>},
+  { path: "/quota-management",component: <QuotaManagement />},
+  { path: "/order-management",component: <OrderManagement />},
   { path: "/dashboard-analytics", component: <DashboardAnalytics /> },
   { path: "/dashboard-crm", component: <DashboardCrm /> },
   { path: "/dashboard", component: <DashboardEcommerce /> },
