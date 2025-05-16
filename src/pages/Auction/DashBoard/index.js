@@ -1,16 +1,17 @@
 
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Row, Col, Card, CardBody, Input, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Badge } from "reactstrap";
+import { Container, Card, CardBody, Input, Button } from "reactstrap";
 import { Link } from "react-router-dom";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import TableContainer from "../../../Components/Common/TableContainer";
 import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
 import SalesOrderModal from "./SalesOrderModal/SalesOrderModal";
-import BidCard from "./BidCard/BidCard"; 
+import BidCard from "./BidCard/BidCard";
 import "./DashBoard.css";
 import CancelBidModal from "./CancelBidModal/CancelBidModal";
 import BidConfirmationModal from "./BidConfirmationModal/BidConfirmationModal";
+import { toast } from 'react-toastify';
 
 const AuctionDashboard = () => {
   document.title = "Dashboard | EPLMS";
@@ -62,12 +63,12 @@ const AuctionDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Basic authentication setup
       const username = process.env.REACT_APP_API_USER_NAME;
       const password = process.env.REACT_APP_API_PASSWORD;
       const basicAuth = 'Basic ' + btoa(username + ':' + password);
-      
+
       const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/all`, {
         method: 'GET',
         headers: {
@@ -81,12 +82,12 @@ const AuctionDashboard = () => {
       }
 
       const responseData = await response.json();
-      
+
       // Access the data correctly from the API response
       if (responseData && responseData.data && Array.isArray(responseData.data)) {
         setBidData(responseData.data);
-       // setBiddingOrderNo(responseData.data.biddingOrderNo);
-       //console.log("biddingOrderNo=========>>>>>>>>",biddingOrderNo);
+        // setBiddingOrderNo(responseData.data.biddingOrderNo);
+        //console.log("biddingOrderNo=========>>>>>>>>",biddingOrderNo);
 
       } else {
         console.log('Unexpected API response structure:', responseData);
@@ -116,38 +117,66 @@ const AuctionDashboard = () => {
     setBidToConfirm(bidNo);
     setIsBidConfirmationModalOpen(true);
   };
+  const handleCancelBid = async (bidNo, remark) => {
+    try {
+      const username = process.env.REACT_APP_API_USER_NAME;
+      const password = process.env.REACT_APP_API_PASSWORD;
+      const basicAuth = 'Basic ' + btoa(username + ':' + password);
 
-const handleCancelBid = async (bidNo, remark) => {
-  try {
-    const username = process.env.REACT_APP_API_USER_NAME;
-    const password = process.env.REACT_APP_API_PASSWORD;
-    const basicAuth = 'Basic ' + btoa(username + ':' + password);
-    
-    const response = await fetch(
-      `${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/cancelBidByBidNumber?bidNumber=${bidNo}&remarks=${encodeURIComponent(remark)}`,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': basicAuth
+      const response = await fetch(
+        `${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/cancelBidByBidNumber?bidNumber=${bidNo}&remarks=${encodeURIComponent(remark)}`,
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': basicAuth
+          }
         }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await response.json();
+      toast.success(`Bid #${bidNo} has been cancelled successfully`, { autoClose: 3000 });
+
+      // Refresh the bid data after successful cancellation
+      fetchBidData();
+    } catch (error) {
+      toast.error(`Error cancelling bid #${bidNo}: ${error.message}`, { autoClose: 3000 });
     }
+  };
+  // const handleCancelBid = async (bidNo, remark) => {
+  //   try {
+  //     const username = process.env.REACT_APP_API_USER_NAME;
+  //     const password = process.env.REACT_APP_API_PASSWORD;
+  //     const basicAuth = 'Basic ' + btoa(username + ':' + password);
 
-    const result = await response.json();
-    console.log(`Bid ${bidNo} cancelled successfully`);
-    
-    // Refresh the bid data after successful cancellation
-    fetchBidData();
-  } catch (error) {
-    console.error('Error cancelling bid:', error);
-    // You might want to show an error message to the user here
-  }
-};
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/cancelBidByBidNumber?bidNumber=${bidNo}&remarks=${encodeURIComponent(remark)}`,
+  //       {
+  //         method: 'POST',
+  //         headers: {
+  //           'Accept': 'application/json',
+  //           'Authorization': basicAuth
+  //         }
+  //       }
+  //     );
+
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+
+  //     const result = await response.json();
+  //     toast.success(`Bid ${bidNo} cancelled successfully`, { autoClose: 3000 });
+
+  //     // Refresh the bid data after successful cancellation
+  //     fetchBidData();
+  //   } catch (error) {
+  //      toast.error(`Error cancelling bid`, { autoClose: 3000 });
+  //   }
+  // };
   // Status badge helper function
   const getStatusBadge = (item) => {
     const status = getStatus(item.bidFrom, item.bidTo);
