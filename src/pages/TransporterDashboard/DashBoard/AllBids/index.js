@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Container, Row, Col, Card, CardHeader, Input, FormGroup } from "reactstrap";
+import { Container, Row, Col, Card, CardHeader, Input, FormGroup, Modal, ModalHeader, ModalBody, Table } from "reactstrap";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from "../../../../Components/Common/Loader";
@@ -16,6 +16,7 @@ const ViewTransporterBids = () => {
     const [bids, setBids] = useState([]);
     const [viewModal, setViewModal] = useState(false);
     const [historyModal, setHistoryModal] = useState(false);
+    const [soDetailsModal, setSoDetailsModal] = useState(false);
     const [viewData, setViewData] = useState({});
     const [selectedBidNo, setSelectedBidNo] = useState('');
     const [CurrentID, setClickedRowId] = useState('');
@@ -26,6 +27,8 @@ const ViewTransporterBids = () => {
     const [statusFilter, setStatusFilter] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [soDetails, setSoDetails] = useState([]);
+    const [loadingSoDetails, setLoadingSoDetails] = useState(false);
     
     // Export Modal
     const [isExportCSV, setIsExportCSV] = useState(false);
@@ -45,6 +48,14 @@ const ViewTransporterBids = () => {
             setHistoryModal(true);
         }
     }, [historyModal]);
+
+    const toggleSoDetails = useCallback(() => {
+        if (soDetailsModal) {
+            setSoDetailsModal(false);
+        } else {
+            setSoDetailsModal(true);
+        }
+    }, [soDetailsModal]);
 
     useEffect(() => {
         const HeaderName = localStorage.getItem("HeaderName");
@@ -77,7 +88,7 @@ const ViewTransporterBids = () => {
             const password = process.env.REACT_APP_API_PASSWORD;
             const basicAuth = 'Basic ' + btoa(username + ':' + password);
             
-            // Get transporter code - you might need to adjust this based on your auth implementation
+            // Get transporter code
             const authUser = JSON.parse(sessionStorage.getItem("authUser") || '{}');
             const transporterCode = authUser?.data?.transporterCode || 'T-000008';
             
@@ -117,6 +128,48 @@ const ViewTransporterBids = () => {
         }
     };
 
+    // Fetch SO Details from API
+    const fetchSoDetails = async (biddingOrderNo) => {
+        try {
+            setLoadingSoDetails(true);
+            
+            // Basic authentication setup
+            const username = process.env.REACT_APP_API_USER_NAME || 'amazin';
+            const password = process.env.REACT_APP_API_PASSWORD || 'TE@M-W@RK';
+            const basicAuth = 'Basic ' + btoa(username + ':' + password);
+            
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getSoDetails?bidNo=${biddingOrderNo}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': basicAuth,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            
+            if (Array.isArray(responseData)) {
+                setSoDetails(responseData);
+                setSoDetailsModal(true);
+            } else {
+                console.log('Unexpected API response structure:', responseData);
+                setSoDetails([]);
+                toast.error("Invalid SO details data format", { autoClose: 3000 });
+            }
+        } catch (err) {
+            console.error('API Error:', err);
+            toast.error("Failed to fetch SO details. Please try again.", { autoClose: 3000 });
+            setSoDetails([]);
+        } finally {
+            setLoadingSoDetails(false);
+        }
+    };
+
     // Handle search input change
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
@@ -130,7 +183,7 @@ const ViewTransporterBids = () => {
     // Filter bids based on search term and status
     const filteredBids = bids.filter(bid => {
         const matchesSearch = Object.values(bid).some(value => 
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+            value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         );
         
         const matchesStatus = !statusFilter || statusFilter === 'All' || bid.status === statusFilter;
@@ -162,6 +215,11 @@ const ViewTransporterBids = () => {
         }
     }, [bids]);
 
+    // SO Details Data
+    const handleSoDetailsClick = useCallback((bidNo) => {
+        fetchSoDetails(bidNo);
+    }, []);
+
     // Delete Data
     const onClickDelete = (id) => {
         setClickedRowId(id);
@@ -178,29 +236,31 @@ const ViewTransporterBids = () => {
             setBids(updatedBids);
             toast.success("Bid Deleted Successfully", { autoClose: 3000 });
             setDeleteModal(false);
-            
-            // Uncomment and adjust when you have a delete API endpoint
-            // const username = process.env.REACT_APP_API_USER_NAME;
-            // const password = process.env.REACT_APP_API_PASSWORD;
-            // const basicAuth = 'Basic ' + btoa(username + ':' + password);
-            
-            // const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8085}/biddingMaster/delete/${CurrentID}`, {
-            //     method: 'DELETE',
-            //     headers: {
-            //         'Authorization': basicAuth
-            //     }
-            // });
-            
-            // if (response.ok) {
-            //     toast.success("Bid Deleted Successfully", { autoClose: 3000 });
-            //     fetchBidData(); // Refresh the data
-            // } else {
-            //     throw new Error('Delete failed');
-            // }
         } catch (e) {
             toast.error("Something went wrong!", { autoClose: 3000 });
             setDeleteModal(false);
         }
+    };
+
+    // Format date for SO Details table
+    const formatSODate = (dateString) => {
+        if (!dateString) return '';
+        
+        // Check if the date is already in DD-MM-YYYY format
+        const dateRegex = /^\d{2}-\d{2}-\d{4}/;
+        if (dateRegex.test(dateString)) {
+            return dateString;
+        }
+        
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
     };
 
     document.title = "Bids Management | EPLMS";
@@ -283,8 +343,9 @@ const ViewTransporterBids = () => {
                                                     <BidCard 
                                                         key={bid.id} 
                                                         bid={bid} 
-                                                        handleViewClick={() => handleViewClick(bid.biddingOrderNo)}
-                                                        handleHistoryClick={() => handleHistoryClick(bid.biddingOrderNo)}
+                                                        handleViewClick={handleViewClick}
+                                                        handleHistoryClick={handleHistoryClick}
+                                                        handleSoDetailsClick={handleSoDetailsClick}
                                                     />
                                                 ))
                                             ) : (
@@ -310,6 +371,81 @@ const ViewTransporterBids = () => {
                                         bidData={viewData}
                                     />
                                     
+                                    {/* SO Details Modal */}
+                                    <Modal
+                                        isOpen={soDetailsModal}
+                                        toggle={toggleSoDetails}
+                                        centered
+                                        size="lg"
+                                        className="so-details-modal"
+                                    >
+                                        <ModalHeader toggle={toggleSoDetails} className="border-0">
+                                            <div className="d-flex">
+                                                <h5 className="mb-0">SO Details: {selectedBidNo}</h5>
+                                            </div>
+                                        </ModalHeader>
+                                        <ModalBody>
+                                            {loadingSoDetails ? (
+                                                <div className="text-center py-4">
+                                                    <div className="spinner-border" role="status">
+                                                        <span className="sr-only">Loading...</span>
+                                                    </div>
+                                                    <p className="mt-2">Loading SO details...</p>
+                                                </div>
+                                            ) : soDetails.length > 0 ? (
+                                                <>
+                                                    <div className="mb-3">
+                                                        <div className="search-box me-2">
+                                                            <Input
+                                                                type="text"
+                                                                className="form-control search"
+                                                                placeholder="Search..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="table-responsive">
+                                                        <Table className="table align-middle table-nowrap mb-0">
+                                                            <thead className="table-light">
+                                                                <tr>
+                                                                    <th className="text-nowrap">Sales Order No.</th>
+                                                                    <th className="text-nowrap">Validity Start Date</th>
+                                                                    <th className="text-nowrap">Validity End Date</th>
+                                                                    <th className="text-nowrap">Order Qty.</th>
+                                                                    <th className="text-nowrap">Remaining Qty.</th>
+                                                                    <th className="text-nowrap">Order Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {soDetails.map((so, index) => (
+                                                                    <tr key={index}>
+                                                                        <td className="text-nowrap">{so.soNumber}</td>
+                                                                        <td className="text-nowrap">{formatSODate(so.validity)}</td>
+                                                                        <td className="text-nowrap">{formatSODate(so.validity)}</td>
+                                                                        <td className="text-nowrap">{so.quantity} MT</td>
+                                                                        <td className="text-nowrap">{Math.floor(so.quantity * 0.3)} MT</td>
+                                                                        <td className="text-nowrap">Ship</td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </Table>
+                                                    </div>
+                                                    <div className="d-flex justify-content-between align-items-center mt-3">
+                                                        <div>Total Results: {soDetails.length}</div>
+                                                        <div className="pagination-wrapper">
+                                                            <button className="btn btn-sm btn-primary me-1">&lt;</button>
+                                                            <span className="mx-2">Page 1 of 1</span>
+                                                            <button className="btn btn-sm btn-primary">&gt;</button>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="text-center py-4">
+                                                    <p>No SO details found for this bid.</p>
+                                                </div>
+                                            )}
+                                        </ModalBody>
+                                    </Modal>
+
                                     <ToastContainer closeButton={false} limit={1} />
                                 </div>
                             </Card>
