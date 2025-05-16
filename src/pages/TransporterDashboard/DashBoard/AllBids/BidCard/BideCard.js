@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./BidCard.css";
 import winnerlogo from '../../../../../assets/images/winner.png';
-
+ 
 const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
 
     const [currentTime, setCurrentTime] = useState(new Date());
@@ -78,14 +78,17 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                 </div>
                 <div className="flex-1 flex items-center justify-between px-4 meta-group">
                     <span className="bid-number1">Bid No.: {bid.biddingOrderNo}</span>
+                    <span className="bid-number1">Bid No.: {bid.biddingOrderNo}</span>
                     <span className="divider"></span>
+                    <span className="bid-time">Bid Start Time:  {formatDate(bid.bidFrom)}</span>
                     <span className="bid-time">Bid Start Time:  {formatDate(bid.bidFrom)}</span>
                 </div>
                 <div className="route-label">
                     Route No.: {bid.routeNo || "RN123"}
+                    Route No.: {bid.routeNo || "RN123"}
                 </div>
             </div>
-
+ 
             {/* Content area */}
             <div className="bid-content">
                 {/* Transporter section */}
@@ -110,7 +113,7 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                     )}
                 </div> */}
                 <div className="section transporter-section">
-                    {bid.status === "Completed" && bid.rank === "Winner" ? (
+                    {bid.status === "Completed" ? (
                         <div className="d-flex flex-column align-items-center p-2 position-relative">
                             <div className="position-relative text-center">
                                 <img
@@ -131,6 +134,8 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                         <div className="text-center">
                             <div className="fw-bold">Rank 1</div>
                             <div>{bid.transporterCode}</div>
+                            <div className="fw-bold">Rank 1</div>
+                            <div>{bid.transporterCode}</div>
                         </div>
                     ) : (
                         <div className="text-center fst-italic">Not Started</div>
@@ -149,13 +154,15 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                     <div className="info-item">
                         <div className="info-label">Distance</div>
                         <div className="info-value">{bid.distance || "765 KM"}</div>
+                        <div className="info-value">{bid.distance || "765 KM"}</div>
                     </div>
                     <div className="info-item">
                         <div className="info-label">Time</div>
                         <div className="info-value">{bid.lastTimeExtension}Hours</div>
+                        <div className="info-value">{bid.lastTimeExtension}Hours</div>
                     </div>
                 </div>
-
+ 
                 {/* Material section */}
                 <div className="section material-section">
                     <div className="info-item">
@@ -171,7 +178,7 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                         <div className="info-value">{bid.multiMaterial == 1 ? "YES" : "NO"}</div>
                     </div>
                 </div>
-
+ 
                 {/* Price section */}
                 <div className="section price-section">
                     <div className="info-item">
@@ -181,25 +188,29 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                     <div className="info-item">
                         <div className="info-label">Interval Price</div>
                         <div className="info-value">{bid.ceilingPrice}</div>
+                        <div className="info-value">{bid.ceilingPrice}</div>
                     </div>
                     <div className="info-item">
                         <div className="info-label">Last Bid</div>
                         <div className="info-value">{bid.ceilingPrice}</div>
+                        <div className="info-value">{bid.ceilingPrice}</div>
                     </div>
                 </div>
-
+ 
                 {/* City/Line section */}
                 <div className="section city-section">
                     <div className="info-item">
                         <div className="info-label">City Name</div>
                         <div className="info-value">{bid.city}</div>
+                        <div className="info-value">{bid.city}</div>
                     </div>
                     <div className="info-item">
                         <div className="info-label">Line No.</div>
                         <div className="info-value">{bid.lineNo || "205"}</div>
+                        <div className="info-value">{bid.lineNo || "205"}</div>
                     </div>
                 </div>
-
+ 
                 {/* Time Remaining section */}
                 <div className="section time-section">
                     <div className="bidding-time-circle">
@@ -219,9 +230,25 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
                                 </>
                             );
                         })()}
+                        {(() => {
+                            const { time, isExpired } = calculateTimeRemaining(bid.bidTo);
+                            return isExpired ? (
+                                <>
+                                    <span className="time-label">Bid</span>
+                                    <span className="time-label">Expired</span>
+                                    <span className="time-value">00:00</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="time-label">Time</span>
+                                    <span className="time-label">Remaining</span>
+                                    <span className="time-value">{time}</span>
+                                </>
+                            );
+                        })()}
                     </div>
                 </div>
-
+ 
                 {/* Action Buttons */}
                 {/* <div className="section actions-section">
                      <Link
@@ -286,5 +313,5 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick }) => {
         </div>
     );
 };
-
+ 
 export default BidCard;

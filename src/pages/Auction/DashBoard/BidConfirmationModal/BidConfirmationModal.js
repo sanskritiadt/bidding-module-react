@@ -171,6 +171,70 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
             </table>
           </div>
         )}
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner color="primary" />
+            <p className="mt-2">Loading bid data...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center text-danger py-5">
+            <i className="ri-error-warning-line fs-1 mb-3"></i>
+            <p>{error}</p>
+            <Button color="primary" size="sm" onClick={fetchBidData}>
+              Retry
+            </Button>
+          </div>
+        ) : (
+          <div className="bid-table-container">
+            <table className="table table-striped table-bordered mb-0">
+              <thead className="bg-primary sticky-header" style={{ color: "black" }}>
+                <tr>
+                  <th>Rank</th>
+                  <th>
+                    Transporter name
+                    <i className="ri-arrow-up-down-line ms-1"></i>
+                  </th>
+                  <th>Auction Type</th>
+                  <th>Ceiling Price</th>
+                  <th>Given Price</th>
+                  <th>Delivered Before</th>
+                  <th>Multiple Orders</th>
+                  <th>Transporter Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transporters.map((transporter, index) => (
+                  <tr key={index}>
+                    <td>{transporter.rank}</td>
+                    <td>
+                      {transporter.name}
+                      <i className="ri-add-line ms-2 text-primary"></i>
+                    </td>
+                    <td>{transporter.auctionType}</td>
+                    <td>{transporter.ceilingPrice}</td>
+                    <td>{transporter.givenPrice}</td>
+                    <td>{transporter.deliveredBefore}</td>
+                    <td>{transporter.multipleOrders}</td>
+                    <td className="text-center">
+                      {renderRating(transporter.rating)}
+                    </td>
+                    <td>
+                      <div className="d-flex gap-1">
+                        <Button color="success" size="sm" className="action-btn">
+                          Assign
+                        </Button>
+                        <Button color="danger" size="sm" className="action-btn">
+                          Reject
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </ModalBody>
       <ModalFooter className="justify-content-end">
         <Button color="light" onClick={toggle} className="bid-cancel-btn">

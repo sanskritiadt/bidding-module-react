@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Container, Row, Col, Card, CardBody, Input, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Badge } from "reactstrap";
 import { Link } from "react-router-dom";
@@ -8,7 +7,6 @@ import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
 import SalesOrderModal from "./SalesOrderModal/SalesOrderModal";
 import BidCard from "./BidCard/BidCard";
 import "./DashBoard.css";
-import axios from "axios";
 
 // Import new chart libraries
 import GaugeChart from 'react-gauge-chart';
@@ -329,49 +327,55 @@ const TransporterDashboard = () => {
 
   // Fetch bid data from API
   useEffect(() => {
-    // Mock data for testing - replace with actual API call
-    const mockData = [
-      {
-        biddingOrderNo: "B872",
-        bidFrom: "2025-02-18T01:00:00",
-        bidTo: "2025-02-18T02:00:00",
-        material: "Jindal",
-        city: "Gurugram",
-        quantity: "10",
-        uom: "Ton",
-        route: "1004",
-        multiMaterial: 1
-      },
-      {
-        biddingOrderNo: "B458",
-        bidFrom: "2025-02-15T02:00:00",
-        bidTo: "2025-02-15T04:00:00",
-        material: "Adani",
-        city: "Delhi",
-        quantity: "15",
-        uom: "Ton",
-        route: "1010",
-        multiMaterial: 0
-      }
-    ];
-    setBidData(mockData);
-    setLoading(false);
+    fetchBidData();
   }, []);
-
+ 
   const fetchBidData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/all`, config);
-      setBidData(response);
+      
+      // Basic auth credentials
+      const credentials = btoa(`${process.env.REACT_APP_API_USER_NAME}:${process.env.REACT_APP_API_PASSWORD}`);
+      
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/all`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${credentials}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      // Check the content type of the response
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Expected JSON response but got ${contentType || 'unknown content type'}`);
+      }
+      
+      const jsonData = await response.json();
+      
+      // Check if response has the expected structure (meta and data)
+      if (jsonData && jsonData.data && Array.isArray(jsonData.data)) {
+        // Set the data array from the nested structure
+        setBidData(jsonData.data);
+        console.log("Bid data received:", jsonData.data);
+      } else {
+        console.log("Empty or invalid data received:", jsonData);
+        setBidData([]);
+      }
     } catch (err) {
-      setError("Failed to fetch bid data. Please try again.");
+      console.error("Error fetching bid data:", err);
+      setError(`Failed to fetch bid data: ${err.message}`);
       setBidData([]);
     } finally {
       setLoading(false);
     }
   };
-
   // Modal handlers
   const handleViewClick = (bidNo) => {
     setSelectedBidNo(bidNo);

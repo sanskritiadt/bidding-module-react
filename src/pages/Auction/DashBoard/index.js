@@ -378,7 +378,7 @@ const handleCancelBid = async (bidNo, remark) => {
           <BidConfirmationModal
             isOpen={isBidConfirmationModalOpen}
             toggle={() => setIsBidConfirmationModalOpen(!isBidConfirmationModalOpen)}
-            bidNo={bidToConfirm || "B098"}
+            bidNo={bidToConfirm || "BID-NE205-002"}
           />
         </Container>
       </div>
