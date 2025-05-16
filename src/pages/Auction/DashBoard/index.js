@@ -124,7 +124,7 @@ const handleCancelBid = async (bidNo, remark) => {
     const basicAuth = 'Basic ' + btoa(username + ':' + password);
     
     const response = await fetch(
-      `${process.env.REACT_APP_LOCAL_URL_8085}/biddingMaster/cancelBidByBidNumber?bidNumber=${bidNo}&remarks=${encodeURIComponent(remark)}`,
+      `${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/cancelBidByBidNumber?bidNumber=${bidNo}&remarks=${encodeURIComponent(remark)}`,
       {
         method: 'POST',
         headers: {
