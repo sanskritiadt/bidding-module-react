@@ -295,16 +295,25 @@ const AllTasksTransporter = () => {
         config
       );
 
-      if(res){
+      if(!res.errorMsg){
         toast.success("Truck allocated successfully");
         fetchData(1, itemsPerPage, "total");
         setSelectedTruckIds([]);
+        setInitialTruckIds([]);
+        setModalEdit(false);
+      }else{
+        toast.error("Truck Allocation Failed");
+        setSelectedTruckIds([]);
+        setInitialTruckIds([]);
         setModalEdit(false);
       }
       // optionally refresh your table here
     } catch (err) {
       console.error(err);
       alert("Failed to update truck allocation");
+      setSelectedTruckIds([]);
+      setInitialTruckIds([]);
+      setModalEdit(false);
     }
   };
 
@@ -454,7 +463,7 @@ const AllTasksTransporter = () => {
     () => [
       {
         Header: "Vehicle No",
-        accessor: "registrationNumber",
+        accessor: "vehicleNo",
         filterable: false,
       },
       {
@@ -508,13 +517,6 @@ const AllTasksTransporter = () => {
       return false;
     }
 
-  
-    // const payload = {
-    //   soNumber: selectedSO1,
-    //   truckIds: selectedTruckIds,
-    //   totalQuantity:totalQuantity
-    // };
-
     const payload = {
       "soNumber": selectedSO1,
       "vehicleNo": selectedTruckIds,
@@ -527,23 +529,21 @@ const AllTasksTransporter = () => {
     };
   
     try {
-      const response = await fetch("http://localhost:8082/orderManagement/allocateTruck", {
-        method: "POST",config,
-        body: JSON.stringify(payload),
-      });
+      const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/allocateTruck`,payload,config);
   
-      const result = await response.json();
-  
-      if (response) {
+      if (!response.errorMsg) {
         toast.success("Truck allocated successfully!");
         setSelectedTruckIds([]);
         fetchData(1, itemsPerPage, "total");
       } else {
-        toast.error("Error allocating truck: " + result.message);
+        toast.error("Truck Allocation Failed");
+        setSelectedTruckIds([]);
+        fetchData(1, itemsPerPage, "total");
       }
     } catch (error) {
-      console.error("Allocation error:", error);
-      toast.error("An unexpected error occurred.");
+      toast.error("An unexpected error occurred.");      
+      setSelectedTruckIds([]);
+      fetchData(1, itemsPerPage, "total");
     }
     toggle();
   };  
@@ -728,17 +728,17 @@ const AllTasksTransporter = () => {
     };
   
     try {
-      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/update`, {
-        method: "POST",config,
-        body: JSON.stringify(payload),
-      });
+      const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/update`, payload,config);
   
-      if (response.ok) {
-        alert(`${modalAction === "commit" ? "Order committed" : "Order rejected"} successfully.`);
+      if (!response.errorMsg) {
+        toast.success(`${modalAction === "commit" ? "Order committed" : "Order rejected"} successfully.`);
+        fetchData(1, itemsPerPage, "total");
         setModalVisible(false);
         // optionally refresh your order list
       } else {
-        alert("Failed to update order status.");
+        toast.error(response.errorMsg);
+        fetchData(1, itemsPerPage, "total");
+        setModalVisible(false);
       }
     } catch (err) {
       console.error(err);

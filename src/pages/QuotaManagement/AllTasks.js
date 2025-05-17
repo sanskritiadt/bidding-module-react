@@ -289,42 +289,30 @@ const AllTasks = () => {
     () => [
       {
         Header: "Vehicle No",
-        accessor: "taskId",
+        accessor: "vehicleNo",
         filterable: false,
-        Cell: (cellProps) => {
-          return <OrdersId {...cellProps} />;
-        },
       },
       {
         Header: "Chassis Number",
-        accessor: "transporter_name",
+        accessor: "chassisNumber",
         filterable: false,
-        Cell: (cellProps) => {
-          return <Project {...cellProps} />;
-        },
       },
       {
         Header: "Truck Max Capacity",
-        accessor: "location",
+        accessor: "vehicleCapacityMax",
         filterable: false,
-        Cell: (cellProps) => {
-          return <Project {...cellProps} />;
-        },
       },
       {
         Header: "Unladen bed Capacity",
-        accessor: "contact_person",
+        accessor: "tareWeight",
         filterable: false,
-        Cell: (cellProps) => {
-          return <Project {...cellProps} />;
-        },
       },
       {
         Header: "Status",
-        accessor: "contact_number",
+        accessor: "status",
         filterable: false,
         Cell: (cellProps) => {
-          return <Priority {...cellProps} />;
+          return <Status {...cellProps} />;
         },
       },
     ],
@@ -1159,19 +1147,31 @@ useEffect(() => {
       try {
         const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement`, payload, config);
         console.log("API Response:", response);
-        if(response){
+        if(!response.errorMsg){
           toast.success("Transporter Assigned Successfully!");
-          setSelectedTransporterCodes([]);
           fetchData(1, itemsPerPage, "total");
+        }else{
+          toast.error("Something went wrong !!");
         }
+        
+        setSelectedTransporterCodes([]);
+        setSelectedOrderIds([]);
+        toggle();
       } catch (error) {
         console.error("Error assigning transporter:", error);
         toast.error("Failed to assign transporter. Please try again.");
+        
+        setSelectedTransporterCodes([]);
+        setSelectedOrderIds([]);
+        toggle();
       }
     }else{
       toast.error("Select one transporter atleast.");
+      
+      setSelectedTransporterCodes([]);
+      setSelectedOrderIds([]);
+      toggle();
     }
-    toggle();
   };  
 
   const submitEditTransporter = () => {
@@ -1180,7 +1180,7 @@ useEffect(() => {
     const payload = {
       soNumber: soNumbers, // e.g., ["SO12345", "SO12346"]
       transporterCode: selectedTransporterCodes1,      
-      createdBy: "Robert", // Make dynamic if needed
+      createdBy: "user01", // Make dynamic if needed
       plantCode: "N205"    // Make dynamic if needed
     };
   
@@ -1197,16 +1197,25 @@ useEffect(() => {
     if(selectedTransporterCodes1.length > 0){
       try {
         const response = axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement`, payload, config);
-        if(response){
+        if(!response.errorMsg){
           toast.success("Transporter Updated Successfully!");
           setSelectedTransporterCodes1([]);
+          setSoNumber(null);
           fetchData(1, itemsPerPage, "total");
+        }else{
+          setSelectedTransporterCodes1([]);
+          setSoNumber(null);
+          toast.error("Something went wrong !!");
         }
       } catch (error) {
+        setSelectedTransporterCodes1([]);
+        setSoNumber(null);
         console.error("Error assigning transporter:", error);
         toast.error("Failed to assign transporter. Please try again.");
       }
     }else{
+      setSelectedTransporterCodes1([]);
+      setSoNumber(null);
       toast.error("Select one transporter atleast.");
     }
 
@@ -1235,12 +1244,12 @@ useEffect(() => {
         },config
       );
   
-      if (response.meta?.code === "EPLMS-003") {
+      if (!response.errorMsg) {
         toast.success("Order priority updated successfully");
         fetchData(1, itemsPerPage, "total");
         // Optional: Refresh data or update local state if needed
       } else {
-        toast.error("Failed to update order priority:", response.meta?.message);
+        toast.error("Failed to update order priority");
       }
     } catch (error) {
       toast.error("Error updating order priority:", error);
@@ -1261,13 +1270,13 @@ useEffect(() => {
         },config
       );
   
-      if (response.meta?.code === "EPLMS-003") {
+      if (!response.erroMsg) {
         toast.success("Order cancelled successfully");
         toggleCancelModal();
         fetchData(1, itemsPerPage, "total");
         // Optionally refresh data
       } else {
-        toast.error("Cancel failed:"+ response.meta?.message);
+        toast.error("Cancel failed");
       }
     } catch (error) {
       toast.error("Error cancelling order:"+ error);
@@ -1301,7 +1310,12 @@ useEffect(() => {
                 <div class="search-box me-2 mb-2 d-inline-block" style={{ width: "40%" }}>
                   <input id="search-bar-0" type="text" name="searchField" onInput={(e) => { getAllSearchFilter(e); }} class="form-control search" placeholder="Search for so number or something..." /><i class="bx bx-search-alt search-icon"></i>
                 </div>
-                <button className="btn btn-success add-btn me-1 for-new-css-1" onClick={() => { setIsEdit(false); toggle(); }}><i className="ri-add-line align-bottom me-1"></i> Assign Transporter</button>
+                <button className="btn btn-success add-btn me-1 for-new-css-1" onClick={() => { 
+                  if(selectedOrderIds.length > 0){ 
+                  setIsEdit(false); toggle();
+                 }else{
+                  toast.error("Please select atleast one SO Number");
+                 } }}><i className="ri-add-line align-bottom me-1"></i> Assign Transporter</button>
               </div>
             <div className="table-responsive">
               <section ref={dropdownRef}>
