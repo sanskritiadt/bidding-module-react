@@ -967,12 +967,13 @@ const CancelBidModal = ({ isOpen, toggle, bidNo, onCancelBid }) => {
   );
 };
 
-const BidConfirmationModal = ({ isOpen, toggle, bidData, loginCode,bidNo }) => {
+const BidConfirmationModal = ({ isOpen, toggle, bidData, loginCode, bidNo }) => {
   const [bidAmount, setBidAmount] = useState("");
   const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [isValid, setIsValid] = useState(true);
 
   // Calculate remaining time based on the bidTo date
   useEffect(() => {
@@ -1077,63 +1078,172 @@ const BidConfirmationModal = ({ isOpen, toggle, bidData, loginCode,bidNo }) => {
   const formatTimeDigit = (digit) => {
     return digit.toString().padStart(2, '0');
   };
-
+  const handleBidAmountChange = (e) => {
+    const value = e.target.value;
+    
+    // Allow empty field or numeric input with up to 2 decimal places
+    if (value === "" || /^\d+(\.\d{0,2})?$/.test(value)) {
+      setBidAmount(value);
+      
+      // Check if the value is valid (positive number)
+      if (value === "" || parseFloat(value) <= 0) {
+        setIsValid(false);
+      } else {
+        setIsValid(true);
+        setError(null); // Clear any previous error
+      }
+    }
+    // Don't update state if input is invalid
+  };
   return (
-    <Modal isOpen={isOpen} toggle={toggle} centered size="sm" className="minimal-bid-modal">
-      <ModalHeader toggle={toggle} className="border-0 pb-0">
-        <h5 className="m-0">Bid : {bidData?.biddingOrderNo}</h5>
-      </ModalHeader>
-      <ModalBody className="pt-0 pb-3">
-        <div className="d-flex align-items-center mb-3 mt-1">
-          <div className="d-flex align-items-center">
-            <i className="ri-timer-line me-2"></i>
-            <span className="d-flex align-items-center">
-              {timeRemaining.hours > 0 && (
-                <>
-                  <Badge color="dark" pill className="me-1">{formatTimeDigit(Math.floor(timeRemaining.hours / 10))}</Badge>
-                  <Badge color="dark" pill className="me-1">{formatTimeDigit(timeRemaining.hours % 10)}</Badge>
-                  <span className="mx-1">:</span>
-                </>
-              )}
-              <Badge color="dark" pill className="me-1">{formatTimeDigit(Math.floor(timeRemaining.minutes / 10))}</Badge>
-              <Badge color="dark" pill className="me-1">{formatTimeDigit(timeRemaining.minutes % 10)}</Badge>
-              <span className="mx-1">:</span>
-              <Badge color="dark" pill className="me-1">{formatTimeDigit(Math.floor(timeRemaining.seconds / 10))}</Badge>
-              <Badge color="dark" pill>{formatTimeDigit(timeRemaining.seconds % 10)}</Badge>
-            </span>
-          </div>
-          <span className="ms-2 text-muted small">Time Remaining</span>
+    // <Modal isOpen={isOpen} toggle={toggle} centered size="sm" className="minimal-bid-modal">
+    //   <ModalHeader toggle={toggle} className="border-0 pb-0">
+    //     <h5 className="m-0">Bid : {bidData?.biddingOrderNo}</h5>
+    //   </ModalHeader>
+    //   <ModalBody className="pt-0 pb-3">
+    //     <div className="d-flex align-items-center mb-3 mt-1">
+    //       <div className="d-flex align-items-center">
+    //         <i className="ri-timer-line me-2"></i>
+    //         <span className="d-flex align-items-center">
+    //           {timeRemaining.hours > 0 && (
+    //             <>
+    //               <Badge color="dark" pill className="me-1">{formatTimeDigit(Math.floor(timeRemaining.hours / 10))}</Badge>
+    //               <Badge color="dark" pill className="me-1">{formatTimeDigit(timeRemaining.hours % 10)}</Badge>
+    //               <span className="mx-1">:</span>
+    //             </>
+    //           )}
+    //           <Badge color="dark" pill className="me-1">{formatTimeDigit(Math.floor(timeRemaining.minutes / 10))}</Badge>
+    //           <Badge color="dark" pill className="me-1">{formatTimeDigit(timeRemaining.minutes % 10)}</Badge>
+    //           <span className="mx-1">:</span>
+    //           <Badge color="dark" pill className="me-1">{formatTimeDigit(Math.floor(timeRemaining.seconds / 10))}</Badge>
+    //           <Badge color="dark" pill>{formatTimeDigit(timeRemaining.seconds % 10)}</Badge>
+    //         </span>
+    //       </div>
+    //       <span className="ms-2 text-muted small">Time Remaining</span>
+    //     </div>
+
+    //     <div className="input-group mb-3">
+    //       <span className="input-group-text">₹</span>
+    //       <input
+    //         type="text"
+    //         className="form-control"
+    //         placeholder="Enter Bid Amount"
+    //         value={bidAmount}
+    //         onChange={(e) => setBidAmount(e.target.value)}
+    //         disabled={loading || success}
+    //       />
+    //     </div>
+
+    //     {error && (
+    //       <div className="alert alert-danger py-2 mb-3">
+    //         {error}
+    //       </div>
+    //     )}
+
+    //     {success && (
+    //       <div className="alert alert-success py-2 mb-3">
+    //         Bid successfully submitted!
+    //       </div>
+    //     )}
+
+    //     <div className="d-flex justify-content-end">
+    //       <Button
+    //         color="primary"
+    //         onClick={handleSubmitBid}
+    //         disabled={loading || success || timeRemaining.hours === 0 && timeRemaining.minutes === 0 && timeRemaining.seconds === 0}
+    //       >
+    //         {loading ? (
+    //           <>
+    //             <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+    //             Processing...
+    //           </>
+    //         ) : success ? "Bid Placed!" : "Start Bid"}
+    //       </Button>
+    //     </div>
+    //   </ModalBody>
+    // </Modal>
+    <Modal isOpen={isOpen} toggle={toggle} centered size="sm">
+      <div className="p-3">
+        {/* Header with close button */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="m-0">Bid : {bidData?.biddingOrderNo || "BID0006"}</h5>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={toggle}
+            aria-label="Close"
+          ></button>
         </div>
 
-        <div className="input-group mb-3">
+        {/* Horizontal divider */}
+        <hr className="my-2" />
+
+        {/* Timer display - Improved layout */}
+        <div className="d-flex align-items-center mb-4">
+          <div className="d-flex align-items-center me-2">
+            <i className="ri-timer-line me-1"></i>
+          </div>
+
+          <div className="d-flex flex-column">
+            <div className="d-flex align-items-center">
+              <Badge color="dark" className="rounded-circle me-1" style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
+                {formatTimeDigit(Math.floor(timeRemaining.hours / 10))}
+              </Badge>
+              <Badge color="dark" className="rounded-circle me-1" style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
+                {formatTimeDigit(timeRemaining.hours % 10)}
+              </Badge>
+              <span className="mx-1">:</span>
+              <Badge color="dark" className="rounded-circle me-1" style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
+                {formatTimeDigit(Math.floor(timeRemaining.minutes / 10))}
+              </Badge>
+              <Badge color="dark" className="rounded-circle me-1" style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
+                {formatTimeDigit(timeRemaining.minutes % 10)}
+              </Badge>
+              <span className="mx-1">:</span>
+              <Badge color="dark" className="rounded-circle me-1" style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
+                {formatTimeDigit(Math.floor(timeRemaining.seconds / 10))}
+              </Badge>
+              <Badge color="dark" className="rounded-circle" style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
+                {formatTimeDigit(timeRemaining.seconds % 10)}
+              </Badge>
+            </div>
+            <div className="text-muted small mt-1">Time Remaining</div>
+          </div>
+        </div>
+
+        {/* Bid amount input */}
+        <div className="input-group mb-4">
           <span className="input-group-text">₹</span>
           <input
             type="text"
             className="form-control"
             placeholder="Enter Bid Amount"
             value={bidAmount}
-            onChange={(e) => setBidAmount(e.target.value)}
+            onChange={handleBidAmountChange}
             disabled={loading || success}
           />
         </div>
 
+        {/* Error message */}
         {error && (
           <div className="alert alert-danger py-2 mb-3">
             {error}
           </div>
         )}
 
+        {/* Success message */}
         {success && (
           <div className="alert alert-success py-2 mb-3">
             Bid successfully submitted!
           </div>
         )}
 
+        {/* Submit button */}
         <div className="d-flex justify-content-end">
           <Button
             color="primary"
             onClick={handleSubmitBid}
-            disabled={loading || success || timeRemaining.hours === 0 && timeRemaining.minutes === 0 && timeRemaining.seconds === 0}
+            disabled={loading || success || !isValid || bidAmount === "" || (timeRemaining.hours === 0 && timeRemaining.minutes === 0 && timeRemaining.seconds === 0)}
           >
             {loading ? (
               <>
@@ -1143,7 +1253,7 @@ const BidConfirmationModal = ({ isOpen, toggle, bidData, loginCode,bidNo }) => {
             ) : success ? "Bid Placed!" : "Start Bid"}
           </Button>
         </div>
-      </ModalBody>
+      </div>
     </Modal>
   );
 };
@@ -1388,7 +1498,7 @@ const TransporterDashboard = () => {
     } else {
       console.warn("Login code not found");
     }
-    
+
     // Only fetch data after login code is set
     if (userLoginCode) {
       fetchBidStatusData(userLoginCode);
@@ -1402,12 +1512,12 @@ const TransporterDashboard = () => {
     try {
       // Use the provided transporterCode or fall back to state loginCode
       const codeToUse = transporterCode || loginCode;
-      
+
       if (!codeToUse) {
         console.warn("No transporter code available for fleet efficiency data fetch");
         return;
       }
-      
+
       // Basic auth credentials
       const credentials = getBasicAuthCredentials();
 
@@ -1453,12 +1563,12 @@ const TransporterDashboard = () => {
     try {
       // Use the provided transporterCode or fall back to state loginCode
       const codeToUse = transporterCode || loginCode;
-      
+
       if (!codeToUse) {
         console.warn("No transporter code available for delivery status data fetch");
         return;
       }
-      
+
       // Basic auth credentials
       const credentials = getBasicAuthCredentials();
 
@@ -1504,12 +1614,12 @@ const TransporterDashboard = () => {
     try {
       // Use the provided transporterCode or fall back to state loginCode
       const codeToUse = transporterCode || loginCode;
-      
+
       if (!codeToUse) {
         console.warn("No transporter code available for bid status data fetch");
         return;
       }
-      
+
       // Basic auth credentials
       const credentials = getBasicAuthCredentials();
 
@@ -1762,7 +1872,7 @@ const TransporterDashboard = () => {
             </Row>
 
             {/* Bid Cards */}
-            <BidCard loginCode={loginCode}/>
+            <BidCard loginCode={loginCode} />
 
             {/* Table */}
             <Card>
