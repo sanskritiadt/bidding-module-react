@@ -62,7 +62,7 @@ const PlantMapping = () => {
       draggable: true,
       progress: undefined,
     });
-    
+
     // Reset UI state
     setSelectedRows([]);
     setSelectedPlants([]);
@@ -239,7 +239,107 @@ const PlantMapping = () => {
   };
 
   // Handle plant assignment - UPDATED to remove duplicate prevention logic
-  const handleAssignPlants = async () => {
+  // const handleAssignPlants = async () => {
+  //   setIsAssigningPlants(true);
+  //   try {
+  //     let mappingData = [];
+
+  //     // If a single transporter is selected
+  //     if (currentTransporterCode) {
+  //       // Get selected plant details for current transporter
+  //       mappingData = selectedPlants.map(plantId => {
+  //         const plant = plants.find(p => p.id === plantId);
+  //         if (!plant) return null; // Skip if plant not found
+
+  //         return {
+  //           transporterCode: currentTransporterCode,
+  //           plantCode: plant.plantCode
+  //         };
+  //       }).filter(item => item !== null); // Remove any null entries
+  //     }
+  //     // If multiple transporters are selected (bulk assign)
+  //     else if (selectedRows.length > 0) {
+  //       // For each selected transporter, create entries for each selected plant
+  //       selectedRows.forEach(transporterId => {
+  //         const transporter = transporters.find(t => t.id === transporterId);
+  //         if (!transporter) return; // Skip if transporter not found
+
+  //         const transporterCode = transporter.transporterCode;
+
+  //         selectedPlants.forEach(plantId => {
+  //           const plant = plants.find(p => p.id === plantId);
+  //           if (!plant) return; // Skip if plant not found
+
+  //           mappingData.push({
+  //             transporterCode: transporterCode,
+  //             plantCode: plant.plantCode
+  //           });
+  //         });
+  //       });
+  //     }
+
+  //     console.log("Attempting to assign plants:", mappingData);
+
+  //     // Check if we have any data to send
+  //     if (mappingData.length === 0) {
+  //       toast.warning("No plants selected to assign.", {
+  //         position: "top-right",
+  //         autoClose: 4000,
+  //       });
+  //       setIsAssigningPlants(false);
+  //       return;
+  //     }
+
+  //     // Make the API call with proper authentication
+  //     const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transporterPlantMap/bulkTransporterPlant`, {
+  //       method: 'POST',
+  //       headers: getAuthHeaders(),
+  //       body: JSON.stringify(mappingData)
+  //     });
+
+  //     if (response.ok) {
+  //       console.log("Plants assigned successfully");
+  //       showSuccessAlert();
+
+  //       // Refresh the data
+  //       fetchTransporters();
+
+  //       // If we're viewing a specific transporter's plants, refresh that view
+  //       if (currentTransporterCode) {
+  //         handleViewPlants(currentTransporterCode);
+  //       }
+  //     } else {
+  //       console.error("Failed to assign plants. Status:", response.status);
+  //       // Error toast with red background
+  //       toast.error("Failed to assign plants. Please try again.", {
+  //         position: "top-right",
+  //         autoClose: 5000,
+  //         hideProgressBar: false,
+  //         closeOnClick: true,
+  //         pauseOnHover: true,
+  //         draggable: true,
+  //         progress: undefined,
+  //       });
+  //     }
+
+  //   } catch (error) {
+  //     console.error("Error assigning plants:", error);
+  //     // Error toast with red background
+  //     toast.error("An error occurred while assigning plants.", {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       hideProgressBar: false,
+  //       closeOnClick: true,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //     });
+  //   } finally {
+  //     setIsAssigningPlants(false);
+  //   }
+  // };
+
+const handleAssignPlants = async () => {
     setIsAssigningPlants(true);
     try {
       let mappingData = [];
@@ -250,7 +350,7 @@ const PlantMapping = () => {
         mappingData = selectedPlants.map(plantId => {
           const plant = plants.find(p => p.id === plantId);
           if (!plant) return null; // Skip if plant not found
-          
+
           return {
             transporterCode: currentTransporterCode,
             plantCode: plant.plantCode
@@ -263,13 +363,13 @@ const PlantMapping = () => {
         selectedRows.forEach(transporterId => {
           const transporter = transporters.find(t => t.id === transporterId);
           if (!transporter) return; // Skip if transporter not found
-          
+
           const transporterCode = transporter.transporterCode;
-          
+
           selectedPlants.forEach(plantId => {
             const plant = plants.find(p => p.id === plantId);
             if (!plant) return; // Skip if plant not found
-            
+
             mappingData.push({
               transporterCode: transporterCode,
               plantCode: plant.plantCode
@@ -279,7 +379,7 @@ const PlantMapping = () => {
       }
 
       console.log("Attempting to assign plants:", mappingData);
-      
+
       // Check if we have any data to send
       if (mappingData.length === 0) {
         toast.warning("No plants selected to assign.", {
@@ -297,9 +397,34 @@ const PlantMapping = () => {
         body: JSON.stringify(mappingData)
       });
 
+      // Parse the response JSON
+      const result = await response.json();
+
       if (response.ok) {
-        console.log("Plants assigned successfully");
-        showSuccessAlert();
+        console.log("Plants assigned successfully:", result);
+
+        // Check if result has meta information with a message
+        if (Array.isArray(result) && result.length > 0 && result[0].meta) {
+          // Show the API response message in toast
+          toast.success(result[0].meta.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        } else {
+          // Generic success toast if no specific message
+          toast.success("Plants assigned successfully", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
 
         // Refresh the data
         fetchTransporters();
@@ -310,18 +435,30 @@ const PlantMapping = () => {
         }
       } else {
         console.error("Failed to assign plants. Status:", response.status);
-        // Error toast with red background
-        toast.error("Failed to assign plants. Please try again.", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
 
+        // Check if result has meta information with an error message
+        if (Array.isArray(result) && result.length > 0 && result[0].meta) {
+          // Show the API error message in toast
+          toast.error(result[0].meta.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        } else {
+          // Generic error toast if no specific message
+          toast.error("Failed to assign plants. Please try again.", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      }
     } catch (error) {
       console.error("Error assigning plants:", error);
       // Error toast with red background
@@ -332,13 +469,11 @@ const PlantMapping = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-        progress: undefined,
       });
     } finally {
       setIsAssigningPlants(false);
     }
   };
-
   // NEW: Handle the download functionality
   const handleDownload = (e) => {
     e.preventDefault();
@@ -367,7 +502,7 @@ const PlantMapping = () => {
     ].join(',') + '\n';
 
     // Create CSV rows
-    const rows = transporters.map(transporter => 
+    const rows = transporters.map(transporter =>
       [
         transporter.transporterCode,
         transporter.transporterName,
@@ -380,7 +515,7 @@ const PlantMapping = () => {
 
     // Combine headers and rows
     const csvData = headers + rows;
-    
+
     // Create and download the file
     const blob = new Blob([csvData], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -392,7 +527,7 @@ const PlantMapping = () => {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-    
+
     // toast.success("CSV file exported successfully!", {
     //   position: "top-right",
     //   autoClose: 3000,

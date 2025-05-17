@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import BreadCrumb from "../../../Components/Common/BreadCrumb";
 import TableContainer from "../../../Components/Common/TableContainer";
 import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
-import AssignRouteModal from "./AssignRouteModal/AssignRouteModal"; 
+import AssignRouteModal from "./AssignRouteModal/AssignRouteModal";
 import ViewRoutesModal from "./ViewRoutesModal/ViewRoutesModal";
 import Loader from "../../../Components/Common/Loader";
 
@@ -20,7 +20,7 @@ const RouteMapping = () => {
     const [viewRouteData, setViewRouteData] = useState([]);
     const [routes, setRoutes] = useState([]);
     const [selectedRoutes, setSelectedRoutes] = useState([]);
-    
+
     // Loading states
     const [isTransportersLoading, setIsTransportersLoading] = useState(false);
     const [isRoutesLoading, setIsRoutesLoading] = useState(false);
@@ -52,7 +52,7 @@ const RouteMapping = () => {
             draggable: true,
             progress: undefined,
         });
-        
+
         // Reset UI state
         setSelectedRows([]);
         setSelectedRoutes([]);
@@ -64,7 +64,7 @@ const RouteMapping = () => {
         const username = process.env.REACT_APP_API_USER_NAME || 'your_default_username';
         const password = process.env.REACT_APP_API_PASSWORD || 'your_default_password';
         const base64Auth = btoa(`${username}:${password}`);
-        
+
         return {
             'Content-Type': 'application/json',
             'Authorization': `Basic ${base64Auth}`
@@ -80,14 +80,14 @@ const RouteMapping = () => {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
-            
+
             if (!response.ok) {
                 throw new Error(`API responded with status: ${response.status}`);
             }
-            
+
             const result = await response.json();
             console.log("API Response:", result);
-            
+
             // Check if the response has the expected structure with data property
             if (result && result.data && Array.isArray(result.data)) {
                 // Map API response data to match table columns
@@ -100,7 +100,7 @@ const RouteMapping = () => {
                     emailId: item.contactEmail || "",
                     rType: item.modeTransport || ""  // Using modeTransport as the route type
                 }));
-                
+
                 console.log("Mapped Data:", mappedData);
                 setTransporters(mappedData);
             } else {
@@ -123,7 +123,7 @@ const RouteMapping = () => {
     useEffect(() => {
         fetchTransporters();
     }, []);
-    
+
     // Updated function to fetch all routes for assignment modal using the new endpoint
     const fetchAllRoutes = async () => {
         setIsRoutesLoading(true);
@@ -133,7 +133,7 @@ const RouteMapping = () => {
                 method: 'GET',
                 headers: getAuthHeaders()
             });
-            
+
             if (response.ok) {
                 const result = await response.json();
 
@@ -142,8 +142,8 @@ const RouteMapping = () => {
                     const mappedRoutes = result.data.map(route => ({
                         id: route.id,
                         routeCode: route.routeCode || "",
-                        departureLocation: route.routeDetermination, 
-                        destinationLocation: route.routeDestination, 
+                        departureLocation: route.routeDetermination,
+                        destinationLocation: route.routeDestination,
                         routeType: route.routeType || "",
                         distance: route.routeDistance || "",
                     }));
@@ -183,12 +183,12 @@ const RouteMapping = () => {
     //             method: 'GET',
     //             headers: getAuthHeaders()
     //         });
-            
+
     //         // If API call is successful, use the returned data
     //         if (response.ok) {
     //             const result = await response.json();
     //             console.log("View routes API response:", result);
-                
+
     //             if (result.data && Array.isArray(result.data)) {
     //                 // Transform the data to match the expected structure for the view modal
     //                 const transformedData = result.data.map(item => ({
@@ -211,7 +211,7 @@ const RouteMapping = () => {
     //                 autoClose: 3000,
     //             });
     //         }
-            
+
     //         setCurrentTransporterCode(transporterCode);
     //         setIsViewRouteModalOpen(true);
     //     } catch (error) {
@@ -231,16 +231,16 @@ const RouteMapping = () => {
     const handleViewRoutes = async (transporterCode) => {
         setIsViewRoutesLoading(true);
         try {
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/transportercode/${transporterCode}`, 
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/transportercode/${transporterCode}`,
                 {
                     method: 'GET',
                     headers: getAuthHeaders()
                 });
-    
+
             if (response.ok) {
                 const result = await response.json();
                 console.log("View routes API response:", result);
-    
+
                 if (result.datalist && Array.isArray(result.datalist)) {
                     // Transform the data to match the expected structure for the view modal
                     const transformedData = result.datalist.map(item => ({
@@ -263,7 +263,7 @@ const RouteMapping = () => {
                     autoClose: 3000,
                 });
             }
-    
+
             setCurrentTransporterCode(transporterCode);
             setIsViewRouteModalOpen(true);
         } catch (error) {
@@ -279,7 +279,7 @@ const RouteMapping = () => {
             setIsViewRoutesLoading(false);
         }
     };
-    
+
     // Columns for transporters table
     const columns = useMemo(
         () => [
@@ -324,8 +324,8 @@ const RouteMapping = () => {
                 Header: "Assign Route",
                 Cell: ({ row }) => (
                     <div className="d-flex justify-content-center align-items-center gap-2">
-                        <Link 
-                            to="#" 
+                        <Link
+                            to="#"
                             className="text-info"
                             onClick={() => handleViewRoutes(row.original.transporterCode)}
                         >
@@ -350,7 +350,82 @@ const RouteMapping = () => {
         [selectedRows, transporters]
     );
 
-    // UPDATED: Handle route assignment
+    // // UPDATED: Handle route assignment
+    // const handleAssignRoutes = async () => {
+    //     setIsAssigningRoutes(true);
+    //     try {
+    //         let mappingData = [];
+    //         const currentDate = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    //         // If a single transporter is selected
+    //         if (currentTransporterCode) {
+    //             // Get selected route details for current transporter
+    //             mappingData = selectedRoutes.map(routeId => {
+    //                 const route = routes.find(r => r.id === routeId);
+    //                 return {
+    //                     transporterCode: currentTransporterCode,
+    //                     routeCode: route.routeCode,
+    //                     createdDate: currentDate,
+    //                     status: "A"
+    //                 };
+    //             });
+    //         }
+    //         // If multiple transporters are selected (bulk assign)
+    //         else if (selectedRows.length > 0) {
+    //             // For each selected transporter, create entries for each selected route
+    //             selectedRows.forEach(transporterId => {
+    //                 const transporter = transporters.find(t => t.id === transporterId);
+    //                 selectedRoutes.forEach(routeId => {
+    //                     const route = routes.find(r => r.id === routeId);
+    //                     mappingData.push({
+    //                         transporterCode: transporter.transporterCode,
+    //                         routeCode: route.routeCode,
+    //                         createdDate: currentDate,
+    //                         status: "A"
+    //                     });
+    //                 });
+    //             });
+    //         }
+
+    //         console.log("Attempting to assign routes:", mappingData);
+
+    //         // Make the API call with proper authentication using the new endpoint
+    //         const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transportersRouteMap`, {
+    //             method: 'POST',
+    //             headers: getAuthHeaders(),
+    //             body: JSON.stringify(mappingData)
+    //         });
+
+    //         if (response.ok) {
+    //             const result = await response.json();
+    //             console.log("Routes assigned successfully:", result);
+    //             showSuccessAlert(); // UPDATED: using toast instead of alert
+
+    //             // Refresh the data
+    //             fetchTransporters();
+
+    //             // Refresh the routes data if needed
+    //             if (currentTransporterCode) {
+    //                 handleViewRoutes(currentTransporterCode);
+    //             }
+    //         } else {
+    //             console.error("Failed to assign routes. Status:", response.status);
+    //             toast.error("Failed to assign routes. Please try again.", {
+    //                 position: "top-right",
+    //                 autoClose: 5000,
+    //             });
+    //         }
+
+    //     } catch (error) {
+    //         console.error("Error assigning routes:", error);
+    //         toast.error("An error occurred while assigning routes.", {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //         });
+    //     } finally {
+    //         setIsAssigningRoutes(false);
+    //     }
+    // };
     const handleAssignRoutes = async () => {
         setIsAssigningRoutes(true);
         try {
@@ -386,36 +461,60 @@ const RouteMapping = () => {
                     });
                 });
             }
-            
+
             console.log("Attempting to assign routes:", mappingData);
-            
+
             // Make the API call with proper authentication using the new endpoint
             const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transportersRouteMap`, {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(mappingData)
             });
-            
+
+            const result = await response.json();
+
             if (response.ok) {
-                const result = await response.json();
                 console.log("Routes assigned successfully:", result);
-                showSuccessAlert(); // UPDATED: using toast instead of alert
-                
+
+                // Check if result is an array and has at least one item with a meta message
+                if (Array.isArray(result) && result.length > 0 && result[0].meta) {
+                    // Display the message from the API response
+                    toast.success(result[0].meta.message, {
+                        position: "top-right",
+                        autoClose: 5000,
+                    });
+                } else {
+                    // Generic success message if no specific message in response
+                    toast.success("Routes assigned successfully", {
+                        position: "top-right",
+                        autoClose: 5000,
+                    });
+                }
+
                 // Refresh the data
                 fetchTransporters();
-                
+
                 // Refresh the routes data if needed
                 if (currentTransporterCode) {
                     handleViewRoutes(currentTransporterCode);
                 }
             } else {
                 console.error("Failed to assign routes. Status:", response.status);
-                toast.error("Failed to assign routes. Please try again.", {
-                    position: "top-right",
-                    autoClose: 5000,
-                });
+
+                // Display error message from API if available
+                if (Array.isArray(result) && result.length > 0 && result[0].meta) {
+                    toast.error(result[0].meta.message, {
+                        position: "top-right",
+                        autoClose: 5000,
+                    });
+                } else {
+                    toast.error("Failed to assign routes. Please try again.", {
+                        position: "top-right",
+                        autoClose: 5000,
+                    });
+                }
             }
-            
+
         } catch (error) {
             console.error("Error assigning routes:", error);
             toast.error("An error occurred while assigning routes.", {
@@ -426,7 +525,6 @@ const RouteMapping = () => {
             setIsAssigningRoutes(false);
         }
     };
-
     // Handle Assign Multiple Route button click - UPDATED
     const handleAssignMultipleRouteClick = () => {
         if (selectedRows.length > 0) {
@@ -464,7 +562,7 @@ const RouteMapping = () => {
         ].join(',') + '\n';
 
         // Create CSV rows
-        const rows = transporters.map(transporter => 
+        const rows = transporters.map(transporter =>
             [
                 transporter.transporterCode,
                 transporter.transporterName,
@@ -477,7 +575,7 @@ const RouteMapping = () => {
 
         // Combine headers and rows
         const csvData = headers + rows;
-        
+
         // Create and download the file
         const blob = new Blob([csvData], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
@@ -489,7 +587,7 @@ const RouteMapping = () => {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
+
         // toast.success("CSV file exported successfully!", {
         //     position: "top-right",
         //     autoClose: 3000,
@@ -532,7 +630,7 @@ const RouteMapping = () => {
                                 </Button>
                             </div>
                         </div>
-                        
+
                         <div className="table-container">
                             {isTransportersLoading ? (
                                 <div className="text-center my-5">
@@ -585,20 +683,20 @@ const RouteMapping = () => {
                     data={transporters}
                 />
             )}
-            
+
             {/* Toast Container */}
             <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        toastStyle={{ backgroundColor: "white" }}
-      />
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                toastStyle={{ backgroundColor: "white" }}
+            />
         </React.Fragment>
     );
 };

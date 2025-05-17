@@ -1083,60 +1083,143 @@ const BulkOrder = ({ bidNo }) => {
     };
   };
 
-  // Function to submit the form data to the API
+  // // Function to submit the form data to the API
+  // const submitFormData = async () => {
+  //   setIsSubmitting(true);
+  //   setSubmitError(null);
+
+  //   try {
+  //     const payload = mapFormValuesToPayload();
+  //     console.log("Submitting payload:", payload);
+
+  //     const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/bulk`, {
+  //       method: 'POST',
+  //       headers: getAuthHeaders(),
+  //       body: JSON.stringify(payload)
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorText = await response.text();
+  //       throw new Error(`API responded with status: ${response.status}, message: ${errorText}`);
+  //     }
+
+  //     const result = await response.json();
+  //     console.log("API Response:", result);
+
+  //     // Show success toast with 3 second auto-close
+  //     toast.success("Your bid has been created successfully!", { autoClose: 3000 });
+
+  //     // Show success modal
+  //     setShowSuccessModal(true);
+
+  //     // After successful submission, go to Finish step
+  //     setActiveStep(4);
+
+  //   } catch (error) {
+  //     console.error("Error submitting form:", error);
+  //     setSubmitError(error.message);
+
+  //     // Dismiss any existing toasts first
+  //     toast.dismiss();
+
+  //     // Show error toast with 3 second auto-close
+  //     toast.error("Something went wrong!", {
+  //       toastId: 'error-toast', // Add a unique ID to prevent multiple toasts
+  //       style: {
+  //         background: '#fff',
+  //         color: '#000',
+  //         opacity: 1,
+  //       },
+  //       toastClassName: "custom-toast-error"
+  //     });
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
   const submitFormData = async () => {
     setIsSubmitting(true);
     setSubmitError(null);
-
+  
     try {
       const payload = mapFormValuesToPayload();
       console.log("Submitting payload:", payload);
-
+  
       const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/bulk`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(payload)
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API responded with status: ${response.status}, message: ${errorText}`);
-      }
-
+  
+      // Parse the response JSON regardless of status to get any error messages
       const result = await response.json();
       console.log("API Response:", result);
-
-      // Show success toast with 3 second auto-close
-      toast.success("Your bid has been created successfully!", { autoClose: 3000 });
-
-      // Show success modal
-      setShowSuccessModal(true);
-
-      // After successful submission, go to Finish step
-      setActiveStep(4);
-
+  
+      if (response.ok) {
+        // Check if the result contains a message in meta object
+        let successMessage = "Your bid has been created successfully!";
+        
+        // First check if it's an array response
+        if (Array.isArray(result) && result.length > 0 && result[0].meta) {
+          successMessage = result[0].meta.message || successMessage;
+        } 
+        // Then check if it's a direct object with meta
+        else if (result.meta && result.meta.message) {
+          successMessage = result.meta.message;
+        }
+        // If result has a direct message property
+        else if (result.message) {
+          successMessage = result.message;
+        }
+  
+        // Show success toast with the message from API
+        toast.success(successMessage, { autoClose: 3000 });
+  
+        // Show success modal
+        setShowSuccessModal(true);
+  
+        // After successful submission, go to Finish step
+        setActiveStep(4);
+      } else {
+        // Extract error message from the response
+        let errorMessage = "Something went wrong!";
+        
+        // First check if it's an array response
+        if (Array.isArray(result) && result.length > 0 && result[0].meta) {
+          errorMessage = result[0].meta.message || errorMessage;
+        } 
+        // Then check if it's a direct object with meta
+        else if (result.meta && result.meta.message) {
+          errorMessage = result.meta.message;
+        }
+        // If result has a direct message property
+        else if (result.message) {
+          errorMessage = result.message;
+        }
+  
+        throw new Error(errorMessage);
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmitError(error.message);
-
+  
       // Dismiss any existing toasts first
       toast.dismiss();
-
-      // Show error toast with 3 second auto-close
-      toast.error("Something went wrong!", {
+  
+      // Show error toast with the error message
+      toast.error(error.message || "Something went wrong!", {
         toastId: 'error-toast', // Add a unique ID to prevent multiple toasts
         style: {
           background: '#fff',
           color: '#000',
           opacity: 1,
         },
-        toastClassName: "custom-toast-error"
+        toastClassName: "custom-toast-error",
+        autoClose: 3000
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   // Updated handleSubmit with validation
   const handleSubmit = async (e) => {
     e.preventDefault();

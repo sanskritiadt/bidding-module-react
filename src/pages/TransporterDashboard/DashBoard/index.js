@@ -1673,7 +1673,7 @@ const TransporterDashboard = () => {
       // Basic auth credentials
       const credentials = getBasicAuthCredentials();
 
-      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/all`, {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${loginCode}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
