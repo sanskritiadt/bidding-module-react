@@ -1803,6 +1803,9 @@ $value in $theme-colors {
   background-color: #03AA98;
   color: #fff !important;
 }
+.btn:hover{
+  pointer-events: none !important;
+}
 .bg-green-commit{
   background-color: #0F8704 !important;
   color: #fff !important;

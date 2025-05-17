@@ -363,6 +363,24 @@ const Navdata = () => {
                     link: "/transporter-dashboard",
                     parentId: "dashboard",
                 },
+                  {
+                    id: "Quota Management",
+                    label: "Quota Management",
+                    link: "/quota-management",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "Order Management",
+                    label: "Order Management",
+                    link: "/order-management",
+                    parentId: "dashboard",
+                },
+                {
+                    id: "  Transporter Slot Master",
+                    label: "Transporter Slot Master",
+                    link: "/sloc-master",
+                    parentId: "dashboard",
+                },
              
              ],
          }

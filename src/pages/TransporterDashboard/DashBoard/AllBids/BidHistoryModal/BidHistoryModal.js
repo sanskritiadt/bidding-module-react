@@ -32,8 +32,8 @@ const BidHistoryModal = ({ isOpen, toggle, bidNo, bidData }) => {
            
             // Get transporter details from session or bidData
             const authUser = JSON.parse(sessionStorage.getItem("authUser") || '{}');
-            const transporterId = authUser?.data?.transporterId || bidData?.transporterId || 1;
-            const transporterCode = authUser?.data?.transporterCode || bidData?.transporterCode || 'T-000004';
+            const transporterId = authUser?.data?.transporterId || bidData?.transporterId;
+            const transporterCode = authUser?.data?.transporterCode || bidData?.transporterCode;
            
             // Prepare request body
             const requestBody = {

@@ -110,13 +110,14 @@ const AllTasksTransporter = () => {
     setModalVisible(true);
   }, []);
 
-  const toggle = useCallback((code = null,soNumber = null,qty = 0) => {
+  const toggle = useCallback((code = null,soNumber = null,qty) => {
+    //alert(qty);
     if (modal) {
-      setModal(false);
       setTask(null);
       setSelectedSO1("");
       setTransporterCode(null);
       setSOTotalQty(0);
+      setModal(false);
     } else {
       if (code) 
       setSelectedSO1(soNumber);
@@ -128,29 +129,33 @@ const AllTasksTransporter = () => {
   }, [modal]);
 
   const toggleEditModal = useCallback(
-    async (code = null,soNumber = null) => {
+    async (code = null,soNumber = null,qty) => {
+      //alert(qty);
       // If modal is closed, we're about to OPEN it
       if (!modalEdit) {
         setSelectedSO1(soNumber);
         setTransporterCode(code);
+        setSOTotalQty(qty);
         await fetchTruckDetails(code);
         try {
           // Fetch the already-allocated truck IDs for this SO
-          const { data } = await axios.get(
-            `http://localhost:8082/truckAllocation/getBySoNumberOrSoANdTransporter?soNumber=${soNumber}&transporterCode=${code}`,config
+          const response = await axios.get(
+            `${process.env.REACT_APP_LOCAL_URL_8085}/truckAllocation/getBySoNumberAndTransporter?soNumber=${soNumber}&transporterCode=${code}`,config
           );
 
-          const prevIds = data.map((truck) => truck.registrationNumber);
+          console.log(response);
+          const prevIds = response.map((truck) => truck.vehicleNo);
 
           // assume your endpoint returns { truckIds: [ ... ] }
-          setSelectedTruckIds(data.registrationNumber || []);
+          setSelectedTruckIds(prevIds || []);
           setInitialTruckIds(prevIds);        // ← store the “previous” list
 
         } catch (err) {
           console.error("Failed to load allocated trucks:", err);
           setSelectedTruckIds([]);       
           setInitialTruckIds([]);
-          setTransporterCode(null);
+          // setTransporterCode(null);
+          // setSOTotalQty(0);
         }
         setModalEdit(true);
       } else {
@@ -159,17 +164,22 @@ const AllTasksTransporter = () => {
         setSelectedSO1(null);
         setSelectedTruckIds([]);        
         setInitialTruckIds([]);
+        setTransporterCode(null);
+        setSOTotalQty(0);
       }
     },
     [modalEdit]
   );
 
-  const toggleModal = useCallback((code = null,soNumber = null) => {
+  const toggleModal = useCallback((code = null,soNumber = null,qty) => {
     if (modal1) {
       setModal1(false);
+      setSOTotalQty(qty);
       setTruckDetailsForSoAndTrans([]);
+
     } else {
       if (code && soNumber) {
+        setSOTotalQty(qty);
         fetchTruckDetailsBySoAndTransporter(code,soNumber); // call API
       }
       setModal1(true);
@@ -179,7 +189,7 @@ const AllTasksTransporter = () => {
   const fetchTruckDetails = async (code) => {
     try {
       const response = await axios.get(
-        `http://localhost:8085/vehicles/getVehicle/${code}`,
+        `${process.env.REACT_APP_LOCAL_URL_8085}/vehicles/getVehicle/${code}`,
         config
       );
 
@@ -200,7 +210,7 @@ const AllTasksTransporter = () => {
   const fetchTruckDetailsBySoAndTransporter = async (code,soNumber) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/truckAllocation/getBySoNumberOrSoANdTransporter?soNumber=${soNumber}&transporterCode=${code}`,
+        `${process.env.REACT_APP_LOCAL_URL_8085}/truckAllocation/getBySoNumberAndTransporter?soNumber=${soNumber}&transporterCode=${code}`,
         config
       );
 
@@ -231,6 +241,7 @@ const AllTasksTransporter = () => {
       return;
     }
 
+    console.log("truckdetails",truckDetails);
      // 1️⃣ Sum “previous” capacity (raw)
     const prevRaw = truckDetails
     .filter(truck => initialTruckIds.includes(truck.registrationNumber))
@@ -238,12 +249,18 @@ const AllTasksTransporter = () => {
     // Round to 3 decimals
     const prevCapacity = Number(prevRaw.toFixed(3));
 
+    console.log(prevRaw);
+
     // 2️⃣ Sum “current” capacity (raw)
     const currRaw = truckDetails
     .filter(truck => selectedTruckIds.includes(truck.registrationNumber))
     .reduce((sum, t) => sum + parseFloat(t.vehicleCapacityMax || 0), 0);
     // Round to 3 decimals
     const currCapacity = Number(currRaw.toFixed(3));
+
+    console.log(currCapacity);
+    console.log(selectedTruckIds);
+    console.log(selectedTruckIds);
 
       // selectedTruckIds is already pre-populated
     // const payload = {
@@ -272,15 +289,18 @@ const AllTasksTransporter = () => {
       "plantCode": "N205"
     };
     try {
-      const res = await axios.put(
-        "http://localhost:8085/truckAllocation",
+      const res = await axios.post(
+        `${process.env.REACT_APP_LOCAL_URL_8085}/truckAllocation`,
         payload,
         config
       );
 
-      fetchData(1, itemsPerPage, "total");
-      setSelectedTruckIds([]);
-      setModalEdit(false);
+      if(res){
+        toast.success("Truck allocated successfully");
+        fetchData(1, itemsPerPage, "total");
+        setSelectedTruckIds([]);
+        setModalEdit(false);
+      }
       // optionally refresh your table here
     } catch (err) {
       console.error(err);
@@ -314,6 +334,7 @@ const AllTasksTransporter = () => {
       disableSortBy: true,
       Cell: ({ row }) => {
         const id = row.original.registrationNumber;
+        console.log(selectedTruckIds);
         return (
           <input
             type="checkbox"
@@ -541,25 +562,25 @@ const AllTasksTransporter = () => {
       
       if (string1 !== "") {
         const payload = {
-          "transporterCode":2,
+          "transporterCode":916001837,
           // "transporterId":sessionStorage.getItem("authUser") ? JSON.parse(sessionStorage.getItem("authUser")).data._id : null,
           "search":string1,
           "page":(currentPage - 1),
           "size":itemsPerPage
         };
-        const response = await axios.post(`http://localhost:8085/orderManagement/filter`,payload,config);
+        const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/filter`,payload,config);
         const ab = response;
         const { items, totalItems } = ab.content;
         setData(ab.content);
         setTotalPages(ab.totalElements);
       } else {
         const payload = {
-          "transporterCode":2,
+          "transporterCode":916001837,
           // "transporterId":sessionStorage.getItem("authUser") ? JSON.parse(sessionStorage.getItem("authUser")).data._id : null,
           "page":(currentPage - 1),
           "size":itemsPerPage
         };
-        const response = await axios.post(`http://localhost:8085/orderManagement/filter`,payload,config);
+        const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/filter`,payload,config);
         const ab = response;
         const { items, totalItems } = ab.content;
         setData(ab.content);
@@ -707,7 +728,7 @@ const AllTasksTransporter = () => {
     };
   
     try {
-      const response = await fetch("http://localhost:8085/orderManagement/update", {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/update`, {
         method: "POST",config,
         body: JSON.stringify(payload),
       });
@@ -857,23 +878,23 @@ const AllTasksTransporter = () => {
                             // </td>
                               <td>
                                 {/* Show Edit Truck and View Icon ONLY if status is 'truckallocated' */}
-                                {item.soStatus === "3" && (
+                                {item.soStatus === 3 && (
                                   <>
                                     <button
                                       className="btn color-blue-bg"
                                       style={{ padding: "5px", border: "1px solid #405189" }}
-                                      onClick={() => toggleEditModal(item.transporterCode,item.soNumber)}
+                                      onClick={() => toggleEditModal(item.transporterCode,item.soNumber,item.availableQuantity)}
                                     >
                                       Edit Truck
                                     </button>{" "}
-                                    <a href="#" onClick={() => toggleModal(item.transporterCode,item.soNumber)}>
+                                    <a href="#" onClick={() => toggleModal(item.transporterCode,item.soNumber,item.availableQuantity)}>
                                       <i className="ri-eye-fill color-g align-bottom me-2 fs-22 text-muted"></i>
                                     </a>
                                   </>
                                 )}
                             
                                 {/* Show Allocate Truck ONLY if status is NOT 'truckallocated' */}
-                                {item.soStatus !== "3" && (
+                                {item.soStatus !== 3 && (
                                   <button
                                     className="btn color-blue-bg"
                                     style={{ padding: "5px", border: "1px solid #405189" }}

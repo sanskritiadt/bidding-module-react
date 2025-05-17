@@ -419,5 +419,29 @@ const getLoggedinUser = () => {
     return JSON.parse(user);
   }
 };
+// Create a utility file like 'authUtils.js'
+ const getLoginCode = () => {
+  try {
+      const storedData = sessionStorage.getItem("main_menu_login");
+      
+      if (storedData) {
+          const obj = JSON.parse(storedData);
+          
+          // Access login directly from the object as shown in your session storage
+          if (obj && obj.login) {
+              return obj.login;
+          } else {
+              console.warn("Login data structure is not as expected");
+              return null;
+          }
+      } else {
+          console.warn("No login data found in session storage");
+          return null;
+      }
+  } catch (error) {
+      console.error("Error accessing login data:", error);
+      return null;
+  }
+};
 
-export { APIClient, setAuthorization, getLoggedinUser };
+export { APIClient, setAuthorization, getLoggedinUser,getLoginCode };

@@ -145,7 +145,7 @@ const AllTasks = () => {
   const fetchTruckDetails = async (soNumber) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/truckAllocation/getBySoNumberOrSoANdTransporter?soNumber=${soNumber}`,
+        `${process.env.REACT_APP_LOCAL_URL_8085}/truckAllocation/getBySoNumberAndTransporter?soNumber=${soNumber}`,
         config
       );
   
@@ -264,7 +264,7 @@ const AllTasks = () => {
             password: "TE@M-W@RK",
         },
       };
-      const response = await axios.get(`http://localhost:8085/orderManagement/getTransporterBySoNumer/${arg.orderNumber}`,config);
+      const response = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/getTransporterBySoNumer/${arg.orderNumber}`,config);
 
       console.log(response);
   
@@ -350,7 +350,7 @@ const AllTasks = () => {
           },
       };
       try {
-        const response = await axios.get('http://localhost:8085/api/transporters/all?plantCode=N205', config);
+        const response = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8085}/api/transporters/all?plantCode=N205`, config);
         console.log(response);
         setTransporters(response);
       } catch (err) {
@@ -717,7 +717,7 @@ useEffect(() => {
           "page":(currentPage - 1),
           "size":itemsPerPage
         };
-        const response = await axios.post(`http://localhost:8085/salesorder_allocation/filter`,payload,config);
+        const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/salesorder_allocation/filter`,payload,config);
         const ab = response;
         // const ab = {
         //   "totalElements": 3,
@@ -856,7 +856,7 @@ useEffect(() => {
           "page":(currentPage - 1),
           "size":itemsPerPage
         };
-        const response = await axios.post(`http://localhost:8085/salesorder_allocation/filter`,payload,config);
+        const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/salesorder_allocation/filter`,payload,config);
         const ab = response;
         // const ab = {
         //   "totalElements": 3,
@@ -1157,7 +1157,7 @@ useEffect(() => {
 
     if(selectedTransporterCodes.length > 0){
       try {
-        const response = await axios.post('http://localhost:8085/orderManagement', payload, config);
+        const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement`, payload, config);
         console.log("API Response:", response);
         if(response){
           toast.success("Transporter Assigned Successfully!");
@@ -1196,7 +1196,7 @@ useEffect(() => {
     
     if(selectedTransporterCodes1.length > 0){
       try {
-        const response = axios.post('http://localhost:8085/orderManagement', payload, config);
+        const response = axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement`, payload, config);
         if(response){
           toast.success("Transporter Updated Successfully!");
           setSelectedTransporterCodes1([]);
@@ -1228,7 +1228,7 @@ useEffect(() => {
   
     try {
       const response = await axios.post(
-        "http://localhost:8085/orderPriority",
+        `${process.env.REACT_APP_LOCAL_URL_8085}/orderPriority`,
         {
           "soNumber":soNumber,
           "priorityCheck":orderPriority,
@@ -1430,13 +1430,13 @@ useEffect(() => {
                               <a
                                 href="#"
                                 onClick={() => {
-                                  if (item.status === "3") {
+                                  if (item.soStatus === 3) {
                                     toggleModal(item.orderNumber);
                                   }
                                 }}
                                 style={{
-                                  pointerEvents: item.status === "3" ? "auto" : "none",
-                                  opacity: item.status === "3" ? 1 : 0.5,
+                                  pointerEvents: item.soStatus === 3 ? "auto" : "none",
+                                  opacity: item.soStatus === 3 ? 1 : 0.5,
                                 }}
                               >
                                 <i className="ri-eye-fill color-g align-bottom me-2 fs-22 text-muted"></i>
@@ -1475,7 +1475,7 @@ useEffect(() => {
                                 className="btn btn-danger"
                                 style={{ padding: "5px" }}
                                 disabled={
-                                  !["1", "0"].includes(item.status)
+                                  ![1, 0].includes(item.soStatus)
                                 }
                                 onClick={() => handleCancelClick(item)}
                               >
@@ -1491,7 +1491,7 @@ useEffect(() => {
                                   padding: "5px",
                                   border: "1px solid #405189",
                                 }}
-                                disabled={item.status !== "1"}
+                                disabled={item.soStatus !== 1}
                                 onClick={() => handleCustomerClick(item)}
                               >
                                 Edit Transporter

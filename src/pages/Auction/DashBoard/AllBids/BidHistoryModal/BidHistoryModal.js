@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Modal, ModalHeader, ModalBody, Input, Row, Col, Spinner } from "reactstrap";
 import { toast } from 'react-toastify';
 import "./BidHistoryModal.css";

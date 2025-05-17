@@ -184,9 +184,8 @@
 // export default BidConfirmationModal;
 
 
-
-
 import React, { useState, useEffect } from 'react';
+
 import {
   Modal,
   ModalHeader,
@@ -197,26 +196,27 @@ import {
 } from 'reactstrap';
 import { toast } from 'react-toastify';
  
-const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
+const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
   const [transporters, setTransporters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [processingAction, setProcessingAction] = useState(false);
- 
+ console.log("bidNo====>",bidNo);
   // Fetch bid data when modal opens
   useEffect(() => {
+  
     if (isOpen && bidNo) {
       fetchBidData();
     }
   }, [isOpen, bidNo]);
- 
+  console.log("login code in BidOrderConfirmation============>>>>>>>",loginCode);
   const fetchBidData = async () => {
     try {
       setLoading(true);
       setError(null);
  
       const response = await fetch(
-        `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/getBidDataByBidNo?biddingNumber=${bidNo}`,
+      
         `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/getBidDataByBidNo?biddingNumber=${bidNo}`,
         {
           method: 'GET',
@@ -259,42 +259,44 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo }) => {
   const handleBidAction = async (flag) => {
     try {
       setProcessingAction(true);
- 
+      
       const response = await fetch(
-        `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/assignBid?flag=${flag}`,
+        `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/assignBid?flag=${flag}&biddingOrderNumber=${bidNo}&transporterCode=${loginCode}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
           },
-          // Add any required body parameters here if needed
-          // body: JSON.stringify({ bidNo: bidNo })
         }
       );
- 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      
+      // Get the response text directly
+      const resultText = await response.text();
+      
+      // Check if the response text indicates an error
+      if (resultText.includes("not found") || !response.ok) {
+        // This is an error message from the API
+        toast.error(resultText, { autoClose: 3000 });
+        throw new Error(resultText); // To skip the success toast
       }
- 
-      const result = await response.json();
- 
-      // Show success message based on action
-      const actionText = flag === 'A' ? 'assigned' : 'rejected';
-      toast.success(`Bid successfully ${actionText}`, { autoClose: 3000 });
- 
+      
+      // This is a success message from the API
+      toast.success(resultText, { autoClose: 3000 });
+      
       // Close the modal after successful action
       toggle();
- 
     } catch (err) {
       console.error(`Error ${flag === 'A' ? 'assigning' : 'rejecting'} bid:`, err);
-      const actionText = flag === 'A' ? 'assigning' : 'rejecting';
-      toast.error(`Error ${actionText} bid. Please try again.`, { autoClose: 3000 });
+      
+      // Only show error toast if we haven't shown one already
+      if (!err.message || !err.message.includes("not found")) {
+        toast.error(`Error processing bid request. Please try again.`, { autoClose: 3000 });
+      }
     } finally {
       setProcessingAction(false);
     }
   };
- 
   const formatCurrency = (amount) => {
     if (!amount) return '0';
     return new Intl.NumberFormat('en-IN', {

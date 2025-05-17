@@ -24,7 +24,7 @@ const Widgets = () => {
     //const token = JSON.parse(sessionStorage.getItem("authUser")) ? JSON.parse(sessionStorage.getItem("authUser")).token : null;
     useEffect(() => {
 
-        axios.get('http://10.6.0.5:8085/orderManagement/count', config)
+        axios.get(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/count`, config)
         .then(response => {
             console.log(response);
             const widgets = taskWidgetsBid(response);

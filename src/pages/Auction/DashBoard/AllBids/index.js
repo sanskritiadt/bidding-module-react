@@ -5,11 +5,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import ExportCSVModal from "../../../../Components/Common/ExportCSVModal";
 import BreadCrumb from "../../../../Components/Common/BreadCrumb";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-
 // Import custom components
 import BidCard from "./BidCard/BideCard";
-import BidViewModal from "./BidViewModal/BidViewModal";
 import BidHistoryModal from "./BidHistoryModal/BidHistoryModal";
+import { getLoginCode } from "../../../../helpers/api_helper";
+
 
 const ViewAllBids = () => {
     const [bids, setBids] = useState([]);
@@ -28,6 +28,8 @@ const ViewAllBids = () => {
     const [soDetailsModal, setSoDetailsModal] = useState(false);
     const [soDetails, setSoDetails] = useState([]);
     const [loadingSoDetails, setLoadingSoDetails] = useState(false);
+    const [loginCode, setLoginCode] = useState('');
+ 
 
     // Export Modal
     const [isExportCSV, setIsExportCSV] = useState(false);
@@ -76,6 +78,13 @@ const ViewAllBids = () => {
     };
 
     useEffect(() => {
+        const loginCode = getLoginCode();
+        if (loginCode) {
+            setLoginCode(loginCode);
+            console.log("Login code found:", loginCode);
+        } else {
+            console.warn("Login code not found");
+        }
         const HeaderName = localStorage.getItem("HeaderName");
         setLatestHeader(HeaderName);
     }, []);
@@ -96,7 +105,7 @@ const ViewAllBids = () => {
         fetchBidData();
     }, []);
 
-    const fetchBidData = async () => {
+    const fetchBidData = async (loginCode) => {
         try {
             setLoading(true);
             setError(null);
@@ -106,11 +115,7 @@ const ViewAllBids = () => {
             const password = process.env.REACT_APP_API_PASSWORD;
             const basicAuth = 'Basic ' + btoa(username + ':' + password);
 
-            // Get transporter code - you might need to adjust this based on your auth implementation
-            const authUser = JSON.parse(sessionStorage.getItem("authUser") || '{}');
-            const transporterCode = authUser?.data?.transporterCode || 'T-000008';
-
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${transporterCode}`, {
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${loginCode}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
