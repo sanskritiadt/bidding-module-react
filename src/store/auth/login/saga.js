@@ -30,6 +30,7 @@ function* loginUser({ payload: { user, history } }) {
             "_id": response.id,
             "first_name": response.firstname,
             "last_name": response.lastname,
+            "login": response.login,
             "email": response.email,
             "phone": response.mobileNumber,
             "plantCode" : response.plantCode,

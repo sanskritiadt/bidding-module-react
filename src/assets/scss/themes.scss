@@ -1804,7 +1804,14 @@ $value in $theme-colors {
   color: #fff !important;
 }
 .btn:hover{
-  pointer-events: none !important;
+  background-color: unset !important;
+  color: unset !important;
+  box-shadow: unset !important;
+  /* and anything else you had on hover: */
+  border-color: unset !important;
+  text-decoration: unset !important;
+  cursor: pointer; /* keeps the pointer cursor if you like */
+  transition: none !important;
 }
 .bg-green-commit{
   background-color: #0F8704 !important;

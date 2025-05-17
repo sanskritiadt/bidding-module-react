@@ -364,14 +364,14 @@ const Navdata = () => {
                     parentId: "dashboard",
                 },
                   {
-                    id: "Quota Management",
-                    label: "Quota Management",
+                    id: "Logistics Order Management",
+                    label: "Logistics Order Management",    
                     link: "/quota-management",
                     parentId: "dashboard",
                 },
                 {
-                    id: "Order Management",
-                    label: "Order Management",
+                    id: " Transporter Order Management",
+                    label: " Transporter Order Management",
                     link: "/order-management",
                     parentId: "dashboard",
                 },
