@@ -50,7 +50,7 @@ const Assigned = [
 ];
 
 
-const AllTasks = () => {
+const AllTasks = ({ onTasksUpdated }) => {
   const dispatch = useDispatch();
 
 //   const { taskList, isTaskCreated, isTaskSuccess, error } = useSelector((state) => ({
@@ -977,6 +977,7 @@ useEffect(() => {
         const { items, totalItems } = ab.content;
         setData(ab.content);
         setTotalPages(ab.totalElements);
+        onTasksUpdated();
       }
 
     } catch (error) {
@@ -1257,7 +1258,12 @@ useEffect(() => {
   };  
 
   const submitCancelOrder = async () => {
-    if (!cancelRemark || !selectedSO) return;
+    //alert("dffg");
+    if (!cancelRemark || !selectedSO) {
+      //alert("hello");
+      toast.error("Please enter remark and so number");
+      return false;
+    }
   
     try {
       const response = await axios.post(
@@ -1463,12 +1469,12 @@ useEffect(() => {
                               checked={
                                 item.priorityStatus === 1
                                   ? true // Always checked if already assigned
-                                  : selectedIds.includes(item.id) // Else, use state
+                                  : selectedIds.includes(item.orderNumber) // Else, use state
                               }
                               className="form-check-input"
                               onChange={(e) => {
                                 const checked = e.target.checked;
-                                const id = item.id;
+                                const id = item.orderNumber;
 
                                 setSelectedIds((prev) =>
                                   checked
@@ -1505,7 +1511,7 @@ useEffect(() => {
                                   padding: "5px",
                                   border: "1px solid #405189",
                                 }}
-                                disabled={item.soStatus !== 1}
+                                disabled={item.soStatus === 1}
                                 onClick={() => handleCustomerClick(item)}
                               >
                                 Edit Transporter
@@ -1646,12 +1652,12 @@ useEffect(() => {
             <div class="form-group">
                 <label>Add Remark <span style={{color:"red"}}>*</span></label>
                 <textarea class="form-control" row={7} value={cancelRemark} 
-                  onKeyUp={(e) => setCancelRemark(e.target.value)} placeholder='Enter Remark'></textarea>
+                  onChange={(e) => setCancelRemark(e.target.value)} placeholder='Enter Remark'></textarea>
             </div>
           </ModalBody>
           <div className="modal-footer">
             <div className="hstack gap-2 justify-content-end">
-              <button type="submit" className="btn color-blue-bg" onChange={() => { submitCancelOrder(); }} id="add-btn">{"Cancel Order"}</button>
+              <button type="submit" className="btn color-blue-bg" onClick={() => { submitCancelOrder(); }} id="add-btn">{"Cancel Order"}</button>
             </div>
           </div>
       </Modal>        

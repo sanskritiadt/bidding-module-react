@@ -11,6 +11,9 @@ import DeleteModal from "../../../../Components/Common/DeleteModal";
 import BidCard from "./BidCard/BideCard";
 import BidViewModal from "./BidViewModal/BidViewModal";
 import BidHistoryModal from "./BidHistoryModal/BidHistoryModal";
+import { getLoginCode } from "../../../../helpers/api_helper";
+
+
 
 const ViewTransporterBids = () => {
     const [bids, setBids] = useState([]);
@@ -28,7 +31,8 @@ const ViewTransporterBids = () => {
     const [error, setError] = useState(null);
     const [soDetails, setSoDetails] = useState([]);
     const [loadingSoDetails, setLoadingSoDetails] = useState(false);
-    
+    const [loginCode, setLoginCode] = useState('');
+
     // Export Modal
     const [isExportCSV, setIsExportCSV] = useState(false);
 
@@ -59,6 +63,15 @@ const ViewTransporterBids = () => {
     useEffect(() => {
         const HeaderName = localStorage.getItem("HeaderName");
         setLatestHeader(HeaderName);
+ 
+        const loginCode = getLoginCode();
+        if (loginCode) {
+            setLoginCode(loginCode);
+            console.log("Login code found: view-all-bids-transporter", loginCode);
+        } else {
+            // Handle missing login code (redirect to login, show error, etc.)
+        }
+
     }, []);
 
     // Get status based on date comparison
@@ -74,10 +87,10 @@ const ViewTransporterBids = () => {
 
     // Fetch bid data from API
     useEffect(() => {
-        fetchBidData();
+        fetchBidData(loginCode);
     }, []);
 
-    const fetchBidData = async () => {
+    const fetchBidData = async (loginCode) => {
         try {
             setLoading(true);
             setError(null);
@@ -87,11 +100,11 @@ const ViewTransporterBids = () => {
             const password = process.env.REACT_APP_API_PASSWORD;
             const basicAuth = 'Basic ' + btoa(username + ':' + password);
             
-            // Get transporter code
-            const authUser = JSON.parse(sessionStorage.getItem("authUser") || '{}');
-            const transporterCode = authUser?.data?.transporterCode || 'T-000008';
-            
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${transporterCode}`, {
+     
+
+
+      
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${loginCode}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
