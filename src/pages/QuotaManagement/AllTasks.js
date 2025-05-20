@@ -1267,7 +1267,7 @@ useEffect(() => {
   
     try {
       const response = await axios.post(
-        "http://localhost:8081/salesorder_allocation/cancelSalesOrder",
+        `${process.env.REACT_APP_LOCAL_URL_8085}/salesorder_allocation/cancelSalesOrder`,
         {
           soNumber: selectedSO,
           remarks: cancelRemark,
@@ -1511,7 +1511,7 @@ useEffect(() => {
                                   padding: "5px",
                                   border: "1px solid #405189",
                                 }}
-                                disabled={item.soStatus === 1}
+                                disabled={item.soStatus !== 1}
                                 onClick={() => handleCustomerClick(item)}
                               >
                                 Edit Transporter

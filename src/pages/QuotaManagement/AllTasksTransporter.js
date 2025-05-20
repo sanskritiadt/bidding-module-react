@@ -529,7 +529,7 @@ const AllTasksTransporter = () => {
     };
   
     try {
-      const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/allocateTruck`,payload,config);
+      const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/truckAllocation`,payload,config);
   
       if (!response.errorMsg) {
         toast.success("Truck allocated successfully!");
@@ -731,7 +731,7 @@ const AllTasksTransporter = () => {
       const response = await axios.post(`${process.env.REACT_APP_LOCAL_URL_8085}/orderManagement/update`, payload,config);
   
       if (!response.errorMsg) {
-        toast.success(`${modalAction === "commit" ? "Order committed" : "Order rejected"} successfully.`);
+        toast.success(`${modalAction === "committed" ? "Order committed" : "Order rejected"} successfully.`);
         fetchData(1, itemsPerPage, "total");
         setModalVisible(false);
         // optionally refresh your order list
@@ -849,7 +849,7 @@ const AllTasksTransporter = () => {
                             <button
                               className="btn color-blue-bg"
                               style={{ padding: "5px" }}
-                              onClick={() => handleCommitRejectClick(item, "commit")}
+                              onClick={() => handleCommitRejectClick(item, "committed")}
                               disabled={item.soStatus === 2 || item.soStatus === 4}
                             >
                               Commit
@@ -857,7 +857,7 @@ const AllTasksTransporter = () => {
                             <button
                               className="btn btn-danger"
                               style={{ padding: "5px" }}
-                              onClick={() => handleCommitRejectClick(item, "reject")}
+                              onClick={() => handleCommitRejectClick(item, "rejected")}
                               disabled={item.soStatus === 2 || item.soStatus === 4}
                             >
                               Reject
@@ -990,7 +990,7 @@ const AllTasksTransporter = () => {
         modalClassName="modal fade zoomIn"
       >
         <ModalHeader className="p-3 bg-soft-info" toggle={() => setModalVisible(false)}>
-          {modalAction === "commit" ? "Commit Order" : "Reject Order"}
+          {modalAction === "committed" ? "Commit Order" : "Reject Order"}
         </ModalHeader>
         <ModalBody className="modal-body">
           <div className="form-group">
@@ -1011,7 +1011,7 @@ const AllTasksTransporter = () => {
               className="btn color-blue-bg"
               onClick={submitCommitReject}
             >
-              {modalAction === "commit" ? "Commit Order" : "Reject Order"}
+              {modalAction === "committed" ? "Commit Order" : "Reject Order"}
             </button>
           </div>
         </div>
