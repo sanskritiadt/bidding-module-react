@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Form, Input, Label } from "reactstrap";
 import { Stepper, Step, StepLabel, StepConnector } from '@material-ui/core';
@@ -296,6 +293,278 @@ const SOBasedOrder = ({ bidNo }) => {
     setActiveStep(prevStep => Math.max(prevStep - 1, 0));
   };
 
+  // // Updated handleSubmit with API integration and fixed date formatting
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   console.log("Form submitted with values:", values);
+  //   console.log("Selected Sales Orders:", selectedOrders);
+
+  //   // Initialize validation errors object
+  //   const validationErrors = {};
+
+  //   // Step 0 validation (Bid Details)
+  //   if (activeStep === 0) {
+  //     if (!values.bidStartingFrom) {
+  //       validationErrors.bidStartingFrom = "Please select bid starting date";
+  //     }
+
+  //     if (!values.bidStartTo) {
+  //       validationErrors.bidStartTo = "Please select bid end date";
+  //     }
+
+  //     if (!values.intervalAmount) {
+  //       validationErrors.intervalAmount = "Please enter interval amount";
+  //     }
+
+  //     if (!values.uom || values.uom === "Select") {
+  //       validationErrors.uom = "Please select UOM";
+  //     }
+  //   }
+
+  //   // Step 1 validation (Material and Transporter)
+  //   else if (activeStep === 1) {
+  //     if (!values.extensionQuantity) {
+  //       validationErrors.extensionQuantity = "Please enter extension quantity";
+  //     }
+
+  //     if (!values.displayToTransporter || values.displayToTransporter === "Select") {
+  //       validationErrors.displayToTransporter = "Please select display option";
+  //     }
+
+  //     if (!values.selectTransporter || values.selectTransporter.length === 0) {
+  //       validationErrors.selectTransporter = "Please select at least one transporter";
+  //     }
+
+  //     if (selectedOrders.length === 0) {
+  //       validationErrors.salesOrders = "Please select at least one sales order";
+  //     }
+  //   }
+
+  //   // Step 2 validation (Delivery and Allocation)
+  //   else if (activeStep === 2) {
+  //     if (!values.autoAllocateTo || values.autoAllocateTo === "Select") {
+  //       validationErrors.autoAllocateTo = "Please select auto allocate option";
+  //     }
+
+  //     if (!values.intervalTimeForAllocatingVehicle) {
+  //       validationErrors.intervalTimeForAllocatingVehicle = "Please select interval time";
+  //     }
+
+  //     if (!values.intervalTimeToReachPlant) {
+  //       validationErrors.intervalTimeToReachPlant = "Please select interval time";
+  //     }
+
+  //     if (!values.gracePeriodToReachPlant) {
+  //       validationErrors.gracePeriodToReachPlant = "Please select grace period";
+  //     }
+  //   }
+
+  //   // Update the errors state
+  //   setErrors(validationErrors);
+
+  //   // If there are validation errors, don't proceed
+  //   if (Object.keys(validationErrors).length > 0) {
+  //     console.log("Validation errors:", validationErrors);
+  //     return;
+  //   }
+
+  //   // If validation passes
+  //   if (activeStep === 2) {
+  //     // Go to Preview (which is not in the stepper)
+  //     setActiveStep(3);
+  //   } else if (activeStep === 3) {
+  //     // If we're at Preview, submit to API
+  //     setIsSubmitting(true);
+
+  //     try {
+  //       // Format dates for API with multiple options to try
+  //       const formatDateOption1 = (dateString) => {
+  //         if (!dateString) return null;
+  //         const date = new Date(dateString);
+  //         const year = date.getFullYear();
+  //         const month = String(date.getMonth() + 1).padStart(2, '0');
+  //         const day = String(date.getDate()).padStart(2, '0');
+  //         const hours = String(date.getHours()).padStart(2, '0');
+  //         const minutes = String(date.getMinutes()).padStart(2, '0');
+  //         const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  //         // Use 'T' as separator instead of space
+  //         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  //       };
+
+  //       const formatDateOption2 = (dateString) => {
+  //         if (!dateString) return null;
+  //         const date = new Date(dateString);
+  //         const year = date.getFullYear();
+  //         const month = String(date.getMonth() + 1).padStart(2, '0');
+  //         const day = String(date.getDate()).padStart(2, '0');
+  //         return `${year}-${month}-${day}`; // Date only, no time
+  //       };
+
+  //       // Convert time to minutes for API
+  //       const timeToMinutes = (timeString) => {
+  //         if (!timeString) return 0;
+
+  //         // Handle different formats
+  //         let hours = 0;
+  //         let minutes = 0;
+
+  //         if (timeString.includes(':')) {
+  //           const parts = timeString.split(':');
+  //           if (parts.length >= 2) {
+  //             hours = parseInt(parts[0]) || 0;
+  //             minutes = parseInt(parts[1]) || 0;
+  //           }
+  //         } else {
+  //           // If it's already a number, return it
+  //           const parsed = parseInt(timeString);
+  //           if (!isNaN(parsed)) {
+  //             return parsed;
+  //           }
+  //         }
+
+  //         return (hours * 60) + minutes;
+  //       };
+
+  //       // Get unique transporters (remove duplicates by ID)
+  //       const uniqueTransporters = [...new Map(
+  //         values.selectTransporter.map(item => [item.id, item])
+  //       ).values()];
+
+  //       // Find selected order details from the salesOrders array
+  //       const getSelectedOrderDetails = (orderNo) => {
+  //         return salesOrders.find(order => order.orderNo === orderNo);
+  //       };
+
+  //       // Create a bid objects array for all selected transporters
+  //       const biddingObjects = uniqueTransporters.map(transporter => {
+  //         // Prepare the sales orders data for this transporter
+  //         const formattedSalesOrders = selectedOrders.map(orderNo => {
+  //           const orderDetails = getSelectedOrderDetails(orderNo);
+
+  //           // Get original data if it exists, otherwise use the mapped order
+  //           const originalOrder = orderDetails?.originalData || {};
+
+  //           // Use a simple date string for validity
+  //           const today = new Date();
+  //           const validityStr = formatDateOption2(today);
+
+  //           // Extract quantity numeric value
+  //           const quantityStr = orderDetails?.quantity || "0";
+  //           const quantityNum = parseInt(quantityStr.toString().replace(/\D/g, '')) || 0;
+
+  //           return {
+  //             soNumber: orderDetails?.orderNo || orderNo,
+  //             validity: validityStr, // Use date-only format
+  //             material: originalOrder.materialCode || orderDetails?.material || '',
+  //             quantity: quantityNum,
+  //             transporterCode: transporter.id,
+  //             plantCode: originalOrder.plant || "PLANT01",
+  //             biddingOrderNo: bidNo,
+  //             status: "A"
+  //           };
+  //         });
+
+  //         // Return a complete bidding object for each transporter
+  //         return {
+  //           biddingMaster: {
+  //             transporterCode: transporter.id,
+  //             ceilingPrice: parseFloat(values.ceilingAmount) || 0,
+  //             uom: values.uom,
+  //             bidFrom: formatDateOption1(values.bidStartingFrom),
+  //             bidTo: formatDateOption1(values.bidStartTo),
+  //             lastTimeExtension: timeToMinutes(values.lastMinutesExtension),
+  //             extentionQuantity: parseInt(values.extensionQuantity) || 0,
+  //             bidUnit: 1,
+  //             addOn: "Created from SO Based Order",
+  //             intervalAmount: parseFloat(values.intervalAmount) || 0,
+  //             noOfInput: selectedOrders.length,
+  //             intervalAllocate: timeToMinutes(values.intervalTimeForAllocatingVehicle),
+  //             intervalReach: timeToMinutes(values.intervalTimeToReachPlant),
+  //             gracePeriod: timeToMinutes(values.gracePeriodToReachPlant),
+  //             status: "A",
+  //             autoAllocation: values.autoAllocateTo === "Yes" ? 1 : 0,
+  //             bid: 1,
+  //             bidType: "ONLINE",
+  //             biddingOrderNo: bidNo,
+  //             createdDate: formatDateOption2(new Date()), // Date only
+  //             route: 0, // Use numeric value for route
+  //             multiMaterial: 1,
+  //             city: "Mumbai",
+  //             material: formattedSalesOrders[0]?.material || "",
+  //             quantity: formattedSalesOrders.reduce((total, order) => total + order.quantity, 0),
+  //             extentionQty: parseInt(values.extensionQuantity) || 0,
+  //             autoAllocationSalesOrder: values.autoAllocateTo === "Yes" ? 1 : 0,
+  //             fromLocation: "PlantA",
+  //             toLocation: "PlantB"
+  //           },
+  //           salesOrders: formattedSalesOrders
+  //         };
+  //       });
+
+  //       const apiData = {
+  //         bulk: false,
+  //         biddings: biddingObjects
+  //       };
+
+  //       // Enhanced logging for debugging
+  //       console.log("API Request Data:", JSON.stringify(apiData, null, 2));
+  //       console.log("Date format being tested for validity:", formatDateOption2(new Date()));
+  //       console.log("Date format being tested for bid dates:", formatDateOption1(new Date()));
+
+  //       // API call with enhanced error handling
+  //       const response = await fetch('http://localhost:8085/biddingMaster/bulk', {
+  //         method: 'POST',
+  //         headers: getAuthHeaders(),
+  //         body: JSON.stringify(apiData)
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorText = await response.text();
+  //         console.error("API Error Response:", errorText);
+  //         console.error("Response Status:", response.status);
+  //         console.error("Response Headers:", Object.fromEntries([...response.headers.entries()]));
+  //         throw new Error(`API responded with status: ${response.status}, message: ${errorText}`);
+  //       }
+
+  //       const result = await response.json();
+  //       console.log("API Success Response:", result);
+
+  //       // Show success toast notification
+  //       toast.success("Your SO based bid has been created successfully!", { 
+  //         autoClose: 3000,
+  //         position: "top-right",
+  //         style: {
+  //           background: "#00A389",
+  //           color: "black"
+  //         }
+  //       });
+
+  //       // After successful submission, go to Finish
+  //       setActiveStep(4);
+  //       // Show success modal
+  //       setShowSuccessModal(true);
+  //     } catch (error) {
+  //       console.error("API Error Details:", error);
+  //       setSubmitError(error.message);
+  //       // Show error toast notification
+  //       toast.error("Something went wrong!", {
+  //         toastId: 'error-toast',
+  //         position: "top-right",
+  //         autoClose: 4000,
+  //         style: {
+  //           background: "#EF4444",
+  //           color: "black"
+  //         }
+  //       });
+  //     } finally {
+  //       setIsSubmitting(false);
+  //     }
+  //   } else {
+  //     // For other steps, just go to next step if validation passed
+  //     setActiveStep(prevStep => Math.min(prevStep + 1, steps.length));
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted with values:", values);

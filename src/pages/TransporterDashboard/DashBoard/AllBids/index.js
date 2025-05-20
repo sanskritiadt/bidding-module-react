@@ -90,7 +90,7 @@ const ViewTransporterBids = () => {
         fetchBidData(loginCode);
     }, []);
 
-    const fetchBidData = async (loginCode) => {
+    const fetchBidData = async () => {
         try {
             setLoading(true);
             setError(null);
@@ -99,11 +99,6 @@ const ViewTransporterBids = () => {
             const username = process.env.REACT_APP_API_USER_NAME;
             const password = process.env.REACT_APP_API_PASSWORD;
             const basicAuth = 'Basic ' + btoa(username + ':' + password);
-            
-     
-
-
-      
             const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${loginCode}`, {
                 method: 'GET',
                 headers: {
