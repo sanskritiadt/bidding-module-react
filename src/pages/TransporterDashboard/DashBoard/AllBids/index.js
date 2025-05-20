@@ -63,7 +63,7 @@ const ViewTransporterBids = () => {
     useEffect(() => {
         const HeaderName = localStorage.getItem("HeaderName");
         setLatestHeader(HeaderName);
- 
+
         const loginCode = getLoginCode();
         if (loginCode) {
             setLoginCode(loginCode);
@@ -86,15 +86,18 @@ const ViewTransporterBids = () => {
     };
 
     // Fetch bid data from API
+    // Update the useEffect to call fetchBidData with loginCode when it changes
     useEffect(() => {
-        fetchBidData(loginCode);
-    }, []);
+        if (loginCode) {
+            fetchBidData(loginCode);
+        }
+    }, [loginCode]);
 
     const fetchBidData = async () => {
         try {
             setLoading(true);
             setError(null);
-            
+
             // Basic authentication setup
             const username = process.env.REACT_APP_API_USER_NAME;
             const password = process.env.REACT_APP_API_PASSWORD;
@@ -112,7 +115,7 @@ const ViewTransporterBids = () => {
             }
 
             const responseData = await response.json();
-            
+
             // Access the data correctly from the API response
             if (responseData && responseData.data && Array.isArray(responseData.data)) {
                 // Add status to each bid based on date comparison
@@ -139,12 +142,12 @@ const ViewTransporterBids = () => {
     const fetchSoDetails = async (biddingOrderNo) => {
         try {
             setLoadingSoDetails(true);
-            
+
             // Basic authentication setup
             const username = process.env.REACT_APP_API_USER_NAME || 'amazin';
             const password = process.env.REACT_APP_API_PASSWORD || 'TE@M-W@RK';
             const basicAuth = 'Basic ' + btoa(username + ':' + password);
-            
+
             const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getSoDetails?bidNo=${biddingOrderNo}`, {
                 method: 'GET',
                 headers: {
@@ -159,7 +162,7 @@ const ViewTransporterBids = () => {
             }
 
             const responseData = await response.json();
-            
+
             if (Array.isArray(responseData)) {
                 setSoDetails(responseData);
                 setSoDetailsModal(true);
@@ -189,12 +192,12 @@ const ViewTransporterBids = () => {
 
     // Filter bids based on search term and status
     const filteredBids = bids.filter(bid => {
-        const matchesSearch = Object.values(bid).some(value => 
+        const matchesSearch = Object.values(bid).some(value =>
             value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         );
-        
+
         const matchesStatus = !statusFilter || statusFilter === 'All' || bid.status === statusFilter;
-        
+
         return matchesSearch && matchesStatus;
     });
 
@@ -252,13 +255,13 @@ const ViewTransporterBids = () => {
     // Format date for SO Details table
     const formatSODate = (dateString) => {
         if (!dateString) return '';
-        
+
         // Check if the date is already in DD-MM-YYYY format
         const dateRegex = /^\d{2}-\d{2}-\d{4}/;
         if (dateRegex.test(dateString)) {
             return dateString;
         }
-        
+
         const date = new Date(dateString);
         return date.toLocaleDateString('en-GB', {
             day: '2-digit',
@@ -271,7 +274,7 @@ const ViewTransporterBids = () => {
     };
 
     document.title = "Bids Management | EPLMS";
-    
+
     return (
         <React.Fragment>
             <div className="page-content">
@@ -347,9 +350,9 @@ const ViewTransporterBids = () => {
                                                 </div>
                                             ) : filteredBids && filteredBids.length ? (
                                                 filteredBids.map(bid => (
-                                                    <BidCard 
-                                                        key={bid.id} 
-                                                        bid={bid} 
+                                                    <BidCard
+                                                        key={bid.id}
+                                                        bid={bid}
                                                         handleViewClick={handleViewClick}
                                                         handleHistoryClick={handleHistoryClick}
                                                         handleSoDetailsClick={handleSoDetailsClick}
@@ -364,20 +367,20 @@ const ViewTransporterBids = () => {
                                     </div>
 
                                     {/* View Modal */}
-                                    <BidViewModal 
+                                    <BidViewModal
                                         isOpen={viewModal}
                                         toggle={toggleView}
                                         viewData={viewData}
                                     />
-                                    
+
                                     {/* History Modal */}
-                                    <BidHistoryModal 
+                                    <BidHistoryModal
                                         isOpen={historyModal}
                                         toggle={toggleHistory}
                                         bidNo={selectedBidNo}
                                         bidData={viewData}
                                     />
-                                    
+
                                     {/* SO Details Modal */}
                                     <Modal
                                         isOpen={soDetailsModal}
