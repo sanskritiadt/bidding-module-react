@@ -63,7 +63,8 @@ function* loginUser({ payload: { user, history } }) {
       }
       else if(response.msg === "User Login Successfully"){
         //history('/MRP-Dashboard');
-        history('/sales-dispatch');
+       // history('/sales-dispatch');
+ history('/auction-dashboard');
         sessionStorage.setItem("authUser", JSON.stringify(set_response));
         sessionStorage.setItem("main_menu_login", JSON.stringify(response));
       }

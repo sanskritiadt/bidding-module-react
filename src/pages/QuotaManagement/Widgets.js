@@ -8,7 +8,7 @@ import axios from "axios";
 import { taskWidgetsBid } from '../../common/data';
 
 
-const Widgets = () => {
+const Widgets = ({ reloadKey }) => {
 
     const [taskWidgetsBid1, setTaskWidgetsBid] = useState([]);
     const config = {
@@ -33,7 +33,7 @@ const Widgets = () => {
         .catch(error => {
             console.error('Error fetching data:', error);
         });
-    }, []);
+    }, [reloadKey]);
 
     const [selectedCard, setSelectedCard] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
