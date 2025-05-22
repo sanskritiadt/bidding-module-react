@@ -251,7 +251,13 @@ const SOBasedOrder = ({ bidNo }) => {
         // Map the API response fields
         const mappedTransporters = result.data.map(transporter => ({
           id: transporter.code,
-          name: transporter.name.trim() // Trim to remove extra spaces
+          code: transporter.code,
+          name: transporter.name.trim(),
+          contactPerson: transporter.contactPerson,
+          contactNumber: transporter.contactNumber,
+          contactEmail: transporter.contactEmail,
+          // Store the complete data for reference
+          fullData: transporter
         }));
 
         console.log("Mapped transporters:", mappedTransporters);
@@ -273,9 +279,9 @@ const SOBasedOrder = ({ bidNo }) => {
   // Updated handleInputChange to also fetch transporters
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  if (name === 'extensionQuantity' && value.length > 20) {
-    return; // Don't allow input longer than 20 digits
-  }
+    if (name === 'extensionQuantity' && value.length > 20) {
+      return; // Don't allow input longer than 20 digits
+    }
     setValues(prevValues => ({
       ...prevValues,
       [name]: value === 'Select' ? '' : value
@@ -357,6 +363,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
     // Step 2 validation (Delivery and Allocation)
     else if (activeStep === 2) {
+
       if (!values.autoAllocateTo || values.autoAllocateTo === "Select") {
         validationErrors.autoAllocateTo = "Please select auto allocate option";
       }
@@ -725,7 +732,17 @@ const SOBasedOrder = ({ bidNo }) => {
     if (!values.selectTransporter.some(t => t.id === transporter.id)) {
       setValues(prevValues => ({
         ...prevValues,
-        selectTransporter: [...prevValues.selectTransporter, transporter]
+        selectTransporter: [...prevValues.selectTransporter, transporter,
+        {
+          id: transporter.id,
+          code: transporter.code,
+          name: transporter.name,
+          contactPerson: transporter.contactPerson,
+          contactNumber: transporter.contactNumber,
+          contactEmail: transporter.contactEmail,
+          fullData: transporter.fullData || transporter
+        }
+        ]
       }));
     }
 
@@ -1049,7 +1066,7 @@ const SOBasedOrder = ({ bidNo }) => {
                 </Label>
                 <Input
                   type="number"
-            
+
                   min="0"
                   required
                   placeholder="Add Quantity"
@@ -1381,7 +1398,7 @@ const SOBasedOrder = ({ bidNo }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      
+
                       {filteredOrders.map((order, index) => (
                         <tr key={index}>
                           <td>

@@ -585,7 +585,7 @@ const TransporterDashboard = () => {
       fetchBidStatusData(userLoginCode);
       fetchFleetEfficiencyData(userLoginCode);
       fetchDeliveryStatusData(userLoginCode);
-      fetchBidData();
+      fetchBidData(userLoginCode);
     }
   }, []);
 
@@ -746,7 +746,7 @@ const TransporterDashboard = () => {
   };
 
   // Fetch bid data from API
-  const fetchBidData = async () => {
+  const fetchBidData = async (loginCode) => {
     try {
       setLoading(true);
       setError(null);
