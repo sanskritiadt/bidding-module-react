@@ -1318,197 +1318,197 @@ const SOBasedOrder = ({ bidNo }) => {
               </div>
 
               {/* IMPROVED Transporter Selection with API integration */}
-              <div className="so-based-order-form-group">
-                <Label className="so-based-order-label">
-                  Select Transporter <span style={{ color: "red" }}>*</span>
-                </Label>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <div style={{ flex: 1, position: "relative" }}>
-                    <div
-                      className="so-based-order-transporter-selector"
-                      onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
-                      style={{
-                        height: "38px",
-                        color: "#000",
-                        display: "flex",
-                        alignItems: "center",
-                        border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
-                        borderRadius: "4px",
-                        padding: "0.375rem 0.75rem",
-                        backgroundColor: "#fff"
-                      }}
-                    >
-                      <span className="so-based-order-transporter-selector-placeholder" style={{ color: "#000" }}>
-                        {values.selectTransporter.length > 0
-                          ? `${values.selectTransporter.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).length} Selected`
-                          : 'Select'}
-                      </span>
-                      <span style={{ marginLeft: "auto" }}>
-                        <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
-                      </span>
-                    </div>
+                <div className="so-based-order-form-group">
+                  <Label className="so-based-order-label">
+                    Select Transporter <span style={{ color: "red" }}>*</span>
+                  </Label>
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <div style={{ flex: 1, position: "relative" }}>
+                      <div
+                        className="so-based-order-transporter-selector"
+                        onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
+                        style={{
+                          height: "38px",
+                          color: "#000",
+                          display: "flex",
+                          alignItems: "center",
+                          border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
+                          borderRadius: "4px",
+                          padding: "0.375rem 0.75rem",
+                          backgroundColor: "#fff"
+                        }}
+                      >
+                        <span className="so-based-order-transporter-selector-placeholder" style={{ color: "#000" }}>
+                          {values.selectTransporter.length > 0
+                            ? `${values.selectTransporter.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).length} Selected`
+                            : 'Select'}
+                        </span>
+                        <span style={{ marginLeft: "auto" }}>
+                          <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
+                        </span>
+                      </div>
 
-                    {/* Transporter dropdown with loading state */}
-                    {showTransporterDropdown && (
-                      <div className="so-based-order-dropdown" style={{
-                        position: "absolute",
-                        width: "100%",
-                        zIndex: 10,
-                        backgroundColor: "#fff",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                        marginTop: "4px",
-                        maxHeight: "300px",
-                        overflowY: "auto"
-                      }}>
-                        {/* Search header */}
-                        <div className="so-based-order-dropdown-header" style={{
-                          padding: "8px",
+                      {/* Transporter dropdown with loading state */}
+                      {showTransporterDropdown && (
+                        <div className="so-based-order-dropdown" style={{
+                          position: "absolute",
+                          width: "100%",
+                          zIndex: 10,
                           backgroundColor: "#fff",
-                          borderBottom: "1px solid #ddd"
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                          marginTop: "4px",
+                          maxHeight: "300px",
+                          overflowY: "auto"
                         }}>
-                          <div style={{ display: "flex", alignItems: "center" }}>
-                            <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
+                          {/* Search header */}
+                          <div className="so-based-order-dropdown-header" style={{
+                            padding: "8px",
+                            backgroundColor: "#fff",
+                            borderBottom: "1px solid #ddd"
+                          }}>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                              <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
+                                <input
+                                  type="checkbox"
+                                  checked={selectAllTransporters}
+                                  onChange={handleSelectAllTransporters}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    width: "18px",
+                                    height: "18px",
+                                    cursor: "pointer"
+                                  }}
+                                />
+                              </div>
                               <input
-                                type="checkbox"
-                                checked={selectAllTransporters}
-                                onChange={handleSelectAllTransporters}
+                                type="text"
+                                placeholder="Search"
+                                value={transporterSearchTerm}
+                                onChange={(e) => setTransporterSearchTerm(e.target.value)}
                                 onClick={(e) => e.stopPropagation()}
+                                className="so-based-order-dropdown-search"
                                 style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer"
+                                  flex: 1,
+                                  padding: "8px 12px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "4px",
+                                  color: "#000",
+                                  fontSize: "14px"
                                 }}
                               />
                             </div>
-                            <input
-                              type="text"
-                              placeholder="Search"
-                              value={transporterSearchTerm}
-                              onChange={(e) => setTransporterSearchTerm(e.target.value)}
-                              onClick={(e) => e.stopPropagation()}
-                              className="so-based-order-dropdown-search"
-                              style={{
-                                flex: 1,
-                                padding: "8px 12px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                color: "#000",
-                                fontSize: "14px"
-                              }}
-                            />
                           </div>
+
+                          {/* Loading indicator for transporters */}
+                          {loadingTransporters && (
+                            <div style={{
+                              padding: "20px",
+                              textAlign: "center",
+                              color: "#4361ee"
+                            }}>
+                              <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
+                              <div style={{ marginTop: "8px" }}>Loading transporters...</div>
+                            </div>
+                          )}
+
+                          {/* Empty state message */}
+                          {!loadingTransporters && filteredTransporters.length === 0 && (
+                            <div style={{
+                              padding: "20px",
+                              textAlign: "center",
+                              color: "#666"
+                            }}>
+                              <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
+                              <div style={{ marginTop: "8px" }}>No transporters found</div>
+                            </div>
+                          )}
+
+                          {/* Transporter list */}
+                          {!loadingTransporters && filteredTransporters.length > 0 && (
+                            <div className="so-based-order-dropdown-content">
+                              {filteredTransporters.map((transporter, index) => (
+                                <div
+                                  key={index}
+                                  className="so-based-order-dropdown-item"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    padding: "10px 8px",
+                                    borderBottom: "1px solid #eee",
+                                    color: "#000",
+                                    cursor: "pointer"
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const isSelected = values.selectTransporter.some(t => t.id === transporter.id);
+                                    if (!isSelected) {
+                                      handleTransporterSelect(transporter);
+                                    } else {
+                                      handleRemoveTransporter(transporter.id, e);
+                                    }
+                                  }}
+                                >
+                                  <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={values.selectTransporter.some(t => t.id === transporter.id)}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        if (e.target.checked) {
+                                          handleTransporterSelect(transporter);
+                                        } else {
+                                          handleRemoveTransporter(transporter.id, e);
+                                        }
+                                      }}
+                                      style={{
+                                        width: "18px",
+                                        height: "18px",
+                                        cursor: "pointer"
+                                      }}
+                                    />
+                                  </div>
+                                  <div style={{
+                                    flex: "0 0 120px",
+                                    paddingRight: "15px",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    fontSize: "14px"
+                                  }}>
+                                    {transporter.id}
+                                  </div>
+                                  <div style={{
+                                    flex: 1,
+                                    fontSize: "14px"
+                                  }}>
+                                    {transporter.name}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
+                      )}
+                    </div>
 
-                        {/* Loading indicator for transporters */}
-                        {loadingTransporters && (
-                          <div style={{
-                            padding: "20px",
-                            textAlign: "center",
-                            color: "#4361ee"
-                          }}>
-                            <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
-                            <div style={{ marginTop: "8px" }}>Loading transporters...</div>
-                          </div>
-                        )}
-
-                        {/* Empty state message */}
-                        {!loadingTransporters && filteredTransporters.length === 0 && (
-                          <div style={{
-                            padding: "20px",
-                            textAlign: "center",
-                            color: "#666"
-                          }}>
-                            <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
-                            <div style={{ marginTop: "8px" }}>No transporters found</div>
-                          </div>
-                        )}
-
-                        {/* Transporter list */}
-                        {!loadingTransporters && filteredTransporters.length > 0 && (
-                          <div className="so-based-order-dropdown-content">
-                            {filteredTransporters.map((transporter, index) => (
-                              <div
-                                key={index}
-                                className="so-based-order-dropdown-item"
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  padding: "10px 8px",
-                                  borderBottom: "1px solid #eee",
-                                  color: "#000",
-                                  cursor: "pointer"
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const isSelected = values.selectTransporter.some(t => t.id === transporter.id);
-                                  if (!isSelected) {
-                                    handleTransporterSelect(transporter);
-                                  } else {
-                                    handleRemoveTransporter(transporter.id, e);
-                                  }
-                                }}
-                              >
-                                <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={values.selectTransporter.some(t => t.id === transporter.id)}
-                                    onChange={(e) => {
-                                      e.stopPropagation();
-                                      if (e.target.checked) {
-                                        handleTransporterSelect(transporter);
-                                      } else {
-                                        handleRemoveTransporter(transporter.id, e);
-                                      }
-                                    }}
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      cursor: "pointer"
-                                    }}
-                                  />
-                                </div>
-                                <div style={{
-                                  flex: "0 0 120px",
-                                  paddingRight: "15px",
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "14px"
-                                }}>
-                                  {transporter.id}
-                                </div>
-                                <div style={{
-                                  flex: 1,
-                                  fontSize: "14px"
-                                }}>
-                                  {transporter.name}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                    {/* TransporterViewer component */}
+                    {values.selectTransporter.length > 0 && (
+                      <TransporterViewer
+                        selectedTransporters={values.selectTransporter}
+                        onRemove={(transporterId) => {
+                          handleRemoveTransporter(transporterId, new Event('click'));
+                        }}
+                      />
                     )}
                   </div>
-
-                  {/* TransporterViewer component */}
-                  {values.selectTransporter.length > 0 && (
-                    <TransporterViewer
-                      selectedTransporters={values.selectTransporter}
-                      onRemove={(transporterId) => {
-                        handleRemoveTransporter(transporterId, new Event('click'));
-                      }}
-                    />
+                  {errors.selectTransporter && (
+                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                      {errors.selectTransporter}
+                    </div>
                   )}
                 </div>
-                {errors.selectTransporter && (
-                  <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
-                    {errors.selectTransporter}
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Improved Accordion Sales Order Selection with API integration */}
