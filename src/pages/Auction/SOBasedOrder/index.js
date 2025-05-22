@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Form, Input, Label } from "reactstrap";
 import { Stepper, Step, StepLabel, StepConnector } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
@@ -88,7 +88,7 @@ const SOBasedOrder = ({ bidNo }) => {
   const [totalSalesOrders, setTotalSalesOrders] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const[biddingOrderNo,setBiddingOrderNo]=useState("");
+  const [biddingOrderNo, setBiddingOrderNo] = useState("");
   const ordersPerPage = 10; // Number of orders to display per page
 
   // Set initial transporter options
@@ -134,6 +134,20 @@ const SOBasedOrder = ({ bidNo }) => {
     };
   };
 
+  // Add debounced search for better performance
+  const debouncedTransporterSearch = useMemo(
+    () => {
+      const timeoutId = setTimeout(() => {
+        // This will trigger the filteredTransporters recalculation
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    },
+    [transporterSearchTerm]
+  );
+
+  // Add these optimized calculations after your state declarations
+
+
   // NEW: Function to fetch sales orders from API
   const fetchSalesOrders = async () => {
     setLoadingSalesOrders(true);
@@ -145,7 +159,7 @@ const SOBasedOrder = ({ bidNo }) => {
       let plantCode = obj?.data?.plantCode || '';
 
       // Create API URL with optional filters
-    //  const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/salesorder_allocation?plant=${plantCode}&page=${currentPage}&limit=${ordersPerPage}&search=${searchTerm}`;
+      //  const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/salesorder_allocation?plant=${plantCode}&page=${currentPage}&limit=${ordersPerPage}&search=${searchTerm}`;
       const apiUrl = `http://10.6.0.5:8081/salesorder_allocation?plant=${plantCode}&page=${currentPage}&limit=${ordersPerPage}&search=${searchTerm}`;
       console.log("Fetching sales orders from:", apiUrl);
 
@@ -217,7 +231,7 @@ const SOBasedOrder = ({ bidNo }) => {
       let plantCode = obj.data.plantCode;
 
       const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/allTransportersByFlag?flag=A&filterParam=${plantCode}`;
-      
+
       console.log("Fetching transporters from:", apiUrl);
 
       const response = await fetch(apiUrl, {
@@ -244,7 +258,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
         // Update the state
         setTransporterOptions(mappedTransporters);
-      
+
       } else {
         toast.info("No transporters found", { autoClose: 3000 });
       }
@@ -259,7 +273,9 @@ const SOBasedOrder = ({ bidNo }) => {
   // Updated handleInputChange to also fetch transporters
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  if (name === 'extensionQuantity' && value.length > 20) {
+    return; // Don't allow input longer than 20 digits
+  }
     setValues(prevValues => ({
       ...prevValues,
       [name]: value === 'Select' ? '' : value
@@ -293,278 +309,6 @@ const SOBasedOrder = ({ bidNo }) => {
     setActiveStep(prevStep => Math.max(prevStep - 1, 0));
   };
 
-  // // Updated handleSubmit with API integration and fixed date formatting
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log("Form submitted with values:", values);
-  //   console.log("Selected Sales Orders:", selectedOrders);
-
-  //   // Initialize validation errors object
-  //   const validationErrors = {};
-
-  //   // Step 0 validation (Bid Details)
-  //   if (activeStep === 0) {
-  //     if (!values.bidStartingFrom) {
-  //       validationErrors.bidStartingFrom = "Please select bid starting date";
-  //     }
-
-  //     if (!values.bidStartTo) {
-  //       validationErrors.bidStartTo = "Please select bid end date";
-  //     }
-
-  //     if (!values.intervalAmount) {
-  //       validationErrors.intervalAmount = "Please enter interval amount";
-  //     }
-
-  //     if (!values.uom || values.uom === "Select") {
-  //       validationErrors.uom = "Please select UOM";
-  //     }
-  //   }
-
-  //   // Step 1 validation (Material and Transporter)
-  //   else if (activeStep === 1) {
-  //     if (!values.extensionQuantity) {
-  //       validationErrors.extensionQuantity = "Please enter extension quantity";
-  //     }
-
-  //     if (!values.displayToTransporter || values.displayToTransporter === "Select") {
-  //       validationErrors.displayToTransporter = "Please select display option";
-  //     }
-
-  //     if (!values.selectTransporter || values.selectTransporter.length === 0) {
-  //       validationErrors.selectTransporter = "Please select at least one transporter";
-  //     }
-
-  //     if (selectedOrders.length === 0) {
-  //       validationErrors.salesOrders = "Please select at least one sales order";
-  //     }
-  //   }
-
-  //   // Step 2 validation (Delivery and Allocation)
-  //   else if (activeStep === 2) {
-  //     if (!values.autoAllocateTo || values.autoAllocateTo === "Select") {
-  //       validationErrors.autoAllocateTo = "Please select auto allocate option";
-  //     }
-
-  //     if (!values.intervalTimeForAllocatingVehicle) {
-  //       validationErrors.intervalTimeForAllocatingVehicle = "Please select interval time";
-  //     }
-
-  //     if (!values.intervalTimeToReachPlant) {
-  //       validationErrors.intervalTimeToReachPlant = "Please select interval time";
-  //     }
-
-  //     if (!values.gracePeriodToReachPlant) {
-  //       validationErrors.gracePeriodToReachPlant = "Please select grace period";
-  //     }
-  //   }
-
-  //   // Update the errors state
-  //   setErrors(validationErrors);
-
-  //   // If there are validation errors, don't proceed
-  //   if (Object.keys(validationErrors).length > 0) {
-  //     console.log("Validation errors:", validationErrors);
-  //     return;
-  //   }
-
-  //   // If validation passes
-  //   if (activeStep === 2) {
-  //     // Go to Preview (which is not in the stepper)
-  //     setActiveStep(3);
-  //   } else if (activeStep === 3) {
-  //     // If we're at Preview, submit to API
-  //     setIsSubmitting(true);
-
-  //     try {
-  //       // Format dates for API with multiple options to try
-  //       const formatDateOption1 = (dateString) => {
-  //         if (!dateString) return null;
-  //         const date = new Date(dateString);
-  //         const year = date.getFullYear();
-  //         const month = String(date.getMonth() + 1).padStart(2, '0');
-  //         const day = String(date.getDate()).padStart(2, '0');
-  //         const hours = String(date.getHours()).padStart(2, '0');
-  //         const minutes = String(date.getMinutes()).padStart(2, '0');
-  //         const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  //         // Use 'T' as separator instead of space
-  //         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-  //       };
-
-  //       const formatDateOption2 = (dateString) => {
-  //         if (!dateString) return null;
-  //         const date = new Date(dateString);
-  //         const year = date.getFullYear();
-  //         const month = String(date.getMonth() + 1).padStart(2, '0');
-  //         const day = String(date.getDate()).padStart(2, '0');
-  //         return `${year}-${month}-${day}`; // Date only, no time
-  //       };
-
-  //       // Convert time to minutes for API
-  //       const timeToMinutes = (timeString) => {
-  //         if (!timeString) return 0;
-
-  //         // Handle different formats
-  //         let hours = 0;
-  //         let minutes = 0;
-
-  //         if (timeString.includes(':')) {
-  //           const parts = timeString.split(':');
-  //           if (parts.length >= 2) {
-  //             hours = parseInt(parts[0]) || 0;
-  //             minutes = parseInt(parts[1]) || 0;
-  //           }
-  //         } else {
-  //           // If it's already a number, return it
-  //           const parsed = parseInt(timeString);
-  //           if (!isNaN(parsed)) {
-  //             return parsed;
-  //           }
-  //         }
-
-  //         return (hours * 60) + minutes;
-  //       };
-
-  //       // Get unique transporters (remove duplicates by ID)
-  //       const uniqueTransporters = [...new Map(
-  //         values.selectTransporter.map(item => [item.id, item])
-  //       ).values()];
-
-  //       // Find selected order details from the salesOrders array
-  //       const getSelectedOrderDetails = (orderNo) => {
-  //         return salesOrders.find(order => order.orderNo === orderNo);
-  //       };
-
-  //       // Create a bid objects array for all selected transporters
-  //       const biddingObjects = uniqueTransporters.map(transporter => {
-  //         // Prepare the sales orders data for this transporter
-  //         const formattedSalesOrders = selectedOrders.map(orderNo => {
-  //           const orderDetails = getSelectedOrderDetails(orderNo);
-
-  //           // Get original data if it exists, otherwise use the mapped order
-  //           const originalOrder = orderDetails?.originalData || {};
-
-  //           // Use a simple date string for validity
-  //           const today = new Date();
-  //           const validityStr = formatDateOption2(today);
-
-  //           // Extract quantity numeric value
-  //           const quantityStr = orderDetails?.quantity || "0";
-  //           const quantityNum = parseInt(quantityStr.toString().replace(/\D/g, '')) || 0;
-
-  //           return {
-  //             soNumber: orderDetails?.orderNo || orderNo,
-  //             validity: validityStr, // Use date-only format
-  //             material: originalOrder.materialCode || orderDetails?.material || '',
-  //             quantity: quantityNum,
-  //             transporterCode: transporter.id,
-  //             plantCode: originalOrder.plant || "PLANT01",
-  //             biddingOrderNo: bidNo,
-  //             status: "A"
-  //           };
-  //         });
-
-  //         // Return a complete bidding object for each transporter
-  //         return {
-  //           biddingMaster: {
-  //             transporterCode: transporter.id,
-  //             ceilingPrice: parseFloat(values.ceilingAmount) || 0,
-  //             uom: values.uom,
-  //             bidFrom: formatDateOption1(values.bidStartingFrom),
-  //             bidTo: formatDateOption1(values.bidStartTo),
-  //             lastTimeExtension: timeToMinutes(values.lastMinutesExtension),
-  //             extentionQuantity: parseInt(values.extensionQuantity) || 0,
-  //             bidUnit: 1,
-  //             addOn: "Created from SO Based Order",
-  //             intervalAmount: parseFloat(values.intervalAmount) || 0,
-  //             noOfInput: selectedOrders.length,
-  //             intervalAllocate: timeToMinutes(values.intervalTimeForAllocatingVehicle),
-  //             intervalReach: timeToMinutes(values.intervalTimeToReachPlant),
-  //             gracePeriod: timeToMinutes(values.gracePeriodToReachPlant),
-  //             status: "A",
-  //             autoAllocation: values.autoAllocateTo === "Yes" ? 1 : 0,
-  //             bid: 1,
-  //             bidType: "ONLINE",
-  //             biddingOrderNo: bidNo,
-  //             createdDate: formatDateOption2(new Date()), // Date only
-  //             route: 0, // Use numeric value for route
-  //             multiMaterial: 1,
-  //             city: "Mumbai",
-  //             material: formattedSalesOrders[0]?.material || "",
-  //             quantity: formattedSalesOrders.reduce((total, order) => total + order.quantity, 0),
-  //             extentionQty: parseInt(values.extensionQuantity) || 0,
-  //             autoAllocationSalesOrder: values.autoAllocateTo === "Yes" ? 1 : 0,
-  //             fromLocation: "PlantA",
-  //             toLocation: "PlantB"
-  //           },
-  //           salesOrders: formattedSalesOrders
-  //         };
-  //       });
-
-  //       const apiData = {
-  //         bulk: false,
-  //         biddings: biddingObjects
-  //       };
-
-  //       // Enhanced logging for debugging
-  //       console.log("API Request Data:", JSON.stringify(apiData, null, 2));
-  //       console.log("Date format being tested for validity:", formatDateOption2(new Date()));
-  //       console.log("Date format being tested for bid dates:", formatDateOption1(new Date()));
-
-  //       // API call with enhanced error handling
-  //       const response = await fetch('http://localhost:8085/biddingMaster/bulk', {
-  //         method: 'POST',
-  //         headers: getAuthHeaders(),
-  //         body: JSON.stringify(apiData)
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorText = await response.text();
-  //         console.error("API Error Response:", errorText);
-  //         console.error("Response Status:", response.status);
-  //         console.error("Response Headers:", Object.fromEntries([...response.headers.entries()]));
-  //         throw new Error(`API responded with status: ${response.status}, message: ${errorText}`);
-  //       }
-
-  //       const result = await response.json();
-  //       console.log("API Success Response:", result);
-
-  //       // Show success toast notification
-  //       toast.success("Your SO based bid has been created successfully!", { 
-  //         autoClose: 3000,
-  //         position: "top-right",
-  //         style: {
-  //           background: "#00A389",
-  //           color: "black"
-  //         }
-  //       });
-
-  //       // After successful submission, go to Finish
-  //       setActiveStep(4);
-  //       // Show success modal
-  //       setShowSuccessModal(true);
-  //     } catch (error) {
-  //       console.error("API Error Details:", error);
-  //       setSubmitError(error.message);
-  //       // Show error toast notification
-  //       toast.error("Something went wrong!", {
-  //         toastId: 'error-toast',
-  //         position: "top-right",
-  //         autoClose: 4000,
-  //         style: {
-  //           background: "#EF4444",
-  //           color: "black"
-  //         }
-  //       });
-  //     } finally {
-  //       setIsSubmitting(false);
-  //     }
-  //   } else {
-  //     // For other steps, just go to next step if validation passed
-  //     setActiveStep(prevStep => Math.min(prevStep + 1, steps.length));
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted with values:", values);
@@ -781,7 +525,7 @@ const SOBasedOrder = ({ bidNo }) => {
           };
         });
 
-        const apiData = {  
+        const apiData = {
           bulk: false,
           biddings: biddingObjects
         };
@@ -816,7 +560,7 @@ const SOBasedOrder = ({ bidNo }) => {
           position: "top-right",
           style: {
             background: "white",
-            
+
           }
         });
 
@@ -1002,6 +746,37 @@ const SOBasedOrder = ({ bidNo }) => {
       selectTransporter: prevValues.selectTransporter.filter(t => t.id !== transporterId)
     }));
   };
+  const selectedTransporterCount = useMemo(() => {
+    const uniqueTransporters = new Set(values.selectTransporter.map(t => t.id));
+    return uniqueTransporters.size;
+  }, [values.selectTransporter]);
+
+  // Create a Set for O(1) lookup instead of O(n) array.some()
+  const selectedTransporterIds = useMemo(() => {
+    return new Set(values.selectTransporter.map(t => t.id));
+  }, [values.selectTransporter]);
+
+  // Optimize transporter selection handlers
+  const handleTransporterToggle = useCallback((transporter, e) => {
+    e.stopPropagation();
+
+    const isSelected = selectedTransporterIds.has(transporter.id);
+    if (!isSelected) {
+      handleTransporterSelect(transporter);
+    } else {
+      handleRemoveTransporter(transporter.id, e);
+    }
+  }, [selectedTransporterIds, handleTransporterSelect, handleRemoveTransporter]);
+
+  const handleCheckboxChange = useCallback((transporter, e) => {
+    e.stopPropagation();
+
+    if (e.target.checked) {
+      handleTransporterSelect(transporter);
+    } else {
+      handleRemoveTransporter(transporter.id, e);
+    }
+  }, [handleTransporterSelect, handleRemoveTransporter]);
 
   // Handle select all transporters properly
   const handleSelectAllTransporters = (e) => {
@@ -1105,6 +880,8 @@ const SOBasedOrder = ({ bidNo }) => {
                     value={values.bidStartingFrom}
                     onChange={handleInputChange}
                     required
+                    // Add min attribute to prevent selection of past dates
+                    min={new Date().toISOString().slice(0, 16)}
                     className={`so-based-order-input ${errors.bidStartingFrom ? "is-invalid" : ""}`}
                     style={{
                       color: "#000",
@@ -1130,6 +907,7 @@ const SOBasedOrder = ({ bidNo }) => {
                     name="bidStartTo"
                     value={values.bidStartTo}
                     onChange={handleInputChange}
+                    min={new Date().toISOString().slice(0, 16)}
                     className={`so-based-order-input ${errors.bidStartTo ? "is-invalid" : ""}`}
                     style={{
                       color: "#000",
@@ -1150,7 +928,10 @@ const SOBasedOrder = ({ bidNo }) => {
                   Ceiling Amount
                 </Label>
                 <Input
-                  type="text"
+
+                  type="number"
+                  step="0.01"
+                  min="0"
                   placeholder="Add Amount"
                   name="ceilingAmount"
                   value={values.ceilingAmount}
@@ -1165,7 +946,9 @@ const SOBasedOrder = ({ bidNo }) => {
                   Interval Amount <span style={{ color: "red" }}>*</span>
                 </Label>
                 <Input
-                  type="text"
+                  type="number"
+                  step="0.01"
+                  min="0"
                   placeholder="Add Amount"
                   name="intervalAmount"
                   value={values.intervalAmount}
@@ -1265,7 +1048,9 @@ const SOBasedOrder = ({ bidNo }) => {
                   Extension Quantity <span style={{ color: "red" }}>*</span>
                 </Label>
                 <Input
-                  type="text"
+                  type="number"
+            
+                  min="0"
                   required
                   placeholder="Add Quantity"
                   name="extensionQuantity"
@@ -1318,197 +1103,181 @@ const SOBasedOrder = ({ bidNo }) => {
               </div>
 
               {/* IMPROVED Transporter Selection with API integration */}
-                <div className="so-based-order-form-group">
-                  <Label className="so-based-order-label">
-                    Select Transporter <span style={{ color: "red" }}>*</span>
-                  </Label>
-                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                    <div style={{ flex: 1, position: "relative" }}>
-                      <div
-                        className="so-based-order-transporter-selector"
-                        onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
-                        style={{
-                          height: "38px",
-                          color: "#000",
-                          display: "flex",
-                          alignItems: "center",
-                          border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
-                          borderRadius: "4px",
-                          padding: "0.375rem 0.75rem",
-                          backgroundColor: "#fff"
-                        }}
-                      >
-                        <span className="so-based-order-transporter-selector-placeholder" style={{ color: "#000" }}>
-                          {values.selectTransporter.length > 0
-                            ? `${values.selectTransporter.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).length} Selected`
-                            : 'Select'}
-                        </span>
-                        <span style={{ marginLeft: "auto" }}>
-                          <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
-                        </span>
-                      </div>
+              <div className="so-based-order-form-group">
+                <Label className="so-based-order-label">
+                  Select Transporter <span style={{ color: "red" }}>*</span>
+                </Label>
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <div style={{ flex: 1, position: "relative" }}>
+                    <div
+                      className="so-based-order-transporter-selector"
+                      onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
+                      style={{
+                        height: "38px",
+                        color: "#000",
+                        display: "flex",
+                        alignItems: "center",
+                        border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
+                        borderRadius: "4px",
+                        padding: "0.375rem 0.75rem",
+                        backgroundColor: "#fff",
+                        cursor: "pointer"
+                      }}
+                    >
+                      <span className="so-based-order-transporter-selector-placeholder" style={{ color: "#000" }}>
+                        {selectedTransporterCount > 0 ? `${selectedTransporterCount} Selected` : 'Select'}
+                      </span>
+                      <span style={{ marginLeft: "auto" }}>
+                        <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
+                      </span>
+                    </div>
 
-                      {/* Transporter dropdown with loading state */}
-                      {showTransporterDropdown && (
-                        <div className="so-based-order-dropdown" style={{
-                          position: "absolute",
-                          width: "100%",
-                          zIndex: 10,
+                    {/* Transporter dropdown with loading state */}
+                    {showTransporterDropdown && (
+                      <div className="so-based-order-dropdown" style={{
+                        position: "absolute",
+                        width: "100%",
+                        zIndex: 10,
+                        backgroundColor: "#fff",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                        marginTop: "4px",
+                        maxHeight: "300px",
+                        overflowY: "auto"
+                      }}>
+                        {/* Search header */}
+                        <div className="so-based-order-dropdown-header" style={{
+                          padding: "8px",
                           backgroundColor: "#fff",
-                          border: "1px solid #ddd",
-                          borderRadius: "4px",
-                          boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                          marginTop: "4px",
-                          maxHeight: "300px",
-                          overflowY: "auto"
+                          borderBottom: "1px solid #ddd"
                         }}>
-                          {/* Search header */}
-                          <div className="so-based-order-dropdown-header" style={{
-                            padding: "8px",
-                            backgroundColor: "#fff",
-                            borderBottom: "1px solid #ddd"
-                          }}>
-                            <div style={{ display: "flex", alignItems: "center" }}>
-                              <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
-                                <input
-                                  type="checkbox"
-                                  checked={selectAllTransporters}
-                                  onChange={handleSelectAllTransporters}
-                                  onClick={(e) => e.stopPropagation()}
-                                  style={{
-                                    width: "18px",
-                                    height: "18px",
-                                    cursor: "pointer"
-                                  }}
-                                />
-                              </div>
+                          <div style={{ display: "flex", alignItems: "center" }}>
+                            <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
                               <input
-                                type="text"
-                                placeholder="Search"
-                                value={transporterSearchTerm}
-                                onChange={(e) => setTransporterSearchTerm(e.target.value)}
+                                type="checkbox"
+                                checked={selectAllTransporters}
+                                onChange={handleSelectAllTransporters}
                                 onClick={(e) => e.stopPropagation()}
-                                className="so-based-order-dropdown-search"
                                 style={{
-                                  flex: 1,
-                                  padding: "8px 12px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "4px",
-                                  color: "#000",
-                                  fontSize: "14px"
+                                  width: "18px",
+                                  height: "18px",
+                                  cursor: "pointer"
                                 }}
                               />
                             </div>
+                            <input
+                              type="text"
+                              placeholder="Search"
+                              value={transporterSearchTerm}
+                              onChange={(e) => setTransporterSearchTerm(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="so-based-order-dropdown-search"
+                              style={{
+                                flex: 1,
+                                padding: "8px 12px",
+                                border: "1px solid #ddd",
+                                borderRadius: "4px",
+                                color: "#000",
+                                fontSize: "14px"
+                              }}
+                            />
                           </div>
-
-                          {/* Loading indicator for transporters */}
-                          {loadingTransporters && (
-                            <div style={{
-                              padding: "20px",
-                              textAlign: "center",
-                              color: "#4361ee"
-                            }}>
-                              <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
-                              <div style={{ marginTop: "8px" }}>Loading transporters...</div>
-                            </div>
-                          )}
-
-                          {/* Empty state message */}
-                          {!loadingTransporters && filteredTransporters.length === 0 && (
-                            <div style={{
-                              padding: "20px",
-                              textAlign: "center",
-                              color: "#666"
-                            }}>
-                              <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
-                              <div style={{ marginTop: "8px" }}>No transporters found</div>
-                            </div>
-                          )}
-
-                          {/* Transporter list */}
-                          {!loadingTransporters && filteredTransporters.length > 0 && (
-                            <div className="so-based-order-dropdown-content">
-                              {filteredTransporters.map((transporter, index) => (
-                                <div
-                                  key={index}
-                                  className="so-based-order-dropdown-item"
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    padding: "10px 8px",
-                                    borderBottom: "1px solid #eee",
-                                    color: "#000",
-                                    cursor: "pointer"
-                                  }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const isSelected = values.selectTransporter.some(t => t.id === transporter.id);
-                                    if (!isSelected) {
-                                      handleTransporterSelect(transporter);
-                                    } else {
-                                      handleRemoveTransporter(transporter.id, e);
-                                    }
-                                  }}
-                                >
-                                  <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
-                                    <input
-                                      type="checkbox"
-                                      checked={values.selectTransporter.some(t => t.id === transporter.id)}
-                                      onChange={(e) => {
-                                        e.stopPropagation();
-                                        if (e.target.checked) {
-                                          handleTransporterSelect(transporter);
-                                        } else {
-                                          handleRemoveTransporter(transporter.id, e);
-                                        }
-                                      }}
-                                      style={{
-                                        width: "18px",
-                                        height: "18px",
-                                        cursor: "pointer"
-                                      }}
-                                    />
-                                  </div>
-                                  <div style={{
-                                    flex: "0 0 120px",
-                                    paddingRight: "15px",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    fontSize: "14px"
-                                  }}>
-                                    {transporter.id}
-                                  </div>
-                                  <div style={{
-                                    flex: 1,
-                                    fontSize: "14px"
-                                  }}>
-                                    {transporter.name}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
-                      )}
-                    </div>
 
-                    {/* TransporterViewer component */}
-                    {values.selectTransporter.length > 0 && (
-                      <TransporterViewer
-                        selectedTransporters={values.selectTransporter}
-                        onRemove={(transporterId) => {
-                          handleRemoveTransporter(transporterId, new Event('click'));
-                        }}
-                      />
+                        {/* Loading indicator for transporters */}
+                        {loadingTransporters && (
+                          <div style={{
+                            padding: "20px",
+                            textAlign: "center",
+                            color: "#4361ee"
+                          }}>
+                            <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
+                            <div style={{ marginTop: "8px" }}>Loading transporters...</div>
+                          </div>
+                        )}
+
+                        {/* Empty state message */}
+                        {!loadingTransporters && filteredTransporters.length === 0 && (
+                          <div style={{
+                            padding: "20px",
+                            textAlign: "center",
+                            color: "#666"
+                          }}>
+                            <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
+                            <div style={{ marginTop: "8px" }}>No transporters found</div>
+                          </div>
+                        )}
+
+                        {/* Transporter list */}
+                        {!loadingTransporters && filteredTransporters.length > 0 && (
+                          <div className="so-based-order-dropdown-content">
+                            {filteredTransporters.map((transporter) => (
+                              <div
+                                key={transporter.id}
+                                className="so-based-order-dropdown-item"
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  padding: "10px 8px",
+                                  borderBottom: "1px solid #eee",
+                                  color: "#000",
+                                  cursor: "pointer"
+                                }}
+                                onClick={(e) => handleTransporterToggle(transporter, e)}
+                              >
+                                <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedTransporterIds.has(transporter.id)}
+                                    onChange={(e) => handleCheckboxChange(transporter, e)}
+                                    style={{
+                                      width: "18px",
+                                      height: "18px",
+                                      cursor: "pointer"
+                                    }}
+                                  />
+                                </div>
+                                <div style={{
+                                  flex: "0 0 120px",
+                                  paddingRight: "15px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  fontSize: "14px"
+                                }}>
+                                  {transporter.id}
+                                </div>
+                                <div style={{
+                                  flex: 1,
+                                  fontSize: "14px"
+                                }}>
+                                  {transporter.name}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {errors.selectTransporter && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
-                      {errors.selectTransporter}
-                    </div>
+
+                  {/* TransporterViewer component */}
+                  {values.selectTransporter.length > 0 && (
+                    <TransporterViewer
+                      selectedTransporters={values.selectTransporter}
+                      onRemove={(transporterId) => {
+                        handleRemoveTransporter(transporterId, new Event('click'));
+                      }}
+                    />
                   )}
                 </div>
+                {errors.selectTransporter && (
+                  <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    {errors.selectTransporter}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Improved Accordion Sales Order Selection with API integration */}
@@ -1605,13 +1374,14 @@ const SOBasedOrder = ({ bidNo }) => {
                       <tr>
                         <th style={{ width: "40px" }}></th>
                         <th>Sales Order No.</th>
-                        <th>Status</th>
+                        {/* <th>Status</th> */}
                         <th>Validity</th>
                         <th>Material</th>
                         <th>Quantity</th>
                       </tr>
                     </thead>
                     <tbody>
+                      
                       {filteredOrders.map((order, index) => (
                         <tr key={index}>
                           <td>
@@ -1622,7 +1392,7 @@ const SOBasedOrder = ({ bidNo }) => {
                             />
                           </td>
                           <td>{order.orderNo}</td>
-                          <td>
+                          {/* <td>
                             <span style={{
                               padding: "2px 8px",
                               borderRadius: "4px",
@@ -1637,7 +1407,7 @@ const SOBasedOrder = ({ bidNo }) => {
                             }}>
                               {order.status || "N/A"}
                             </span>
-                          </td>
+                          </td> */}
                           <td>{order.validity}</td>
                           <td>{order.material}</td>
                           <td>{order.quantity}</td>
@@ -2209,16 +1979,16 @@ const SOBasedOrder = ({ bidNo }) => {
 
       {/* Add ToastContainer for notifications */}
       <ToastContainer closeButton={false} limit={1}
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-            toastStyle={{ backgroundColor: "white" }} />
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{ backgroundColor: "white" }} />
       {/* Show success modal */}
       {showSuccessModal && <SuccessModal />}
     </>
