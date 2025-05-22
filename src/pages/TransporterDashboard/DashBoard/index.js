@@ -516,7 +516,6 @@ const BidStatusChart = ({ running, completed, notStarted }) => {
 const TransporterDashboard = () => {
   document.title = "Dashboard | EPLMS";
 
-  const [selectedDate, setSelectedDate] = useState("");
   const [bidData, setBidData] = useState([]);
   const [isExportCSV, setIsExportCSV] = useState(false);
   const [isSalesOrderModalOpen, setIsSalesOrderModalOpen] = useState(false);
@@ -917,13 +916,6 @@ const TransporterDashboard = () => {
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h4>Dashboard</h4>
               <div>
-                <Input
-                  type="date"
-                  className="form-control d-inline-block me-3"
-                  style={{ width: 'auto' }}
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                />
                 <Link to="/view-all-transporter-bids" className="fw-bold">
                   <i className="ri-link me-1"></i> View All My Bids
                 </Link>

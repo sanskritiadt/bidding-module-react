@@ -17,7 +17,6 @@ import {getLoginCode} from '../../../helpers/api_helper';
 const AuctionDashboard = () => {
   document.title = "Dashboard | EPLMS";
 
-  const [selectedDate, setSelectedDate] = useState("");
   const [bidData, setBidData] = useState([]);
   const [isExportCSV, setIsExportCSV] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -286,15 +285,6 @@ const AuctionDashboard = () => {
                 <h4 className="dashboard-title">Dashboard</h4>
               </div>
               <div>
-                <div className="text-end mb-4">
-                  <Input
-                    type="date"
-                    className="form-control d-inline-block calendar-input"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    placeholder="Select Date"
-                  />
-                </div>
                 <div className="text-end">
                   <Link to="/view-all-bids" className="view-all-link fw-bold">
                     <i className="ri-link me-1"></i> View All Bids

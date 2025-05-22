@@ -190,8 +190,8 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
                             const { time, isExpired } = calculateTimeRemaining(bid.bidTo);
                             return isExpired ? (
                                 <>
-                                    <span className="time-label">Bid</span>
-                                    <span className="time-label">Expired</span>
+                                    <span className="time-label">Time</span>
+                                    <span className="time-label">Remaining</span>
                                     <span className="time-value">00:00</span>
                                 </>
                             ) : (

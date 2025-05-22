@@ -257,7 +257,7 @@ const BidCard = ({loginCode}) => {
           <CardBody className="bidding-card-body">
             <div className="bidding-time-circle">
               {isExpired ? (
-                <div className="bidding-expired-message">Bid Expired</div>
+                <div className="bidding-expired-message">Time Remaining</div>
               ) : (
                 <>
                   <div className="bidding-time-label">Time</div>
