@@ -18,6 +18,9 @@ import Loader from "../../../Components/Common/Loader";
 import ViewPlantsModal from "./ViewPlantsModal/ViewPlantsModal";
 import AssignPlantModal from "./AssignPlantModal/AssignPlantModel";
 
+import mappingIcon from "../../../assets/images/mappingIcon.png";
+
+
 const PlantMapping = () => {
   const [transporters, setTransporters] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -181,7 +184,7 @@ const PlantMapping = () => {
     }
   };
 
-  // Handle view plants for a transporter - UPDATED to remove duplicate handling
+  // Handle view plants for a transporter
   const handleViewPlants = async (transporterCode) => {
     setIsViewPlantsLoading(true);
     try {
@@ -238,108 +241,8 @@ const PlantMapping = () => {
     }
   };
 
-  // Handle plant assignment - UPDATED to remove duplicate prevention logic
-  // const handleAssignPlants = async () => {
-  //   setIsAssigningPlants(true);
-  //   try {
-  //     let mappingData = [];
-
-  //     // If a single transporter is selected
-  //     if (currentTransporterCode) {
-  //       // Get selected plant details for current transporter
-  //       mappingData = selectedPlants.map(plantId => {
-  //         const plant = plants.find(p => p.id === plantId);
-  //         if (!plant) return null; // Skip if plant not found
-
-  //         return {
-  //           transporterCode: currentTransporterCode,
-  //           plantCode: plant.plantCode
-  //         };
-  //       }).filter(item => item !== null); // Remove any null entries
-  //     }
-  //     // If multiple transporters are selected (bulk assign)
-  //     else if (selectedRows.length > 0) {
-  //       // For each selected transporter, create entries for each selected plant
-  //       selectedRows.forEach(transporterId => {
-  //         const transporter = transporters.find(t => t.id === transporterId);
-  //         if (!transporter) return; // Skip if transporter not found
-
-  //         const transporterCode = transporter.transporterCode;
-
-  //         selectedPlants.forEach(plantId => {
-  //           const plant = plants.find(p => p.id === plantId);
-  //           if (!plant) return; // Skip if plant not found
-
-  //           mappingData.push({
-  //             transporterCode: transporterCode,
-  //             plantCode: plant.plantCode
-  //           });
-  //         });
-  //       });
-  //     }
-
-  //     console.log("Attempting to assign plants:", mappingData);
-
-  //     // Check if we have any data to send
-  //     if (mappingData.length === 0) {
-  //       toast.warning("No plants selected to assign.", {
-  //         position: "top-right",
-  //         autoClose: 4000,
-  //       });
-  //       setIsAssigningPlants(false);
-  //       return;
-  //     }
-
-  //     // Make the API call with proper authentication
-  //     const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transporterPlantMap/bulkTransporterPlant`, {
-  //       method: 'POST',
-  //       headers: getAuthHeaders(),
-  //       body: JSON.stringify(mappingData)
-  //     });
-
-  //     if (response.ok) {
-  //       console.log("Plants assigned successfully");
-  //       showSuccessAlert();
-
-  //       // Refresh the data
-  //       fetchTransporters();
-
-  //       // If we're viewing a specific transporter's plants, refresh that view
-  //       if (currentTransporterCode) {
-  //         handleViewPlants(currentTransporterCode);
-  //       }
-  //     } else {
-  //       console.error("Failed to assign plants. Status:", response.status);
-  //       // Error toast with red background
-  //       toast.error("Failed to assign plants. Please try again.", {
-  //         position: "top-right",
-  //         autoClose: 5000,
-  //         hideProgressBar: false,
-  //         closeOnClick: true,
-  //         pauseOnHover: true,
-  //         draggable: true,
-  //         progress: undefined,
-  //       });
-  //     }
-
-  //   } catch (error) {
-  //     console.error("Error assigning plants:", error);
-  //     // Error toast with red background
-  //     toast.error("An error occurred while assigning plants.", {
-  //       position: "top-right",
-  //       autoClose: 5000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     });
-  //   } finally {
-  //     setIsAssigningPlants(false);
-  //   }
-  // };
-
-const handleAssignPlants = async () => {
+  // Handle plant assignment
+  const handleAssignPlants = async () => {
     setIsAssigningPlants(true);
     try {
       let mappingData = [];
@@ -474,14 +377,15 @@ const handleAssignPlants = async () => {
       setIsAssigningPlants(false);
     }
   };
-  // NEW: Handle the download functionality
+
+  // Handle the download functionality
   const handleDownload = (e) => {
     e.preventDefault();
     downloadCSV();
     setIsExportCSV(false);
   };
 
-  // NEW: Download CSV function
+  // Download CSV function
   const downloadCSV = () => {
     if (transporters.length === 0) {
       toast.warning("No data available to export", {
@@ -527,11 +431,15 @@ const handleAssignPlants = async () => {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+  };
 
-    // toast.success("CSV file exported successfully!", {
-    //   position: "top-right",
-    //   autoClose: 3000,
-    // });
+  // Handle Assign Multiple Plant button click
+  const handleAssignMultiplePlantClick = () => {
+    if (selectedRows.length > 0) {
+      setCurrentTransporterCode("");
+      fetchPlants();
+      handleModalToggle();
+    }
   };
 
   // Columns for transporters table
@@ -574,7 +482,7 @@ const handleAssignPlants = async () => {
       { Header: "Phone No.", accessor: "phoneNo" },
       { Header: "Email Id", accessor: "emailId" },
       { Header: "R-Type", accessor: "rType" },
-      {
+   {
         Header: "Assign Plant",
         Cell: ({ row }) => (
           <div className="d-flex justify-content-center align-items-center gap-2">
@@ -587,14 +495,24 @@ const handleAssignPlants = async () => {
             </Link>
             <Link
               to="#"
-              className="text-success"
+            className="text-primary" 
               onClick={() => {
                 setCurrentTransporterCode(row.original.transporterCode);
                 fetchPlants();
                 handleModalToggle();
               }}
             >
-              <i className="ri-map-pin-line fs-16"></i>
+              {/* Replace the icon with your custom image */}
+              <img 
+                src={mappingIcon} 
+                alt="Mapping Icon" 
+                style={{ 
+                  width: '16px', 
+                  height: '18px',
+                // NEW (proper blue filter):
+filter: 'brightness(0) saturate(100%) invert(45%) sepia(100%) saturate(2878%) hue-rotate(200deg) brightness(90%) contrast(120%)'
+                }} 
+              />
             </Link>
           </div>
         ),
@@ -611,63 +529,76 @@ const handleAssignPlants = async () => {
       <div className="page-content">
         <Container fluid>
           <BreadCrumb title="Transporter Plant Mapping" pageTitle="Transporter Plant Mapping" />
+          
+          <Row>
+            <Col lg={12}>
+              <Card id="plantList">
+                <CardHeader className="border-0">
+                  <Row className="g-4 align-items-center">
+                    <div className="col-sm">
+                      <div>
+                        <h5 className="card-title mb-0 bg-light">Transporter Plant Mapping</h5>
+                      </div>
+                    </div>
+                    <div className="col-sm-auto">
+                      <div className="d-flex gap-2">
+                        <button
+                          type="button"
+                          className="btn btn-success add-btn"
+                          id="assignMultiplePlant"
+                          onClick={handleAssignMultiplePlantClick}
+                          disabled={selectedRows.length === 0}
+                        >
+                          <i className="ri-map-pin-line align-bottom me-1"></i> Assign Multiple Plant
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-info add-btn"
+                          onClick={() => setIsExportCSV(true)}
+                        >
+                          <i className="ri-file-download-line align-bottom me-1"></i> Export
+                        </button>
+                      </div>
+                    </div>
+                  </Row>
+                </CardHeader>
+                <div className="card-body pt-0">
+                  <div>
+                    {isTransportersLoading ? (
+                      <Loader />
+                    ) : (
+                      <TableContainer
+                        columns={columns}
+                        data={transporters}
+                        isGlobalFilter={true}
+                        isAddUserList={false}
+                        customPageSize={5}
+                        isGlobalSearch={true}
+                        className="custom-header-css"
+                        SearchPlaceholder="Search for Transporter..."
+                        divClass="overflow-auto"
+                        tableClass="width-50"
+                      />
+                    )}
+                  </div>
 
-          <div className="bg-white rounded p-4" style={{ width: "100%" }}>
-            <div className="d-flex align-items-center justify-content-between mb-4">
-              <div style={{ width: "68%" }}>
-                <h5 className="card-title mb-0 bg-light px-3 py-2">
-                  Transporter Plant Mapping
-                </h5>
-              </div>
-
-              <div className="d-flex gap-2">
-                <Button
-                  style={{
-                    backgroundColor: '#4FC3A1',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    cursor: selectedRows.length > 0 ? 'pointer' : 'not-allowed'
-                  }}
-                  id="assignMultiplePlant"
-                  onClick={() => {
-                    if (selectedRows.length > 0) {
-                      setCurrentTransporterCode("");
-                      fetchPlants();
-                      handleModalToggle();
-                    }
-                  }}
-                  disabled={selectedRows.length === 0}
-                >
-                  <i className="ri-map-pin-line align-bottom me-1"></i> Assign Multiple Plant
-                </Button>
-
-                <Button color="info" onClick={() => setIsExportCSV(true)}>
-                  <i className="ri-file-download-line align-bottom me-1"></i> Export
-                </Button>
-              </div>
-            </div>
-
-            <div className="table-container">
-              {isTransportersLoading ? (
-                <div className="text-center my-5">
-                  <Loader />
+                  {/* Toast Container */}
+                  <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                    toastStyle={{ backgroundColor: "white" }}
+                  />
                 </div>
-              ) : (
-                <TableContainer
-                  columns={columns}
-                  data={transporters}
-                  isGlobalFilter={true}
-                  isAddUserList={false}
-                  customPageSize={10}
-                  isGlobalSearch={true}
-                  className="custom-header-css"
-                  SearchPlaceholder="Search for Transporter..."
-                />
-              )}
-            </div>
-          </div>
+              </Card>
+            </Col>
+          </Row>
         </Container>
       </div>
 
@@ -702,20 +633,6 @@ const handleAssignPlants = async () => {
           data={transporters}
         />
       )}
-
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        toastStyle={{ backgroundColor: "white" }}
-      />
     </React.Fragment>
   );
 };
