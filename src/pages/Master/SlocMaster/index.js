@@ -191,15 +191,21 @@ const SlocMaster = () => {
 
   // ];
   const handleAllocateAction = async () => {
-    const allcatedData = [...selectedRows];
+    debugger
+    const vehicles = [...selectedRows];
     const data = {
-      allcatedData,
-      SlotNumber
+      vehicles,
+      slotNumber
     }
     try {
-      await axios.post(`${process.env.REACT_APP_LOCAL_URL_8082}/vehicleslotdetails/allocate`, allcatedData, config)
+      await axios.post(`${process.env.REACT_APP_LOCAL_URL_8082}/vehicleslotdetails/allocate`, data, config)
         .then((res) => {
-          toast.success("Allocated Truck SuccessFully", { autoClose: 3000 });
+          if (res.status.data === '200 OK') {
+            toast.success("Allocated Truck SuccessFully", { autoClose: 3000 });
+          }else{
+            toast.error(res.status.msg, { autoClose: 3000 });
+          }
+
         })
     } catch (e) {
       toast.error("Something went wrong!", { autoClose: 3000 });
@@ -220,7 +226,7 @@ const SlocMaster = () => {
         vehicleCapacityMax: item.vehicleCapacityMax,
         certifiedCapacity: item.certifiedCapacity,
         transporterCode: item.transporterCode,
-        vehicleCapacityMin: item.vehicleCapacityMin
+        AssignedCapacity: item.vehicleCapacityMin
       }));
       setSelectedRows(filteredRows);
     } else {
@@ -252,8 +258,8 @@ const SlocMaster = () => {
           companyCode: rowData.companyCode,
           vehicleCapacityMax: rowData.vehicleCapacityMax,
           certifiedCapacity: rowData.certifiedCapacity,
-          transporterCode: rowData.transporterCode,
-          vehicleCapacityMin: rowData.vehicleCapacityMin
+          transporterCode: !rowData.transporterCode ? '' : rowData.transporterCode,
+          AssignedCapacity: rowData.vehicleCapacityMin
         };
 
         return (
@@ -700,6 +706,7 @@ const SlocMaster = () => {
   };
 
   const allocateModal = () => {
+    setSelectedRows([]);
     if (AllocateModal) {
       setAllocateModal(false);
       // setModal(true);
@@ -797,7 +804,7 @@ const SlocMaster = () => {
   /**
    * Handling click on event on calendar
    */
-  const [SlotNumber, setSlotNumber] = useState('');
+  const [slotNumber, setSlotNumber] = useState('');
   const handleEventClick = async (arg) => {
     debugger;
     const event = arg.event;

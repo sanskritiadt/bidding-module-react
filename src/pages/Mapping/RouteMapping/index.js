@@ -120,50 +120,120 @@ const RouteMapping = () => {
     }, []);
 
     // Function to fetch all routes for assignment modal
-    const fetchAllRoutes = async () => {
-        setIsRoutesLoading(true);
-        try {
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/getAllRoutes`, {
-                method: 'GET',
-                headers: getAuthHeaders()
-            });
+    // const fetchAllRoutes = async () => {
+    //     setIsRoutesLoading(true);
+    //     try {
+    //         const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/getAllRoutes`, {
+    //             method: 'GET',
+    //             headers: getAuthHeaders()
+    //         });
 
-            if (response.ok) {
-                const result = await response.json();
+    //         if (response.ok) {
+    //             const result = await response.json();
 
-                if (result.data && Array.isArray(result.data)) {
-                    const mappedRoutes = result.data.map(route => ({
+    //             if (result.data && Array.isArray(result.data)) {
+    //                 const mappedRoutes = result.data.map(route => ({
+    //                     id: route.id,
+    //                     routeCode: route.routeCode || "",
+    //                     departureLocation: route.routeDetermination,
+    //                     destinationLocation: route.routeDestination,
+    //                     routeType: route.routeType || "",
+    //                     distance: route.routeDistance || "",
+    //                 }));
+    //                 setRoutes(mappedRoutes);
+    //             } else {
+    //                 console.error("Invalid data structure received from routes API");
+    //                 setRoutes([]);
+    //             }
+    //         } else {
+    //             console.error("Failed to fetch routes. Status:", response.status);
+    //             setRoutes([]);
+    //             toast.error("Failed to fetch routes. Please try again later.", {
+    //                 position: "top-right",
+    //                 autoClose: 5000,
+    //             });
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching all routes:", error);
+    //         setRoutes([]);
+    //         toast.error("Error fetching routes. Please try again later.", {
+    //             position: "top-right",
+    //             autoClose: 5000,
+    //         });
+    //     } finally {
+    //         setIsRoutesLoading(false);
+    //     }
+    // };
+
+const fetchAllRoutes = async () => {
+    setIsRoutesLoading(true);
+    try {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/getAllRoutes`, {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log("Raw API Response:", result); // Debug log
+
+            // Check if data exists and is an array
+            if (result.data && Array.isArray(result.data)) {
+                const mappedRoutes = result.data.map(route => {
+                    console.log("Mapping route:", route); // Debug each route
+                    return {
                         id: route.id,
                         routeCode: route.routeCode || "",
-                        departureLocation: route.routeDetermination,
-                        destinationLocation: route.routeDestination,
+                        // Fix the field mapping based on your API response
+                        departureLocation: route.routeDetermination || route.routeName || "",
+                        destinationLocation: route.routeDestination || "",
                         routeType: route.routeType || "",
-                        distance: route.routeDistance || "",
-                    }));
-                    setRoutes(mappedRoutes);
+                        distance: route.routeDistance ? `${route.routeDistance} km` : "",
+                    };
+                });
+                
+                console.log("Mapped routes:", mappedRoutes); // Debug mapped data
+                setRoutes(mappedRoutes);
+                
+                // Show success message if routes are found
+                if (mappedRoutes.length > 0) {
+                    console.log(`Successfully loaded ${mappedRoutes.length} routes`);
                 } else {
-                    console.error("Invalid data structure received from routes API");
-                    setRoutes([]);
+                    console.warn("No routes found in the response");
+                    toast.warning("No routes available for assignment.", {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
                 }
             } else {
-                console.error("Failed to fetch routes. Status:", response.status);
+                console.error("Invalid data structure received from routes API:", result);
                 setRoutes([]);
-                toast.error("Failed to fetch routes. Please try again later.", {
+                toast.error("Invalid data format received from routes API.", {
                     position: "top-right",
                     autoClose: 5000,
                 });
             }
-        } catch (error) {
-            console.error("Error fetching all routes:", error);
+        } else {
+            console.error("Failed to fetch routes. Status:", response.status);
+            const errorText = await response.text();
+            console.error("Error response:", errorText);
             setRoutes([]);
-            toast.error("Error fetching routes. Please try again later.", {
+            toast.error("Failed to fetch routes. Please try again later.", {
                 position: "top-right",
                 autoClose: 5000,
             });
-        } finally {
-            setIsRoutesLoading(false);
         }
-    };
+    } catch (error) {
+        console.error("Error fetching all routes:", error);
+        setRoutes([]);
+        toast.error("Error fetching routes. Please try again later.", {
+            position: "top-right",
+            autoClose: 5000,
+        });
+    } finally {
+        setIsRoutesLoading(false);
+    }
+};
 
     const handleViewRoutes = async (transporterCode) => {
         setIsViewRoutesLoading(true);

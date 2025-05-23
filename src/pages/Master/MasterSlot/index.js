@@ -95,7 +95,7 @@ const SlotMaster = () => {
   }));
 
   useEffect(() => {
-   
+    debugger
     getSlotData();
     const obj = JSON.parse(sessionStorage.getItem("authUser"));
     let plantcode = obj.data.plantCode;
@@ -232,11 +232,12 @@ const SlotMaster = () => {
   }
 
   const deleteSlotMasterData = () => {
-    
-    axios.delete(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/delete/${event.id}`, config)
+    debugger
+    const slotNumber = event.slotNumber;
+    axios.delete(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/deleteBySlotNumber?slotNumber=${slotNumber}`, config)
       .then(res => {
         const result = res;
-        if (result.status.msg === "SlotMaster Deleted") {
+        if (result.status.msg === "SlotMaster Deleted Successfully") {
           toast.success("Slot Deleted Successfully", { autoClose: 3000 });
           getSlotData();
         }
@@ -263,7 +264,7 @@ const SlotMaster = () => {
 
 
   const submitMultiEvent = async (id) => {
- 
+    debugger;
     const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${id}`, config);
     const st_date = res.slotDateFromFormatted;
     const ed_date = res.slotDateToFormatted;
@@ -289,6 +290,7 @@ const SlotMaster = () => {
         setSelectedValues(selectedTransportersFromRes.map(item => item.value));
     setEvent({
       id: res.id,
+      slotNumber: res.slotNumber,
       title: res.title,
       start: res.start,
       end: res.end,
@@ -368,7 +370,7 @@ const SlotMaster = () => {
 
   // const submitEventData = async (e) => {
   //   e.preventDefault();
-  //   ;
+  //   debugger;
   //   const totalData = {
   //     ...values,
   //     "transporterCodes": selectedValues,
@@ -447,7 +449,7 @@ const SlotMaster = () => {
 
   const submitEventData = async (e) => {
     e.preventDefault();
-   
+    debugger;
 
     const id = document.getElementById("update_event_id").value;
     console.log("id_val", id);
@@ -650,11 +652,11 @@ const SlotMaster = () => {
    * Handling click on event on calendar
    */
   const handleEventClick = async (arg) => {
- 
+    debugger;
     const event = arg.event;
+const slotNumber = event.extendedProps.slotNumber;
 
-
-    const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${event.id}`, config);
+    const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${slotNumber}`, config);
     const st_date = res.slotDateFromFormatted;
     const ed_date = res.slotDateToFormatted;
 
@@ -681,6 +683,7 @@ const SlotMaster = () => {
         setSelectedValues(selectedTransportersFromRes.map(item => item.value));
     setEvent({
       id: res.id,
+      slotNumber: res.slotNumber,
       title: res.title,
       start: res.start,
       end: res.end,
@@ -740,7 +743,7 @@ const SlotMaster = () => {
     },
     validationSchema: Yup.object({
     }),
-    onSubmit: (values) => {
+    onSubmit: (values) => {debugger
       console.log(values);
       const totalData = {
         ...values,
@@ -769,7 +772,7 @@ const SlotMaster = () => {
       }
 
       // If there is an existing slot ID, use PUT, otherwise use POST to create
-      const url = event.id ? `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/updateSlot/${event.id}` : `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/create`;
+      const url = event.id ? `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/updateSlot/${event.slotNumber}` : `${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/create`;
 
       const method = event.id ? 'put' : 'post';
 
@@ -809,7 +812,7 @@ const SlotMaster = () => {
   const [selectedTransporters, setSelectedTransporters] = useState([]); // array of full option objects
 
   useEffect(() => {
-    
+    debugger
     if (
       event?.transporterNames?.length > 0 &&
       transporterdata.length > 0 &&
@@ -907,7 +910,7 @@ const SlotMaster = () => {
         Cell: ({ row }) => (
           <span {...row.getToggleRowExpandedProps()}>
             {row.isExpanded ? (
-              <i className="ri-arrow-down-s-fill"></i>
+              <i className="ri-arrow-down-s-fill" ></i>
             ) : (
               <i className="ri-arrow-right-s-fill"></i>
             )}
@@ -937,6 +940,10 @@ const SlotMaster = () => {
     ],
     []
   );
+
+  
+
+
 
   // Customers Column
   // const columns = useMemo(
@@ -1046,6 +1053,7 @@ const SlotMaster = () => {
 
     return {
       id: item.id,
+      slotNumber: item.slotNumber,
       title: item.plantName,
       state: item.state,
       maxTtCommitTr: item.maxTtCommitTr,
@@ -1196,7 +1204,7 @@ const SlotMaster = () => {
                           //   return "none";
                           // }}
                           moreLinkClick={(info) => {
-                            
+                            debugger
                             const clickedDateStr = info.date; // e.g., '2025-05-12'
                             const clickedDate = new Date(clickedDateStr);
                             clickedDate.setHours(0, 0, 0, 0); // normalize
@@ -1454,9 +1462,21 @@ const SlotMaster = () => {
                       <InfoRow iconClass={A5} text={`${format(event?.startTimeFormatted)} to ${format(event?.endTimeFormatted)}`} />
                       <InfoRow iconClass={A6} text={format(event?.state)} />
                       <InfoRow iconClass={A7} text={format(event?.materialName)} />
-                      <InfoRowStatus iconClass={A8} text={format(event?.status)} />
+                      {/* <InfoRowStatus iconClass={A8} text={format(event?.status)} /> */}
+                       <InfoRowStatus
+                                              iconClass={A8}
+                                              text={
+                                                event?.status === 'A'
+                                                  ? 'Assigned'
+                                                  : event?.status === 'B'
+                                                    ? 'Committed'
+                                                    : event?.status === 'C'
+                                                      ? 'Allocated'
+                                                      : format(event?.status)
+                                              }
+                                            />
                       <InfoRow iconClass={A9} text={format(event?.remarks)} />
-                      <input type="hidden" id="id_param" value={event?.id} />
+                      <input type="hidden" id="id_param" value={event?.slotNumber} />
                     </div>
 
                     <Row className="event-details1">
@@ -1722,7 +1742,7 @@ const SlotMaster = () => {
                           />
                         </div>
                       </Col>
-                      <Input type="hidden" id="update_event_id" value={validation.values.id} />
+                      <Input type="hidden" id="update_event_id" value={validation.values.slotNumber} />
                       {/* <Col xs={12}>
                         <div className="mb-3">
                           <Label 
@@ -1877,7 +1897,7 @@ const SlotMaster = () => {
               <div className="border-start px-3 py-2 w-100">
                 <div style={{display:'flex'}}>
                 <h6 className="fw-bold mb-2" style={{color:'black'}}>{item.title}</h6>
-                <button className="btn btn-success btn-sm" type="button" style={{marginLeft: 'auto'}} onClick={() => submitMultiEvent(item.id)}>Edit</button>
+                <button className="btn btn-success btn-sm" type="button" style={{marginLeft: 'auto'}} onClick={() => submitMultiEvent(item.slotNumber)}>Edit</button>
                 </div>
                 
                 <p className="mb-1"><i className="bi bi-truck"></i> {item.noOfTtRq} Truck Required</p>
