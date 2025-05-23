@@ -197,7 +197,7 @@ const BulkOrder = ({ bidNo }) => {
   const [showRouteDropdown, setShowRouteDropdown] = useState(false);
   const [routeSearchTerm, setRouteSearchTerm] = useState("");
   const [loadingRoutes, setLoadingRoutes] = useState(false);
-const[biddingOrderNo,setBiddingOrderNo]=useState("");
+  const [biddingOrderNo, setBiddingOrderNo] = useState("");
 
 
   useEffect(() => {
@@ -530,10 +530,12 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
   };
 
 
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+    if (name === 'ceilingAmount' && value.length > 10) {
+      return;
+    }
     // Update the values state
     setValues(prevValues => {
       const newValues = {
@@ -685,13 +687,13 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
 
         if (!cities.length) {
           console.log("Fallback cities used");
-         // setCitiesData(["UJJAIN", "INDORE"]);
+          // setCitiesData(["UJJAIN", "INDORE"]);
         } else {
           setCitiesData(cities);
         }
       } catch (error) {
         console.error("Error fetching cities:", error);
-      //  setCitiesData(["UJJAIN", "INDORE"]);
+        //  setCitiesData(["UJJAIN", "INDORE"]);
       } finally {
         setLoadingCities(false);
       }
@@ -852,7 +854,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
 
       // Create the biddingMaster object for this transporter
       const biddingMaster = {
-    
+
         transporterCode: transporter.id, // Use the transporter ID from selection
         ceilingPrice: parseFloat(values.ceilingAmount) || 0,
         uom: values.uom || "MT", // Default to MT if not provided
@@ -949,33 +951,33 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
   const submitFormData = async () => {
     setIsSubmitting(true);
     setSubmitError(null);
-  
+
     try {
       const payload = mapFormValuesToPayload();
       console.log("Submitting payload:", payload);
-  
+
       const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/bulk`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(payload)
       });
-  
+
       // Parse the response JSON regardless of status to get any error messages
       const result = await response.json();
       console.log("API Response:", result);
       setBiddingOrderNo(result[0].data.biddingOrderNo);
-   //   console.log("result data 2",result.data.biddingOrderNo);
+      //   console.log("result data 2",result.data.biddingOrderNo);
 
-      
+
       if (response.ok) {
         // Check if the result contains a message in meta object
         let successMessage = `Your bid has been ${biddingOrderNo} created successfully!`;
-      
-        
+
+
         // First check if it's an array response
         if (Array.isArray(result) && result.length > 0 && result[0].meta) {
           successMessage = result[0].meta.message || successMessage;
-        } 
+        }
         // Then check if it's a direct object with meta
         else if (result.meta && result.meta.message) {
           successMessage = result.meta.message;
@@ -984,23 +986,23 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
         else if (result.message) {
           successMessage = result.message;
         }
-  
+
         // Show success toast with the message from API
         toast.success(successMessage, { autoClose: 3000 });
-  
+
         // Show success modal
         setShowSuccessModal(true);
-  
+
         // After successful submission, go to Finish step
         setActiveStep(4);
       } else {
         // Extract error message from the response
         let errorMessage = "Something went wrong!";
-        
+
         // First check if it's an array response
         if (Array.isArray(result) && result.length > 0 && result[0].meta) {
           errorMessage = result[0].meta.message || errorMessage;
-        } 
+        }
         // Then check if it's a direct object with meta
         else if (result.meta && result.meta.message) {
           errorMessage = result.meta.message;
@@ -1009,16 +1011,16 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
         else if (result.message) {
           errorMessage = result.message;
         }
-  
+
         throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmitError(error.message);
-  
+
       // Dismiss any existing toasts first
       toast.dismiss();
-  
+
       // Show error toast with the error message
       toast.error(error.message || "Something went wrong!", {
         toastId: 'error-toast', // Add a unique ID to prevent multiple toasts
@@ -1038,46 +1040,46 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted with values:", values);
-  
+
     // If we're at the Delivery and Allocation step (index 2)
     if (activeStep === 2) {
       // Initialize validation errors object
       const validationErrors = {};
-  
+
       // Check required fields for Delivery and Allocation step
       if (!values.fromLocation || values.fromLocation === "Select") {
         validationErrors.fromLocation = "Please select from location";
       }
-  
+
       if (!values.toLocation || values.toLocation === "Select") {
         validationErrors.toLocation = "Please select to location";
       }
-  
+
       if (!values.route || values.route === "Select") {
         validationErrors.route = "Please select a route";
       }
-  
+
       if (!values.intervalTimeForAllocatingVehicle) {
         validationErrors.intervalTimeForAllocatingVehicle = "Please select a date";
       }
-  
+
       if (!values.intervalTimeToReachPlant) {
         validationErrors.intervalTimeToReachPlant = "Please select a date";
       }
-  
+
       if (!values.gracePeriodToReachPlant) {
         validationErrors.gracePeriodToReachPlant = "Please select a date";
       }
-  
+
       // Update the errors state
       setErrors(validationErrors);
-  
+
       // If there are validation errors, don't proceed
       if (Object.keys(validationErrors).length > 0) {
         console.log("Validation errors:", validationErrors);
         return;
       }
-  
+
       // If validation passes, proceed to Preview
       setActiveStep(3); // This will be Preview
     } else if (activeStep === 3) {
@@ -1085,7 +1087,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
       try {
         // Call submitFormData and wait for it to complete
         await submitFormData();
-        
+
         // Check if the API call was successful (no submitError and not submitting)
         if (!submitError && !isSubmitting) {
           // Instead of refreshing the entire page, only refresh the bid number
@@ -1094,7 +1096,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
           const refreshBidEvent = new CustomEvent('refreshBidNumber', {
             bubbles: true, // Allow the event to bubble up to parent components
           });
-          
+
           // Dispatch the event from the current element
           e.target.dispatchEvent(refreshBidEvent);
         }
@@ -1204,6 +1206,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
                     value={values.bidStartingFrom}
                     onChange={handleInputChange}
                     required
+                    min={new Date().toISOString().slice(0, 16)}
                     className="bulk-order-input"
                     style={{ color: "#000" }}
                   />
@@ -1219,6 +1222,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
                     type="datetime-local"
                     name="bidStartTo"
                     value={values.bidStartTo}
+                    min={new Date().toISOString().slice(0, 16)}
                     onChange={handleInputChange}
                     className="bulk-order-input"
                     style={{ color: "#000" }}
@@ -1229,7 +1233,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
 
               <div className="bulk-order-form-group city-dropdown-container">
                 <Label className="bulk-order-label">
-                  City
+                  City  <span style={{ color: "red" }}>*</span>
                 </Label>
                 <div style={{ position: "relative" }}>
                   {/* Main selector that shows the current selection */}
@@ -1367,9 +1371,11 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
                   type="number"
                   placeholder="Add Amount"
                   name="ceilingAmount"
+                  step="0.01"
+                  min="0"
                   value={values.ceilingAmount}
                   onChange={handleInputChange}
-                  required
+
                   className="bulk-order-input"
                   style={{ color: "#000" }}
                 />

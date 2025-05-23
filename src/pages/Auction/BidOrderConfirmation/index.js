@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback,useRef } from "react";
 import { Container, Row, Col, Card, Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 import classnames from "classnames";
 import axios from "axios";
@@ -13,10 +13,14 @@ const BidOrderConfirmation = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
- 
+ const eventListenerAttached = useRef(false);
   useEffect(() => {
     document.title = "Bid Management | EPLMS";
     fetchBidNo();
+      if (!eventListenerAttached.current) {
+    document.addEventListener('refreshBidNumber', handleRefreshBidNumber);
+    eventListenerAttached.current = true;
+  }
     
     // Add event listener for the custom event
     document.addEventListener('refreshBidNumber', handleRefreshBidNumber);
@@ -69,7 +73,7 @@ const BidOrderConfirmation = () => {
       }
     } catch (error) {
       console.error("Error fetching bid number:", error);
-      setBidNo("B545"); // Fallback to default value on error
+    // Fallback to default value on error
     } finally {
       setLoading(false);
     }
