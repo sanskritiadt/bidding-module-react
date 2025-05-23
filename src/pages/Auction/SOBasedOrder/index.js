@@ -34,24 +34,7 @@ const CustomStepIcon = (props) => {
   const { active, completed, icon } = props;
 
   return (
-    <div
-      className={`custom-step-icon ${active ? 'active' : ''} ${completed ? 'completed' : ''}`}
-      style={{
-        width: 40,
-        height: 40,
-        borderRadius: '50%',
-        backgroundColor: completed ? '#00A389' : active ? '#4361ee' : '#e0e0e0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: '16px',
-        boxShadow: active || completed ? '0 4px 8px rgba(0,0,0,0.15)' : 'none',
-        position: 'relative',
-        transition: 'all 0.3s ease',
-      }}
-    >
+    <div className={`custom-step-icon ${active ? 'active' : ''} ${completed ? 'completed' : ''}`}>
       {completed ? (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M20 6L9 17L4 12" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -279,8 +262,14 @@ const SOBasedOrder = ({ bidNo }) => {
   // Updated handleInputChange to also fetch transporters
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'extensionQuantity' && value.length > 20) {
+    if (name === 'extensionQuantity' && value.length > 10) {
       return; // Don't allow input longer than 20 digits
+    }
+    if (name === 'ceilingAmount' && value.length > 5) {
+      return;
+    }
+    if (name === 'intervalAmount' && value.length > 5) {
+      return;
     }
     setValues(prevValues => ({
       ...prevValues,
@@ -565,16 +554,18 @@ const SOBasedOrder = ({ bidNo }) => {
         toast.success("Your SO based bid has been created successfully!", {
           autoClose: 3000,
           position: "top-right",
-          style: {
-            background: "white",
-
-          }
+          className: "bg-light"
         });
+          document.dispatchEvent(new CustomEvent('refreshBidNumber'));
 
         // After successful submission, go to Finish
         setActiveStep(4);
         // Show success modal
         setShowSuccessModal(true);
+      
+
+        // After successful submission, reset form and go back to first step
+      
       } catch (error) {
         console.error("API Error Details:", error);
         setSubmitError(error.message);
@@ -583,10 +574,7 @@ const SOBasedOrder = ({ bidNo }) => {
           toastId: 'error-toast',
           position: "top-right",
           autoClose: 4000,
-          style: {
-            background: "#EF4444",
-            color: "black"
-          }
+          className: "bg-error color-error"
         });
       } finally {
         setIsSubmitting(false);
@@ -628,6 +616,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
   // Fetch transporters on mount
   useEffect(() => {
+    console.log("SOBAsed useEffect bidNo:", bidNo);
     document.title = "SO Based Order | EPLMS";
 
     // Automatically fetch transporters when the component mounts
@@ -709,7 +698,7 @@ const SOBasedOrder = ({ bidNo }) => {
           ></lord-icon>
         </div>
         <h3 className="so-based-order-modal-title">
-          Your SO Based <span style={{ color: "blue" }}> {biddingOrderNo}</span>  has been created!
+          Your SO Based <span className="color-primary"> {biddingOrderNo}</span>  has been created!
         </h3>
         <button
           type="button"
@@ -821,6 +810,7 @@ const SOBasedOrder = ({ bidNo }) => {
       }));
     } else {
       // Remove only the filtered transporters from selection
+      // Remove only the filtered transporters from selection
       const filteredIds = filteredTransporters.map(t => t.id);
 
       setValues(prevValues => ({
@@ -888,9 +878,9 @@ const SOBasedOrder = ({ bidNo }) => {
             <div className="so-based-order-row">
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Bid Starting From <span style={{ color: "red" }}>*</span>
+                  Bid Starting From <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="datetime-local"
                     name="bidStartingFrom"
@@ -899,15 +889,10 @@ const SOBasedOrder = ({ bidNo }) => {
                     required
                     // Add min attribute to prevent selection of past dates
                     min={new Date().toISOString().slice(0, 16)}
-                    className={`so-based-order-input ${errors.bidStartingFrom ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.bidStartingFrom ? "#dc3545" : "",
-                      borderWidth: errors.bidStartingFrom ? "2px" : ""
-                    }}
+                    className={`so-based-order-input date-input-min ${errors.bidStartingFrom ? "is-invalid" : ""}`}
                   />
                   {errors.bidStartingFrom && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.bidStartingFrom}
                     </div>
                   )}
@@ -916,24 +901,19 @@ const SOBasedOrder = ({ bidNo }) => {
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Bid Start To<span style={{ color: "red" }}>*</span>
+                  Bid Start To<span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="datetime-local"
                     name="bidStartTo"
                     value={values.bidStartTo}
                     onChange={handleInputChange}
                     min={new Date().toISOString().slice(0, 16)}
-                    className={`so-based-order-input ${errors.bidStartTo ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.bidStartTo ? "#dc3545" : "",
-                      borderWidth: errors.bidStartTo ? "2px" : ""
-                    }}
+                    className={`so-based-order-input date-input-min ${errors.bidStartTo ? "is-invalid" : ""}`}
                   />
                   {errors.bidStartTo && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.bidStartTo}
                     </div>
                   )}
@@ -945,7 +925,6 @@ const SOBasedOrder = ({ bidNo }) => {
                   Ceiling Amount
                 </Label>
                 <Input
-
                   type="number"
                   step="0.01"
                   min="0"
@@ -954,13 +933,12 @@ const SOBasedOrder = ({ bidNo }) => {
                   value={values.ceilingAmount}
                   onChange={handleInputChange}
                   className="so-based-order-input"
-                  style={{ color: "#000" }}
                 />
               </div>
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Interval Amount <span style={{ color: "red" }}>*</span>
+                  Interval Amount <span className="color-error">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -971,14 +949,9 @@ const SOBasedOrder = ({ bidNo }) => {
                   value={values.intervalAmount}
                   onChange={handleInputChange}
                   className={`so-based-order-input ${errors.intervalAmount ? "is-invalid" : ""}`}
-                  style={{
-                    color: "#000",
-                    borderColor: errors.intervalAmount ? "#dc3545" : "",
-                    borderWidth: errors.intervalAmount ? "2px" : ""
-                  }}
                 />
                 {errors.intervalAmount && (
-                  <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                  <div className="invalid-feedback">
                     {errors.intervalAmount}
                   </div>
                 )}
@@ -988,29 +961,24 @@ const SOBasedOrder = ({ bidNo }) => {
             <div className="so-based-order-row">
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  UOM<span style={{ color: "red" }}>*</span>
+                  UOM<span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="select"
                     name="uom"
                     value={values.uom}
                     onChange={handleInputChange}
                     className={`so-based-order-select ${errors.uom ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.uom ? "#dc3545" : "",
-                      borderWidth: errors.uom ? "2px" : ""
-                    }}
                   >
                     {uomOptions.map((uom, index) => (
-                      <option key={index} value={uom} style={{ color: "#000" }}>
+                      <option key={index} value={uom}>
                         {uom}
                       </option>
                     ))}
                   </Input>
                   {errors.uom && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.uom}
                     </div>
                   )}
@@ -1022,7 +990,7 @@ const SOBasedOrder = ({ bidNo }) => {
                 <Label className="so-based-order-label">
                   Last Minutes Extension
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="time"
                     placeholder=" --:--:--"
@@ -1030,7 +998,6 @@ const SOBasedOrder = ({ bidNo }) => {
                     value={values.lastMinutesExtension}
                     onChange={handleInputChange}
                     className="so-based-order-input black-placeholder"
-                    style={{ color: "#000" }}
                   />
                 </div>
               </div>
@@ -1042,7 +1009,6 @@ const SOBasedOrder = ({ bidNo }) => {
                 className={`so-based-order-button so-based-order-back-button ${activeStep === 0 ? 'disabled' : ''}`}
                 onClick={handleBackPage}
                 disabled={activeStep === 0}
-                style={{ opacity: activeStep === 0 ? "0.6" : "1" }}
               >
                 <i className="ri-arrow-left-line me-1"></i> Back
               </button>
@@ -1062,11 +1028,10 @@ const SOBasedOrder = ({ bidNo }) => {
             <div className="so-based-order-row">
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Extension Quantity <span style={{ color: "red" }}>*</span>
+                  Extension Quantity <span className="color-error">*</span>
                 </Label>
                 <Input
                   type="number"
-
                   min="0"
                   required
                   placeholder="Add Quantity"
@@ -1074,14 +1039,9 @@ const SOBasedOrder = ({ bidNo }) => {
                   value={values.extensionQuantity}
                   onChange={handleInputChange}
                   className={`so-based-order-input ${errors.extensionQuantity ? "is-invalid" : ""}`}
-                  style={{
-                    color: "#000",
-                    borderColor: errors.extensionQuantity ? "#dc3545" : "",
-                    borderWidth: errors.extensionQuantity ? "2px" : ""
-                  }}
                 />
                 {errors.extensionQuantity && (
-                  <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                  <div className="invalid-feedback">
                     {errors.extensionQuantity}
                   </div>
                 )}
@@ -1089,9 +1049,9 @@ const SOBasedOrder = ({ bidNo }) => {
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Display To Transporter <span style={{ color: "red" }}>*</span>
+                  Display To Transporter <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="select"
                     required
@@ -1099,20 +1059,15 @@ const SOBasedOrder = ({ bidNo }) => {
                     value={values.displayToTransporter}
                     onChange={handleInputChange}
                     className={`so-based-order-select ${errors.displayToTransporter ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.displayToTransporter ? "#dc3545" : "",
-                      borderWidth: errors.displayToTransporter ? "2px" : ""
-                    }}
                   >
                     {displayToTransporterOptions.map((option, index) => (
-                      <option key={index} value={option} style={{ color: "#000" }}>
+                      <option key={index} value={option}>
                         {option}
                       </option>
                     ))}
                   </Input>
                   {errors.displayToTransporter && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.displayToTransporter}
                     </div>
                   )}
@@ -1122,65 +1077,34 @@ const SOBasedOrder = ({ bidNo }) => {
               {/* IMPROVED Transporter Selection with API integration */}
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Select Transporter <span style={{ color: "red" }}>*</span>
+                  Select Transporter <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <div style={{ flex: 1, position: "relative" }}>
+                <div className="form-group-with-viewer">
+                  <div className="input-container">
                     <div
-                      className="so-based-order-transporter-selector"
+                      className={`so-based-order-transporter-selector ${errors.selectTransporter ? "border-error border-2" : ""}`}
                       onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
-                      style={{
-                        height: "38px",
-                        color: "#000",
-                        display: "flex",
-                        alignItems: "center",
-                        border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
-                        borderRadius: "4px",
-                        padding: "0.375rem 0.75rem",
-                        backgroundColor: "#fff",
-                        cursor: "pointer"
-                      }}
                     >
-                      <span className="so-based-order-transporter-selector-placeholder" style={{ color: "#000" }}>
+                      <span className="so-based-order-transporter-selector-placeholder">
                         {selectedTransporterCount > 0 ? `${selectedTransporterCount} Selected` : 'Select'}
                       </span>
-                      <span style={{ marginLeft: "auto" }}>
-                        <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
+                      <span>
+                        <i className="ri-arrow-down-s-line"></i>
                       </span>
                     </div>
 
                     {/* Transporter dropdown with loading state */}
                     {showTransporterDropdown && (
-                      <div className="so-based-order-dropdown" style={{
-                        position: "absolute",
-                        width: "100%",
-                        zIndex: 10,
-                        backgroundColor: "#fff",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                        marginTop: "4px",
-                        maxHeight: "300px",
-                        overflowY: "auto"
-                      }}>
+                      <div className="so-based-order-dropdown">
                         {/* Search header */}
-                        <div className="so-based-order-dropdown-header" style={{
-                          padding: "8px",
-                          backgroundColor: "#fff",
-                          borderBottom: "1px solid #ddd"
-                        }}>
-                          <div style={{ display: "flex", alignItems: "center" }}>
-                            <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
+                        <div className="so-based-order-dropdown-header">
+                          <div className="dropdown-controls">
+                            <div className="checkbox-container">
                               <input
                                 type="checkbox"
                                 checked={selectAllTransporters}
                                 onChange={handleSelectAllTransporters}
                                 onClick={(e) => e.stopPropagation()}
-                                style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer"
-                                }}
                               />
                             </div>
                             <input
@@ -1190,39 +1114,23 @@ const SOBasedOrder = ({ bidNo }) => {
                               onChange={(e) => setTransporterSearchTerm(e.target.value)}
                               onClick={(e) => e.stopPropagation()}
                               className="so-based-order-dropdown-search"
-                              style={{
-                                flex: 1,
-                                padding: "8px 12px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                color: "#000",
-                                fontSize: "14px"
-                              }}
                             />
                           </div>
                         </div>
 
                         {/* Loading indicator for transporters */}
                         {loadingTransporters && (
-                          <div style={{
-                            padding: "20px",
-                            textAlign: "center",
-                            color: "#4361ee"
-                          }}>
-                            <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
-                            <div style={{ marginTop: "8px" }}>Loading transporters...</div>
+                          <div className="so-based-order-loading-state">
+                            <i className="ri-loader-4-line spin"></i>
+                            <div className="loading-text">Loading transporters...</div>
                           </div>
                         )}
 
                         {/* Empty state message */}
                         {!loadingTransporters && filteredTransporters.length === 0 && (
-                          <div style={{
-                            padding: "20px",
-                            textAlign: "center",
-                            color: "#666"
-                          }}>
-                            <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
-                            <div style={{ marginTop: "8px" }}>No transporters found</div>
+                          <div className="so-based-order-empty-state">
+                            <i className="ri-inbox-line"></i>
+                            <div className="empty-text">No transporters found</div>
                           </div>
                         )}
 
@@ -1233,42 +1141,19 @@ const SOBasedOrder = ({ bidNo }) => {
                               <div
                                 key={transporter.id}
                                 className="so-based-order-dropdown-item"
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  padding: "10px 8px",
-                                  borderBottom: "1px solid #eee",
-                                  color: "#000",
-                                  cursor: "pointer"
-                                }}
                                 onClick={(e) => handleTransporterToggle(transporter, e)}
                               >
-                                <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
+                                <div className="checkbox-container">
                                   <input
                                     type="checkbox"
                                     checked={selectedTransporterIds.has(transporter.id)}
                                     onChange={(e) => handleCheckboxChange(transporter, e)}
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      cursor: "pointer"
-                                    }}
                                   />
                                 </div>
-                                <div style={{
-                                  flex: "0 0 120px",
-                                  paddingRight: "15px",
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "14px"
-                                }}>
+                                <div className="transporter-id">
                                   {transporter.id}
                                 </div>
-                                <div style={{
-                                  flex: 1,
-                                  fontSize: "14px"
-                                }}>
+                                <div className="transporter-name">
                                   {transporter.name}
                                 </div>
                               </div>
@@ -1290,7 +1175,7 @@ const SOBasedOrder = ({ bidNo }) => {
                   )}
                 </div>
                 {errors.selectTransporter && (
-                  <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                  <div className="invalid-feedback">
                     {errors.selectTransporter}
                   </div>
                 )}
@@ -1300,22 +1185,17 @@ const SOBasedOrder = ({ bidNo }) => {
             {/* Improved Accordion Sales Order Selection with API integration */}
             <div className="so-based-order-accordion">
               <div
-                className="so-based-order-accordion-header"
+                className={`so-based-order-accordion-header ${errors.salesOrders ? "border-error border-2" : ""}`}
                 onClick={toggleAccordion}
-                style={{
-                  border: errors.salesOrders ? "2px solid #dc3545" : "none"
-                }}
               >
-                <span>Select Sales Order Details <span style={{ color: "red" }}>*</span></span>
+                <span>Select Sales Order Details <span className="color-error">*</span></span>
                 <i className={`ri-arrow-${accordionOpen ? 'up' : 'down'}-s-line`}></i>
               </div>
 
               <div
-                className={`so-based-order-accordion-content ${accordionOpen ? 'open' : ''}`}
+                className={`so-based-order-accordion-content ${accordionOpen ? 'open' : ''} ${errors.salesOrders ? "border-error border-2" : ""}`}
                 style={{
-                  display: accordionOpen ? 'block' : 'none', // Use display instead of maxHeight for reliable showing/hiding
-                  border: errors.salesOrders ? "2px solid #dc3545" : "1px solid #e0e0e0",
-                  borderTop: "none"
+                  display: accordionOpen ? 'block' : 'none',
                 }}
               >
                 <div className="so-based-order-search-container">
@@ -1325,45 +1205,28 @@ const SOBasedOrder = ({ bidNo }) => {
                     className="so-based-order-search-input"
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    style={{ color: "#000" }}
                   />
                 </div>
 
                 {/* Loading state for sales orders */}
                 {loadingSalesOrders && (
-                  <div style={{
-                    padding: "30px",
-                    textAlign: "center",
-                    color: "#4361ee"
-                  }}>
-                    <i className="ri-loader-4-line spin" style={{ fontSize: "28px" }}></i>
-                    <div style={{ marginTop: "10px", fontSize: "16px" }}>Loading sales orders...</div>
+                  <div className="so-sales-orders-loading">
+                    <i className="ri-loader-4-line spin"></i>
+                    <div className="loading-text">Loading sales orders...</div>
                   </div>
                 )}
 
                 {/* Error state for sales orders */}
                 {salesOrdersError && !loadingSalesOrders && (
-                  <div style={{
-                    padding: "30px",
-                    textAlign: "center",
-                    color: "#dc3545"
-                  }}>
-                    <i className="ri-error-warning-line" style={{ fontSize: "28px" }}></i>
-                    <div style={{ marginTop: "10px", fontSize: "16px" }}>
+                  <div className="so-sales-orders-error">
+                    <i className="ri-error-warning-line"></i>
+                    <div className="error-text">
                       Error loading sales orders: {salesOrdersError}
                     </div>
                     <button
                       type="button"
                       onClick={fetchSalesOrders}
-                      style={{
-                        padding: "6px 12px",
-                        marginTop: "15px",
-                        backgroundColor: "#4361ee",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer"
-                      }}
+                      className="retry-button"
                     >
                       Retry
                     </button>
@@ -1372,13 +1235,9 @@ const SOBasedOrder = ({ bidNo }) => {
 
                 {/* Empty state for no sales orders */}
                 {!loadingSalesOrders && !salesOrdersError && filteredOrders.length === 0 && (
-                  <div style={{
-                    padding: "30px",
-                    textAlign: "center",
-                    color: "#666"
-                  }}>
-                    <i className="ri-file-list-3-line" style={{ fontSize: "28px" }}></i>
-                    <div style={{ marginTop: "10px", fontSize: "16px" }}>
+                  <div className="so-sales-orders-empty">
+                    <i className="ri-file-list-3-line"></i>
+                    <div className="empty-text">
                       No sales orders found. {searchTerm ? "Try a different search term." : ""}
                     </div>
                   </div>
@@ -1389,16 +1248,14 @@ const SOBasedOrder = ({ bidNo }) => {
                   <table className="so-based-order-table">
                     <thead>
                       <tr>
-                        <th style={{ width: "40px" }}></th>
+                        <th className="w-40"></th>
                         <th>Sales Order No.</th>
-                        {/* <th>Status</th> */}
                         <th>Validity</th>
                         <th>Material</th>
                         <th>Quantity</th>
                       </tr>
                     </thead>
                     <tbody>
-
                       {filteredOrders.map((order, index) => (
                         <tr key={index}>
                           <td>
@@ -1409,22 +1266,6 @@ const SOBasedOrder = ({ bidNo }) => {
                             />
                           </td>
                           <td>{order.orderNo}</td>
-                          {/* <td>
-                            <span style={{
-                              padding: "2px 8px",
-                              borderRadius: "4px",
-                              fontSize: "12px",
-                              fontWeight: "500",
-                              backgroundColor: order.status === "Confirmed" ? "#d1fae5" :
-                                order.status === "Processing" ? "#e0f2fe" :
-                                  order.status === "Blocked" ? "#fee2e2" : "#f3f4f6",
-                              color: order.status === "Confirmed" ? "#059669" :
-                                order.status === "Processing" ? "#0369a1" :
-                                  order.status === "Blocked" ? "#b91c1c" : "#4b5563",
-                            }}>
-                              {order.status || "N/A"}
-                            </span>
-                          </td> */}
                           <td>{order.validity}</td>
                           <td>{order.material}</td>
                           <td>{order.quantity}</td>
@@ -1443,10 +1284,9 @@ const SOBasedOrder = ({ bidNo }) => {
                     <div className="so-based-order-pagination-controls">
                       <button
                         type="button"
-                        className="so-based-order-pagination-prev"
+                        className={`so-based-order-pagination-prev ${currentPage === 1 ? 'disabled-opacity' : ''}`}
                         disabled={currentPage === 1}
                         onClick={() => handlePageChange(currentPage - 1)}
-                        style={{ opacity: currentPage === 1 ? 0.5 : 1 }}
                       >
                         <i className="ri-arrow-left-s-line"></i>
                       </button>
@@ -1455,10 +1295,9 @@ const SOBasedOrder = ({ bidNo }) => {
                       </div>
                       <button
                         type="button"
-                        className="so-based-order-pagination-next"
+                        className={`so-based-order-pagination-next ${currentPage === totalPages ? 'disabled-opacity' : ''}`}
                         disabled={currentPage === totalPages}
                         onClick={() => handlePageChange(currentPage + 1)}
-                        style={{ opacity: currentPage === totalPages ? 0.5 : 1 }}
                       >
                         <i className="ri-arrow-right-s-line"></i>
                       </button>
@@ -1470,7 +1309,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
             {/* Display error for sales order selection */}
             {errors.salesOrders && (
-              <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px", marginBottom: "16px" }}>
+              <div className="invalid-feedback mb-4">
                 {errors.salesOrders}
               </div>
             )}
@@ -1499,9 +1338,9 @@ const SOBasedOrder = ({ bidNo }) => {
             <div className="so-based-order-row">
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Auto Allocate To L1 <span style={{ color: "red" }}>*</span>
+                  Auto Allocate To L1 <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="select"
                     name="autoAllocateTo"
@@ -1509,20 +1348,15 @@ const SOBasedOrder = ({ bidNo }) => {
                     onChange={handleInputChange}
                     required
                     className={`so-based-order-select ${errors.autoAllocateTo ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.autoAllocateTo ? "#dc3545" : "",
-                      borderWidth: errors.autoAllocateTo ? "2px" : ""
-                    }}
                   >
                     {autoAllocateToOptions.map((option, index) => (
-                      <option key={index} value={option} style={{ color: "#000" }}>
+                      <option key={index} value={option}>
                         {option}
                       </option>
                     ))}
                   </Input>
                   {errors.autoAllocateTo && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.autoAllocateTo}
                     </div>
                   )}
@@ -1531,9 +1365,9 @@ const SOBasedOrder = ({ bidNo }) => {
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Interval time for Allocating Vehicle <span style={{ color: "red" }}>*</span>
+                  Interval time for Allocating Vehicle <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="time"
                     name="intervalTimeForAllocatingVehicle"
@@ -1541,27 +1375,21 @@ const SOBasedOrder = ({ bidNo }) => {
                     onChange={handleInputChange}
                     required
                     className={`so-based-order-input ${errors.intervalTimeForAllocatingVehicle ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.intervalTimeForAllocatingVehicle ? "#dc3545" : "",
-                      borderWidth: errors.intervalTimeForAllocatingVehicle ? "2px" : ""
-                    }}
                     placeholder="Select Time"
                   />
                   {errors.intervalTimeForAllocatingVehicle && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.intervalTimeForAllocatingVehicle}
                     </div>
                   )}
-
                 </div>
               </div>
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Interval time for to reach plant <span style={{ color: "red" }}>*</span>
+                  Interval time for to reach plant <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="time"
                     name="intervalTimeToReachPlant"
@@ -1569,27 +1397,21 @@ const SOBasedOrder = ({ bidNo }) => {
                     onChange={handleInputChange}
                     required
                     className={`so-based-order-input ${errors.intervalTimeToReachPlant ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.intervalTimeToReachPlant ? "#dc3545" : "",
-                      borderWidth: errors.intervalTimeToReachPlant ? "2px" : ""
-                    }}
                     placeholder="Select Time"
                   />
                   {errors.intervalTimeToReachPlant && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.intervalTimeToReachPlant}
                     </div>
                   )}
-
                 </div>
               </div>
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Grace Period to reach plant <span style={{ color: "red" }}>*</span>
+                  Grace Period to reach plant <span className="color-error">*</span>
                 </Label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <Input
                     type="time"
                     name="gracePeriodToReachPlant"
@@ -1597,19 +1419,13 @@ const SOBasedOrder = ({ bidNo }) => {
                     onChange={handleInputChange}
                     required
                     className={`so-based-order-input ${errors.gracePeriodToReachPlant ? "is-invalid" : ""}`}
-                    style={{
-                      color: "#000",
-                      borderColor: errors.gracePeriodToReachPlant ? "#dc3545" : "",
-                      borderWidth: errors.gracePeriodToReachPlant ? "2px" : ""
-                    }}
                     placeholder="Select Time"
                   />
                   {errors.gracePeriodToReachPlant && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                    <div className="invalid-feedback">
                       {errors.gracePeriodToReachPlant}
                     </div>
                   )}
-
                 </div>
               </div>
             </div>
@@ -1681,20 +1497,8 @@ const SOBasedOrder = ({ bidNo }) => {
               {/* Updated Transporter Display for Preview */}
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">Select Transporter</Label>
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  paddingTop: "8px",
-                  paddingBottom: "8px"
-                }}>
-                  <div style={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                    color: "#000"
-                  }}>
+                <div className="preview-transporter-container">
+                  <div className="preview-transporter-tags">
                     {values.selectTransporter.length > 0 ? (
                       (() => {
                         // Get unique transporters by ID
@@ -1712,15 +1516,7 @@ const SOBasedOrder = ({ bidNo }) => {
                               <span
                                 key={i}
                                 title={t.name}
-                                style={{
-                                  backgroundColor: "#4361ee",
-                                  color: "white",
-                                  padding: "5px 12px",
-                                  borderRadius: "4px",
-                                  fontSize: "13px",
-                                  fontWeight: "500",
-                                  display: "inline-block"
-                                }}
+                                className="preview-transporter-tag"
                               >
                                 {t.name}
                               </span>
@@ -1728,13 +1524,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
                             {/* Show ellipsis for additional transporters */}
                             {remaining > 0 && (
-                              <span
-                                style={{
-                                  fontSize: "18px",
-                                  fontWeight: "bold",
-                                  marginLeft: "4px"
-                                }}
-                              >
+                              <span className="preview-transporter-ellipsis">
                                 ...
                               </span>
                             )}
@@ -1747,113 +1537,62 @@ const SOBasedOrder = ({ bidNo }) => {
                   </div>
 
                   {/* View Icon */}
-                  {values.selectTransporter.length > 0 && (
+ {values.selectTransporter.length > 0 && (
+                    <TransporterViewer
+                      selectedTransporters={values.selectTransporter}
+                      onRemove={(transporterId) => {
+                        handleRemoveTransporter(transporterId, new Event('click'));
+                      }}
+                    />
+                  )}
+
+                  {/* {values.selectTransporter.length > 0 && (
                     <span
                       onClick={() => setShowTransporterModal(true)}
-                      style={{
-                        cursor: "pointer",
-                        width: "28px",
-                        height: "28px",
-                        minWidth: "28px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: "1px solid #ced4da",
-                        borderRadius: "4px",
-                        backgroundColor: "#f8f9fa",
-                        marginLeft: "10px"
-                      }}
+                      className="preview-view-icon"
                     >
-                      <i className="ri-eye-line" style={{ fontSize: "16px", color: "#4361ee" }}></i>
+                      <i className="ri-eye-line"></i>
                     </span>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
 
             {/* Transporter Preview Modal */}
             {showTransporterModal && (
-              <div
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: "rgba(0,0,0,0.5)",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 1000
-                }}
-              >
-                <div
-                  style={{
-                    backgroundColor: "white",
-                    borderRadius: "8px",
-                    width: "90%",
-                    maxWidth: "500px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "16px",
-                      borderBottom: "1px solid #eee",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center"
-                    }}
-                  >
-                    <h3 style={{ margin: 0, fontSize: "18px" }}>Selected Transporters</h3>
+              <div className="transporter-modal-overlay">
+                <div className="transporter-modal-content">
+                  <div className="transporter-modal-header">
+                    <h3>Selected Transporters</h3>
                     <button
                       onClick={() => setShowTransporterModal(false)}
-                      style={{
-                        background: "transparent",
-                        border: "none",
-                        fontSize: "20px",
-                        cursor: "pointer"
-                      }}
+                      className="transporter-modal-close"
                     >
                       <i className="ri-close-line"></i>
                     </button>
                   </div>
-                  <div style={{ padding: "16px", maxHeight: "70vh", overflowY: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <div className="transporter-modal-body">
+                    <table className="transporter-modal-table">
                       <thead>
                         <tr>
-                          <th style={{ padding: "8px", textAlign: "left", borderBottom: "1px solid #eee" }}>ID</th>
-                          <th style={{ padding: "8px", textAlign: "left", borderBottom: "1px solid #eee" }}>Name</th>
+                          <th>ID</th>
+                          <th>Name</th>
                         </tr>
                       </thead>
                       <tbody>
                         {[...new Map(values.selectTransporter.map(item => [item.id, item])).values()].map((t, i) => (
                           <tr key={i}>
-                            <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>{t.id}</td>
-                            <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>{t.name}</td>
+                            <td>{t.id}</td>
+                            <td>{t.name}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                  <div
-                    style={{
-                      padding: "16px",
-                      borderTop: "1px solid #eee",
-                      display: "flex",
-                      justifyContent: "flex-end"
-                    }}
-                  >
+                  <div className="transporter-modal-footer">
                     <button
                       onClick={() => setShowTransporterModal(false)}
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "#4361ee",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer"
-                      }}
+                      className="transporter-modal-close-btn"
                     >
                       Close
                     </button>
@@ -1869,7 +1608,7 @@ const SOBasedOrder = ({ bidNo }) => {
                 <thead>
                   <tr>
                     <th>Sales Order No.</th>
-                    <th>Status</th>
+                    {/* <th>Status</th> */}
                     <th>Validity</th>
                     <th>Material</th>
                     <th>Quantity</th>
@@ -1881,22 +1620,14 @@ const SOBasedOrder = ({ bidNo }) => {
                     return orderDetails ? (
                       <tr key={index}>
                         <td>{orderDetails.orderNo}</td>
-                        <td>
-                          <span style={{
-                            padding: "2px 8px",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            fontWeight: "500",
-                            backgroundColor: orderDetails.status === "Confirmed" ? "#d1fae5" :
-                              orderDetails.status === "Processing" ? "#e0f2fe" :
-                                orderDetails.status === "Blocked" ? "#fee2e2" : "#f3f4f6",
-                            color: orderDetails.status === "Confirmed" ? "#059669" :
-                              orderDetails.status === "Processing" ? "#0369a1" :
-                                orderDetails.status === "Blocked" ? "#b91c1c" : "#4b5563",
-                          }}>
+                        {/* <td>
+                          <span className={`status-badge ${orderDetails.status === "Confirmed" ? "confirmed" :
+                            orderDetails.status === "Processing" ? "processing" :
+                              orderDetails.status === "Blocked" ? "blocked" : "default"
+                            }`}>
                             {orderDetails.status || "N/A"}
                           </span>
-                        </td>
+                        </td> */}
                         <td>{orderDetails.validity}</td>
                         <td>{orderDetails.material}</td>
                         <td>{orderDetails.quantity}</td>
@@ -1940,9 +1671,8 @@ const SOBasedOrder = ({ bidNo }) => {
               </button>
               <button
                 type="submit"
-                className="so-based-order-button so-based-order-next-button"
+                className={`so-based-order-button so-based-order-next-button ${isSubmitting ? 'disabled-opacity' : ''}`}
                 disabled={isSubmitting}
-                style={{ opacity: isSubmitting ? 0.7 : 1 }}
               >
                 {isSubmitting ? (
                   <span>
@@ -1956,46 +1686,13 @@ const SOBasedOrder = ({ bidNo }) => {
           </div>
         )}
 
-        {/* Finish Step */}
-        {activeStep === 4 && (
-          <div className="so-based-order-finish-container">
-            <div className="so-based-order-finish-icon">
-              {submitError ? (
-                <div style={{ color: "#EF4444", fontSize: "80px" }}>
-                  <i className="ri-error-warning-line"></i>
-                </div>
-              ) : (
-                <lord-icon
-                  src="https://cdn.lordicon.com/lupuorrc.json"
-                  trigger="loop"
-                  colors="primary:#0ab39c,secondary:#405189"
-                  style={{ width: "120px", height: "120px" }}
-                ></lord-icon>
-              )}
-            </div>
-            <h3 className={`so-based-order-finish-title ${submitError ? 'so-based-order-finish-title-error' : 'so-based-order-finish-title-success'}`}>
-              {submitError
-                ? "Error submitting your bid"
-                : "Your SO Based Bid has been created!"}
-            </h3>
-            {submitError && (
-              <p className="so-based-order-error-message">
-                {submitError}
-              </p>
-            )}
-            <button
-              type="button"
-              className="so-based-order-finish-button"
-              onClick={handleBackToCreateBid}
-            >
-              Back to Create Bid
-            </button>
-          </div>
-        )}
+
       </Form>
 
       {/* Add ToastContainer for notifications */}
-      <ToastContainer closeButton={false} limit={1}
+      <ToastContainer
+        closeButton={false}
+        limit={1}
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -2005,7 +1702,9 @@ const SOBasedOrder = ({ bidNo }) => {
         draggable
         pauseOnHover
         theme="light"
-        toastStyle={{ backgroundColor: "white" }} />
+        toastClassName="bg-light"
+      />
+
       {/* Show success modal */}
       {showSuccessModal && <SuccessModal />}
     </>
