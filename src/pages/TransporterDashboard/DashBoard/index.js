@@ -162,11 +162,11 @@ const BidConfirmationModal = ({ isOpen, toggle, bidData, loginCode, bidNo }) => 
   };
   const handleBidAmountChange = (e) => {
     const value = e.target.value;
-    
+
     // Allow empty field or numeric input with up to 2 decimal places
     if (value === "" || /^\d+(\.\d{0,2})?$/.test(value)) {
       setBidAmount(value);
-      
+
       // Check if the value is valid (positive number)
       if (value === "" || parseFloat(value) <= 0) {
         setIsValid(false);
@@ -750,8 +750,6 @@ const TransporterDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-
-      // Basic auth credentials
       const credentials = getBasicAuthCredentials();
 
       const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/biddingMaster/getAllBidsByTransporterCode?transporterCode=${loginCode}`, {

@@ -1,44 +1,48 @@
-
-
 import React, { useState, useEffect } from 'react';
-
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
-  Spinner
+  Spinner,
+  Collapse,
+  Card,
+  CardBody
 } from 'reactstrap';
 import { toast } from 'react-toastify';
  
-const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
+const BidConfirmationModal = ({ isOpen, toggle, bidNo, loginCode }) => {
   const [transporters, setTransporters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [processingAction, setProcessingAction] = useState(false);
- console.log("bidNo====>",bidNo);
+  const [expandedTransporter, setExpandedTransporter] = useState(null);
+  const [bidDetails, setBidDetails] = useState(null);
+
+  console.log("bidNo====>", bidNo);
+  
   // Fetch bid data when modal opens
   useEffect(() => {
-  
     if (isOpen && bidNo) {
       fetchBidData();
     }
   }, [isOpen, bidNo]);
-  console.log("login code in BidOrderConfirmation============>>>>>>>",loginCode);
+  
+  console.log("login code in BidOrderConfirmation============>>>>>>>", loginCode);
+  
   const fetchBidData = async () => {
     try {
       setLoading(true);
       setError(null);
  
       const response = await fetch(
-      
         `${process.env.REACT_APP_LOCAL_URL_8082}/transporterBidding/getBidDataByBidNo?biddingNumber=${bidNo}`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
+            'Authorization': 'Basic YW1hemluOlRFQU0tV0BSSw=='
           }
         }
       );
@@ -48,6 +52,9 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
       }
 
       const data = await response.json();
+      
+      // Store full bid details
+      setBidDetails(data.body);
  
       // Map the API response to the expected format
       const mappedData = {
@@ -59,6 +66,12 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
         deliveredBefore: "N/A", // This field is not in the API response
         multipleOrders: "N/A", // This field is not in the API response
         rating: 4.5, // This field is not in the API response
+        // Additional details for expanded view
+        contactInfo: data.body.contactNumber || "N/A",
+        vehicleType: data.body.vehicleType || "N/A",
+        capacity: data.body.capacity || "N/A",
+        experience: data.body.experience || "N/A",
+        location: data.body.location || "N/A"
       };
  
       setTransporters([mappedData]);
@@ -82,7 +95,7 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
+            'Authorization': 'Basic YW1hemluOlRFQU0tV0BSSw=='
           },
         }
       );
@@ -113,6 +126,7 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
       setProcessingAction(false);
     }
   };
+
   const formatCurrency = (amount) => {
     if (!amount) return '0';
     return new Intl.NumberFormat('en-IN', {
@@ -149,10 +163,17 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
     return stars;
   };
 
+  const toggleTransporterDetails = (index) => {
+    setExpandedTransporter(expandedTransporter === index ? null : index);
+  };
+
   return (
     <Modal isOpen={isOpen} toggle={toggle} centered size="xl" className="bid-confirmation-modal">
       <ModalHeader toggle={toggle} className="border-0">
-        <div className="bid-confirmation-title">Bid Confirmation - {bidNo}</div>
+        <div className="bid-confirmation-title">
+          <h4 className="mb-0">Bid Confirmation - {bidNo}</h4>
+          <small className="text-muted">Review and confirm transporter details</small>
+        </div>
       </ModalHeader>
       <ModalBody>
         {loading ? (
@@ -170,73 +191,234 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo,loginCode }) => {
           </div>
         ) : (
           <div className="bid-table-container">
-            <table className="table table-striped table-bordered mb-0">
-              <thead className="bg-primary sticky-header" style={{ color: "black" }}>
-                <tr>
-                  <th>Rank</th>
-                  <th>
-                    Transporter name
-                    <i className="ri-arrow-up-down-line ms-1"></i>
-                  </th>
-                  <th>Auction Type</th>
-                  <th>Ceiling Price</th>
-                  <th>Given Price</th>
-                  <th>Delivered Before</th>
-                  <th>Multiple Orders</th>
-                  <th>Transporter Rating</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transporters.map((transporter, index) => (
-                  <tr key={index}>
-                    <td>{transporter.rank}</td>
-                    <td>
-                      {transporter.name}
-                      <i className="ri-add-line ms-2 text-primary"></i>
-                    </td>
-                    <td>{transporter.auctionType}</td>
-                    <td>{transporter.ceilingPrice}</td>
-                    <td>{transporter.givenPrice}</td>
-                    <td>{transporter.deliveredBefore}</td>
-                    <td>{transporter.multipleOrders}</td>
-                    <td className="text-center">
-                      {renderRating(transporter.rating)}
-                    </td>
-                    <td>
-                      <div className="d-flex gap-1">
-                        <Button
-                          color="success"
-                          size="sm"
-                          className="action-btn"
-                          onClick={() => handleBidAction('A')}
-                          disabled={processingAction}
-                        >
-                          {processingAction ? <Spinner size="sm" /> : 'Assign'}
-                        </Button>
-                        <Button
-                          color="danger"
-                          size="sm"
-                          className="action-btn"
-                          onClick={() => handleBidAction('R')}
-                          disabled={processingAction}
-                        >
-                          {processingAction ? <Spinner size="sm" /> : 'Reject'}
-                        </Button>
-                      </div>
-                    </td>
+            <div className="table-responsive">
+              <table className="table table-striped table-bordered mb-0">
+                <thead className="table-primary">
+                  <tr>
+                    <th className="text-nowrap">Rank</th>
+                    <th className="text-nowrap">
+                      Transporter Name
+                      <i className="ri-arrow-up-down-line ms-1"></i>
+                    </th>
+                    <th className="text-nowrap">Auction Type</th>
+                    <th className="text-nowrap">Ceiling Price</th>
+                    <th className="text-nowrap">Given Price</th>
+                    <th className="text-nowrap">Delivered Before</th>
+                    <th className="text-nowrap">Multiple Orders</th>
+                    <th className="text-nowrap">Rating</th>
+                    <th className="text-nowrap">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {transporters.map((transporter, index) => (
+                    <React.Fragment key={index}>
+                      <tr>
+                        <td className="align-middle">
+                          <span className="badge bg-primary">{transporter.rank}</span>
+                        </td>
+                        <td className="align-middle">
+                          <div className="d-flex align-items-center justify-content-between">
+                            <span className="fw-medium">{transporter.name}</span>
+                            <Button
+                              color="link"
+                              size="sm"
+                              className="p-0 ms-2 text-primary"
+                              onClick={() => toggleTransporterDetails(index)}
+                              title="View detailed information"
+                            >
+                              <i className={`ri-${expandedTransporter === index ? 'subtract' : 'add'}-line fs-5`}></i>
+                            </Button>
+                          </div>
+                        </td>
+                        <td className="align-middle">
+                          <span className="badge bg-info text-dark">{transporter.auctionType}</span>
+                        </td>
+                        <td className="align-middle text-end">₹{transporter.ceilingPrice}</td>
+                        <td className="align-middle text-end">
+                          <span className="fw-bold text-success">₹{transporter.givenPrice}</span>
+                        </td>
+                        <td className="align-middle">{transporter.deliveredBefore}</td>
+                        <td className="align-middle">{transporter.multipleOrders}</td>
+                        <td className="align-middle text-center">
+                          <div className="d-flex align-items-center justify-content-center">
+                            {renderRating(transporter.rating)}
+                            <small className="ms-1 text-muted">({transporter.rating})</small>
+                          </div>
+                        </td>
+                        <td className="align-middle">
+                          <div className="d-flex gap-1">
+                            <Button
+                              color="success"
+                              size="sm"
+                              className="action-btn"
+                              onClick={() => handleBidAction('A')}
+                              disabled={processingAction}
+                            >
+                              {processingAction ? <Spinner size="sm" /> : 'Assign'}
+                            </Button>
+                            <Button
+                              color="danger"
+                              size="sm"
+                              className="action-btn"
+                              onClick={() => handleBidAction('R')}
+                              disabled={processingAction}
+                            >
+                              {processingAction ? <Spinner size="sm" /> : 'Reject'}
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                      
+                      {/* Expandable Details Row */}
+                      <tr>
+                        <td colSpan="9" className="p-0 border-0">
+                          <Collapse isOpen={expandedTransporter === index}>
+                            <Card className="m-2 border">
+                              <CardBody className="bg-light">
+                                <h6 className="text-primary mb-3">
+                                  <i className="ri-information-line me-1"></i>
+                                  Detailed Transporter Information
+                                </h6>
+                                <div className="row">
+                                  <div className="col-md-6">
+                                    <div className="info-item mb-2">
+                                      <strong>Contact Info:</strong> 
+                                      <span className="ms-2">{transporter.contactInfo}</span>
+                                    </div>
+                                    <div className="info-item mb-2">
+                                      <strong>Vehicle Type:</strong> 
+                                      <span className="ms-2">{transporter.vehicleType}</span>
+                                    </div>
+                                    <div className="info-item mb-2">
+                                      <strong>Capacity:</strong> 
+                                      <span className="ms-2">{transporter.capacity}</span>
+                                    </div>
+                                  </div>
+                                  <div className="col-md-6">
+                                    <div className="info-item mb-2">
+                                      <strong>Experience:</strong> 
+                                      <span className="ms-2">{transporter.experience}</span>
+                                    </div>
+                                    <div className="info-item mb-2">
+                                      <strong>Location:</strong> 
+                                      <span className="ms-2">{transporter.location}</span>
+                                    </div>
+                                    <div className="info-item mb-2">
+                                      <strong>Bid Status:</strong> 
+                                      <span className="ms-2 badge bg-success">Active</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {bidDetails && (
+                                  <div className="mt-3 pt-3 border-top">
+                                    <h6 className="text-secondary mb-2">
+                                      <i className="ri-file-list-line me-1"></i>
+                                      Additional Bid Details
+                                    </h6>
+                                    <div className="row">
+                                      <div className="col-md-4">
+                                        <small className="text-muted">Logistics Amount:</small>
+                                        <div className="fw-medium">₹{formatCurrency(bidDetails.logstAmt)}</div>
+                                      </div>
+                                      <div className="col-md-4">
+                                        <small className="text-muted">Transport Amount:</small>
+                                        <div className="fw-medium">₹{formatCurrency(bidDetails.transAmt)}</div>
+                                      </div>
+                                      <div className="col-md-4">
+                                        <small className="text-muted">Transporter Code:</small>
+                                        <div className="fw-medium">{bidDetails.transporterCode}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </CardBody>
+                            </Card>
+                          </Collapse>
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </ModalBody>
-      <ModalFooter className="justify-content-end">
-        <Button color="light" onClick={toggle} className="bid-cancel-btn" disabled={processingAction}>
-          Cancel
+      <ModalFooter className="justify-content-end border-0">
+        <Button 
+          color="secondary" 
+          onClick={toggle} 
+          className="bid-cancel-btn" 
+          disabled={processingAction}
+        >
+          <i className="ri-close-line me-1"></i>
+          Close
         </Button>
       </ModalFooter>
+      
+      {/* Custom Styles */}
+      <style jsx>{`
+        .bid-confirmation-modal .modal-content {
+          border-radius: 12px;
+          border: none;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .bid-confirmation-title h4 {
+          color: #2c3e50;
+          font-weight: 600;
+        }
+        
+        .table th {
+          font-weight: 600;
+          font-size: 13px;
+          padding: 12px 8px;
+          vertical-align: middle;
+        }
+        
+        .table td {
+          padding: 12px 8px;
+          font-size: 13px;
+          vertical-align: middle;
+        }
+        
+        .action-btn {
+          min-width: 65px;
+          font-size: 11px;
+          padding: 4px 8px;
+          font-weight: 500;
+        }
+        
+        .info-item {
+          font-size: 13px;
+        }
+        
+        .info-item strong {
+          color: #495057;
+          min-width: 120px;
+          display: inline-block;
+        }
+        
+        .badge {
+          font-size: 10px;
+          padding: 4px 8px;
+        }
+        
+        .text-nowrap {
+          white-space: nowrap;
+        }
+        
+        .table-responsive {
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        
+        .collapse-content {
+          background-color: #f8f9fa;
+          border-left: 3px solid #007bff;
+        }
+      `}</style>
     </Modal>
   );
 };

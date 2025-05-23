@@ -90,7 +90,7 @@ function GlobalFilter({
         <form>
           <Row>
             <Col sm={8}>
-              <div className={(isProductsFilter || isContactsFilter || isCompaniesFilter || isNFTRankingFilter) ? "search-box me-2 mb-2 d-inline-block" : "search-box me-2 mb-2 d-inline-block col-12"}>
+              <div className={(isProductsFilter || isContactsFilter || isCompaniesFilter || isNFTRankingFilter) ? "search-box me-2 d-inline-block" : "search-box me-2 d-inline-block col-12"}>
                 {/* <input
                   onChange={(e) => {
                     setValue(e.target.value);
