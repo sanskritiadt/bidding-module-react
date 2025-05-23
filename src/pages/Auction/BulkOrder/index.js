@@ -1461,7 +1461,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
           <div className="bulk-order-container">
             {/* First row: 4 fields */}
             <div className="bulk-order-row">
-              <div className="bulk-order-form-group">
+              {/* <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   Multi Material <span style={{ color: "red" }}>*</span>
                 </Label>
@@ -1483,7 +1483,7 @@ const[biddingOrderNo,setBiddingOrderNo]=useState("");
                     ))}
                   </Input>
                 </div>
-              </div>
+              </div> */}
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   Material <span style={{ color: "red" }}>*</span>
