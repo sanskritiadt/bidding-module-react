@@ -285,9 +285,15 @@ const SlotMaster = () => {
       ed_date == null
         ? date_r(st_date)
         : date_r(st_date) + " to " + date_r(ed_date);
-        setSlotDateFrom(date_r(res.slotDateFromFormatted));
-        setSlotDateTo(date_r(res.slotDateToFormatted));
-        setSelectedValues(selectedTransportersFromRes.map(item => item.value));
+    const convertTo24HourFormat = (timeStr) => {
+      const date = new Date(`1970-01-01T${timeStr}`);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}:00`;
+    };
+    setSlotDateFrom(date_r(res.slotDateFromFormatted));
+    setSlotDateTo(date_r(res.slotDateToFormatted));
+    setSelectedValues(selectedTransportersFromRes.map(item => item.value));
     setEvent({
       id: res.id,
       slotNumber: res.slotNumber,
@@ -296,7 +302,7 @@ const SlotMaster = () => {
       end: res.end,
       location: res.location,
       description: res.description,
-      defaultDate: er_date,
+      // defaultDate: er_date,
       slotDateFromFormatted: res.slotDateFromFormatted,
       endTimeFormatted: res.endTimeFormatted,
       startTimeFormatted: res.startTimeFormatted,
@@ -311,8 +317,8 @@ const SlotMaster = () => {
       plantCode: res.plantCode,
       transporterNames: res.transporterNames.join(","),
       remarks: res.remarks,
-      startTime: res.startTimeFormatted,
-      endTime: res.endTimeFormatted,
+      startTime: convertTo24HourFormat(res.startTimeFormatted),
+      endTime: convertTo24HourFormat(res.endTimeFormatted),
       state: res.state,
     });
 
@@ -536,6 +542,8 @@ const SlotMaster = () => {
   const toggle = () => {
     if (modal) {
       setSelectedTransporters([]);
+      setSlotDateFrom('');
+      setSlotDateTo('');
       if (!slotModalSize) {
         setValues([]);
         setSelectedValues([]);
@@ -654,7 +662,7 @@ const SlotMaster = () => {
   const handleEventClick = async (arg) => {
     debugger;
     const event = arg.event;
-const slotNumber = event.extendedProps.slotNumber;
+    const slotNumber = event.extendedProps.slotNumber;
 
     const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${slotNumber}`, config);
     const st_date = res.slotDateFromFormatted;
@@ -667,8 +675,8 @@ const slotNumber = event.extendedProps.slotNumber;
         label: `${item.name.trim()} (${item.code})`
       }));
     setSelectedTransporters(selectedTransportersFromRes);
-    
-    
+
+
 
     const r_date =
       ed_date == null
@@ -678,9 +686,16 @@ const slotNumber = event.extendedProps.slotNumber;
       ed_date == null
         ? date_r(st_date)
         : date_r(st_date) + " to " + date_r(ed_date);
-        setSlotDateFrom(date_r(res.slotDateFromFormatted));
-        setSlotDateTo(date_r(res.slotDateToFormatted));
-        setSelectedValues(selectedTransportersFromRes.map(item => item.value));
+        const convertTo24HourFormat = (timeStr) => {
+  const date = new Date(`1970-01-01T${timeStr}`);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}:00`;
+};
+
+    setSlotDateFrom(date_r(res.slotDateFromFormatted));
+    setSlotDateTo(date_r(res.slotDateToFormatted));
+    setSelectedValues(selectedTransportersFromRes.map(item => item.value));
     setEvent({
       id: res.id,
       slotNumber: res.slotNumber,
@@ -689,7 +704,7 @@ const slotNumber = event.extendedProps.slotNumber;
       end: res.end,
       location: res.location,
       description: res.description,
-      defaultDate: er_date,
+      // defaultDate: er_date,/
       slotDateFromFormatted: res.slotDateFromFormatted,
       endTimeFormatted: res.endTimeFormatted,
       startTimeFormatted: res.startTimeFormatted,
@@ -704,8 +719,8 @@ const slotNumber = event.extendedProps.slotNumber;
       plantCode: res.plantCode,
       transporterNames: res.transporterNames.join(","),
       remarks: res.remarks,
-      startTime: res.startTimeFormatted,
-      endTime: res.endTimeFormatted,
+      startTime: convertTo24HourFormat(res.startTimeFormatted),
+      endTime: convertTo24HourFormat(res.endTimeFormatted),
       state: res.state,
     });
 
@@ -724,26 +739,49 @@ const slotNumber = event.extendedProps.slotNumber;
   };
 
   // events validation
+ const convertTo24HourFormat = (timeStr) => {
+  if (!timeStr || typeof timeStr !== "string") return "";
+
+  const [time, modifier] = timeStr.trim().split(" ");
+  if (!time || !modifier) return "";
+
+  let [hours, minutes] = time.split(":");
+  if (!hours || !minutes) return "";
+
+  hours = parseInt(hours, 10);
+  minutes = parseInt(minutes, 10);
+
+  if (modifier.toUpperCase() === "AM" && hours === 12) {
+    hours = 0;
+  } else if (modifier.toUpperCase() === "PM" && hours !== 12) {
+    hours += 12;
+  }
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+};
+
   const validation = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
+    
     enableReinitialize: true,
     initialValues: {
       //id: (event && event.id) || null,
-      defaultDate: (event && event.defaultDate) || "",
+      // defaultDate: (event && event.defaultDate) || "",
       noOfTtRq: (event && event.noOfTtRq) || "",
       materialCode: (event && event.materialCode) || "",
       maxTtCommitTr: (event && event.maxTtCommitTr) || "",
       plantCode: (event && event.plantCode) || "",
       remarks: (event && event.remarks) || "",
-      startTime: (event && event.startTimeFormatted) || "",
-      endTime: (event && event.endTimeFormatted) || "",
+      startTime: convertTo24HourFormat(event && event.startTimeFormatted) || "",
+      endTime: convertTo24HourFormat(event && event.endTimeFormatted) || "",
       slotDateFrom: (event && event.slotDateFromFormatted) || "",
       slotDateTo: (event && event.slotDateToFormatted) || "",
       state: (event && event.state) || ""
     },
     validationSchema: Yup.object({
     }),
-    onSubmit: (values) => {debugger
+    onSubmit: (values) => {
+      debugger
       console.log(values);
       const totalData = {
         ...values,
@@ -941,7 +979,7 @@ const slotNumber = event.extendedProps.slotNumber;
     []
   );
 
-  
+
 
 
 
@@ -1057,14 +1095,14 @@ const slotNumber = event.extendedProps.slotNumber;
       title: item.plantName,
       state: item.state,
       maxTtCommitTr: item.maxTtCommitTr,
-      noOfTtRq : item.noOfTtRq,
+      noOfTtRq: item.noOfTtRq,
       // start: `2025-04-${day}`,
       // end: `2025-04-${nextDay}`,
       start: item.slotDateFrom,
       end: addOneDay(item.slotDateTo),
       allDay: true,
       extendedProps: {
-        materialId: item.plantName,        
+        materialId: item.plantName,
       },
     };
   });
@@ -1463,18 +1501,18 @@ const slotNumber = event.extendedProps.slotNumber;
                       <InfoRow iconClass={A6} text={format(event?.state)} />
                       <InfoRow iconClass={A7} text={format(event?.materialName)} />
                       {/* <InfoRowStatus iconClass={A8} text={format(event?.status)} /> */}
-                       <InfoRowStatus
-                                              iconClass={A8}
-                                              text={
-                                                event?.status === 'A'
-                                                  ? 'Assigned'
-                                                  : event?.status === 'B'
-                                                    ? 'Committed'
-                                                    : event?.status === 'C'
-                                                      ? 'Allocated'
-                                                      : format(event?.status)
-                                              }
-                                            />
+                      <InfoRowStatus
+                        iconClass={A8}
+                        text={
+                          event?.status === 'A'
+                            ? 'Assigned'
+                            : event?.status === 'B'
+                              ? 'Committed'
+                              : event?.status === 'C'
+                                ? 'Allocated'
+                                : format(event?.status)
+                        }
+                      />
                       <InfoRow iconClass={A9} text={format(event?.remarks)} />
                       <input type="hidden" id="id_param" value={event?.slotNumber} />
                     </div>
@@ -1633,9 +1671,14 @@ const slotNumber = event.extendedProps.slotNumber;
                             <Flatpickr
                               className="form-control slotmasterCss"
                               id="event-start-date"
-                              name="defaultDate"
+                              // name="defaultDate"
                               placeholder="Select Date"
-                              value={validation.values.defaultDate || ""}
+                              // value={validation.values.defaultDate || ""}
+                              value={
+                                slotDateFrom && slotDateTo
+                                  ? [new Date(slotDateFrom), new Date(slotDateTo)]
+                                  : []
+                              }
                               options={{
                                 mode: "range",
                                 dateFormat: "Y-m-d",
@@ -1880,34 +1923,34 @@ const slotNumber = event.extendedProps.slotNumber;
         <hr className="headingnewSlot"></hr>
         <ModalBody>
           {
-            eventList.map((item,index)=>(
+            eventList.map((item, index) => (
               <div key={index} className="card d-flex flex-row shadow-sm border-0" style={{ maxWidth: '500px' }}>
-              <div style={{
-                backgroundColor: "rgb(10 179 156)",
-                width: "5px",
-                borderTopLeftRadius: "5px",
-                borderBottomLeftRadius: "5px",
-              }}></div>
-  
-              <div className="d-flex flex-column justify-content-center align-items-center px-3 text-center"style={{width: "173px",fontSize:'large',color:'black' }}>
-                <small className="fw-semibold">{formatDate(item.start)} - </small>
-                <small className="fw-semibold">{formatDate(item.end)}</small>
-              </div>
-  
-              <div className="border-start px-3 py-2 w-100">
-                <div style={{display:'flex'}}>
-                <h6 className="fw-bold mb-2" style={{color:'black'}}>{item.title}</h6>
-                <button className="btn btn-success btn-sm" type="button" style={{marginLeft: 'auto'}} onClick={() => submitMultiEvent(item.slotNumber)}>Edit</button>
+                <div style={{
+                  backgroundColor: "rgb(10 179 156)",
+                  width: "5px",
+                  borderTopLeftRadius: "5px",
+                  borderBottomLeftRadius: "5px",
+                }}></div>
+
+                <div className="d-flex flex-column justify-content-center align-items-center px-3 text-center" style={{ width: "173px", fontSize: 'large', color: 'black' }}>
+                  <small className="fw-semibold">{formatDate(item.start)} - </small>
+                  <small className="fw-semibold">{formatDate(item.end)}</small>
                 </div>
-                
-                <p className="mb-1"><i className="bi bi-truck"></i> {item.noOfTtRq} Truck Required</p>
-                <p className="mb-1"><i className="bi bi-geo-alt"></i> {item.state}</p>
-                <p className="mb-0"><i className="bi bi-layers"></i>Max. {item.maxTtCommitTr} Truck Per Transporter</p>
+
+                <div className="border-start px-3 py-2 w-100">
+                  <div style={{ display: 'flex' }}>
+                    <h6 className="fw-bold mb-2" style={{ color: 'black' }}>{item.title}</h6>
+                    <button className="btn btn-success btn-sm" type="button" style={{ marginLeft: 'auto' }} onClick={() => submitMultiEvent(item.slotNumber)}>Edit</button>
+                  </div>
+
+                  <p className="mb-1"><i className="bi bi-truck"></i> {item.noOfTtRq} Truck Required</p>
+                  <p className="mb-1"><i className="bi bi-geo-alt"></i> {item.state}</p>
+                  <p className="mb-0"><i className="bi bi-layers"></i>Max. {item.maxTtCommitTr} Truck Per Transporter</p>
+                </div>
               </div>
-            </div>
             ))
           }
-         
+
         </ModalBody>
       </Modal>
 

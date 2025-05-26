@@ -34,6 +34,7 @@ function* loginUser({ payload: { user, history } }) {
             "email": response.email,
             "phone": response.mobileNumber,
             "plantCode" : response.plantCode,
+            "transporterCode" : response.login,
             "password": "$2a$12$OdX.AB8Oiz6PEXohnREMjOtIy8h4/Ha3wPMHVcA/J373tQ0afoco2",
             "role": "admin",
             "confirm_password": "789789789",
