@@ -21,6 +21,12 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo, loginCode }) => {
   const [bidDetails, setBidDetails] = useState(null);
 
   console.log("bidNo====>", bidNo);
+
+   const username = process.env.REACT_APP_API_USER_NAME;
+      const password = process.env.REACT_APP_API_PASSWORD;
+      const basicAuth = 'Basic ' + btoa(username + ':' + password);
+
+
   
   // Fetch bid data when modal opens
   useEffect(() => {
@@ -42,7 +48,7 @@ const BidConfirmationModal = ({ isOpen, toggle, bidNo, loginCode }) => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic YW1hemluOlRFQU0tV0BSSw=='
+            'Authorization': basicAuth
           }
         }
       );
