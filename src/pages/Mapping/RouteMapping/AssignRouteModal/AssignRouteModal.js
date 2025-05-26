@@ -110,7 +110,7 @@ const AssignRouteModal = ({
         width: '100%',
         borderRadius: "30px" 
       }}
-      contentClassName="rounded-4"
+  
     >
       <ModalHeader
         toggle={toggle}

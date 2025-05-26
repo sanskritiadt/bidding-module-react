@@ -38,7 +38,7 @@ const ViewPlantsModal = ({
         maxWidth: '900px', 
         width: '100%' 
       }}
-      contentClassName="rounded-4"
+   
     >
       <ModalHeader
         toggle={toggle}
