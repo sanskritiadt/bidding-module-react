@@ -351,7 +351,7 @@ const TableContainer = ({
 
   return (
     <Fragment>
-     <Row className="mt-4 mb-2">
+     <Row className="mb-2">
 
         {isGlobalSearch && (
           <div className="col-sm-1 sel_con">
