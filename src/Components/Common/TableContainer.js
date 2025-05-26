@@ -10,7 +10,7 @@ import {
   usePagination,
   useRowSelect
 } from "react-table";
-import { Table, Row, Col, Button, Input, CardBody, Nav, NavItem, NavLink, Card} from "reactstrap";
+import { Table, Row, Col, Button, Input, CardBody, Nav, NavItem, NavLink, } from "reactstrap";
 import { Filter, DefaultColumnFilter } from "./filters";
 import {
   ProductsGlobalFilter,
@@ -90,7 +90,7 @@ function GlobalFilter({
         <form>
           <Row>
             <Col sm={8}>
-              <div className={(isProductsFilter || isContactsFilter || isCompaniesFilter || isNFTRankingFilter) ? "search-box me-2 d-inline-block" : "search-box me-2 d-inline-block col-12"}>
+              <div className={(isProductsFilter || isContactsFilter || isCompaniesFilter || isNFTRankingFilter) ? "search-box me-2 mb-2 d-inline-block" : "search-box me-2 mb-2 d-inline-block col-12"}>
                 {/* <input
                   onChange={(e) => {
                     setValue(e.target.value);
@@ -351,8 +351,7 @@ const TableContainer = ({
 
   return (
     <Fragment>
-     <Row className="mb-2">
-
+     <Row className="mt-4 mb-2">
         {isGlobalSearch && (
           <div className="col-sm-1 sel_con">
 
@@ -548,26 +547,7 @@ const TableContainer = ({
                         <td colSpan={columns.length}>
                           <div className="bg-light p-2">
                             {/* Replace with desired expanded content */}
-                            {/* <strong>Details:</strong> {row.values.name} */}
-                            <Row>
-                              {row.original.vehicles.map((Item, index) => (
-                                <Col lg={3} key={index}>
-                                  <div>
-                                    <Card className="mb-1 ribbon-box ribbon-fill ribbon-sm shadow_light">
-                                      <div className={`ribbon ribbon-info element`}> <i className="ri-truck-line" ></i> </div>
-                                      <CardBody style={{ padding: "10px 0px 5px 0", textAlign: "center" }}>
-                                        <div className="flex-grow-1 ms-3">
-                                          <h6 className="fs-12 mb-1">{Item.registrationNumber} | {Item.vehicleCapacityMax}MT</h6>
-                                        </div>
-                                      </CardBody>
-                                    </Card>
-                                  </div>
-                                </Col>
-                              ))}
- 
- 
-                            </Row>
- 
+                            <strong>Details:</strong> {row.values.name}
                           </div>
                         </td>
                       </tr>
