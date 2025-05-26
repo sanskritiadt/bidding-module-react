@@ -80,7 +80,7 @@ const TransporterViewer = ({ selectedTransporters = [], onRemove = null }) => {
       {/* Popup Modal to show all selected transporters */}
       {showPopup && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content1">
             <div className="modal-header">
               <h4>Transporter Details</h4>
               <button className="modal-close-btn" onClick={togglePopup}>
