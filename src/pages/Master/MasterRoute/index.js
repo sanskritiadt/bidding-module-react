@@ -633,7 +633,7 @@ const MasterRoute = () => {
                 Header: "Action",
                 Cell: (cellProps) => {
                     return (
-                        <ul className="list-inline hstack gap-2 mb-0">
+                        <ul className="list-inline hstack  mb-0">
                             <li className="list-inline-item edit" title="Edit">
                                 <Link
                                     to="#"
