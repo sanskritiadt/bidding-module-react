@@ -1139,7 +1139,7 @@ const PlantMapping = () => {
           <div className="d-flex justify-content-center align-items-center gap-2">
             <button
               type="button"
-              className="btn btn-link text-info p-0"
+              className="text-info"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
