@@ -56,123 +56,125 @@ const [originalValues, setOriginalValues] = useState({}); // Original API data s
 const [hasChanges, setHasChanges] = useState(false); // Track karne ke liye ki user ne changes kiye hain
 const [routeTypes, setRouteTypes] = useState([]); // For storing route types from API
 const [routeTypesLoading, setRouteTypesLoading] = useState(false);
+const [fieldErrors, setFieldErrors] = useState({});
     // Validation functions
 
-    const containsEmoji = (text) => {
-        const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
-        return emojiRegex.test(text);
-    };
+   // Helper function to check for leading spaces - Fixed
+const hasLeadingSpace = (text) => {
+    if (!text || typeof text !== 'string') return false;
+    return text !== text.trimStart();
+};
 
-    // Helper function to check for leading spaces
-    const hasLeadingSpace = (text) => {
-        return text !== text.trimStart();
-    };
+// Helper function to check for emojis - Fixed
+const containsEmoji = (text) => {
+    if (!text || typeof text !== 'string') return false;
+    const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+    return emojiRegex.test(text);
+};
 
-    // Add new state for field-level errors
-    const [fieldErrors, setFieldErrors] = useState({});
+// Updated validation functions
+const validateRouteName = (name) => {
+    if (!name || typeof name !== 'string') return true; // Allow empty initially
+    if (containsEmoji(name)) return false;
+    if (hasLeadingSpace(name)) return false;
+    const nameRegex = /^[A-Za-z0-9\s-]+$/;
+    return nameRegex.test(name.trim());
+};
 
-    // Updated validation functions
-    const validateRouteName = (name) => {
-        if (!name) return true; // Allow empty initially
-        if (containsEmoji(name)) return false;
-        if (hasLeadingSpace(name)) return false;
-        const nameRegex = /^[A-Za-z0-9\s-]+$/;
-        return nameRegex.test(name.trim());
-    };
+const validateDestination = (destination) => {
+    if (!destination || typeof destination !== 'string') return true;
+    if (containsEmoji(destination)) return false;
+    if (hasLeadingSpace(destination)) return false;
+    const destRegex = /^[A-Za-z\s,.-]+$/;
+    return destRegex.test(destination.trim());
+};
 
-    const validateDestination = (destination) => {
-        if (!destination) return true;
-        if (containsEmoji(destination)) return false;
-        if (hasLeadingSpace(destination)) return false;
-        const destRegex = /^[A-Za-z\s,.-]+$/;
-        return destRegex.test(destination.trim());
-    };
+const validateShippingType = (type) => {
+    if (!type || typeof type !== 'string') return true;
+    if (containsEmoji(type)) return false;
+    if (hasLeadingSpace(type)) return false;
+    const typeRegex = /^[A-Za-z0-9\s-/]+$/;
+    return typeRegex.test(type.trim());
+};
 
-    const validateShippingType = (type) => {
-        if (!type) return true;
-        if (containsEmoji(type)) return false;
-        if (hasLeadingSpace(type)) return false;
-        const typeRegex = /^[A-Za-z0-9\s-/]+$/;
-        return typeRegex.test(type.trim());
-    };
+const validateIntermediateStops = (stops) => {
+    if (!stops || typeof stops !== 'string') return true;
+    if (containsEmoji(stops)) return false;
+    if (hasLeadingSpace(stops)) return false;
+    const stopsRegex = /^[A-Za-z0-9\s,.-]+$/;
+    return stopsRegex.test(stops.trim());
+};
 
-    const validateIntermediateStops = (stops) => {
-        if (!stops) return true;
-        if (containsEmoji(stops)) return false;
-        if (hasLeadingSpace(stops)) return false;
-        const stopsRegex = /^[A-Za-z0-9\s,.-]+$/;
-        return stopsRegex.test(stops.trim());
-    };
+const validateDistance = (distance) => {
+    if (!distance) return true;
+    const distanceStr = String(distance);
+    if (containsEmoji(distanceStr)) return false;
+    if (hasLeadingSpace(distanceStr)) return false;
+    const distanceRegex = /^\d+(\.\d{1,2})?$/;
+    return distanceRegex.test(distanceStr.trim());
+};
 
-    const validateDistance = (distance) => {
-        if (!distance) return true;
-        if (containsEmoji(distance)) return false;
-        if (hasLeadingSpace(distance)) return false;
-        const distanceRegex = /^\d+(\.\d{1,2})?$/;
-        return distanceRegex.test(distance.trim());
-    };
+const validateCost = (cost) => {
+    if (!cost) return true;
+    const costStr = String(cost);
+    if (containsEmoji(costStr)) return false;
+    if (hasLeadingSpace(costStr)) return false;
+    const costRegex = /^\d+(\.\d{1,2})?$/;
+    return costRegex.test(costStr.trim());
+};
 
-    const validateCost = (cost) => {
-        if (!cost) return true;
-        if (containsEmoji(cost)) return false;
-        if (hasLeadingSpace(cost)) return false;
-        const costRegex = /^\d+(\.\d{1,2})?$/;
-        return costRegex.test(cost.trim());
-    };
+const validateCarrier = (carrier) => {
+    if (!carrier || typeof carrier !== 'string') return true;
+    if (containsEmoji(carrier)) return false;
+    if (hasLeadingSpace(carrier)) return false;
+    const carrierRegex = /^[A-Za-z0-9\s&.-]+$/;
+    return carrierRegex.test(carrier.trim());
+};
 
-    const validateCarrier = (carrier) => {
-        if (!carrier) return true;
-        if (containsEmoji(carrier)) return false;
-        if (hasLeadingSpace(carrier)) return false;
-        const carrierRegex = /^[A-Za-z0-9\s&.-]+$/;
-        return carrierRegex.test(carrier.trim());
-    };
+const validateTransportationZone = (zone) => {
+    if (!zone || typeof zone !== 'string') return true;
+    if (containsEmoji(zone)) return false;
+    if (hasLeadingSpace(zone)) return false;
+    const zoneRegex = /^[A-Za-z0-9\s-]+$/;
+    return zoneRegex.test(zone.trim());
+};
 
-    const validateTransportationZone = (zone) => {
-        if (!zone) return true;
-        if (containsEmoji(zone)) return false;
-        if (hasLeadingSpace(zone)) return false;
-        const zoneRegex = /^[A-Za-z0-9\s-]+$/;
-        return zoneRegex.test(zone.trim());
-    };
-
-    const validateShippingPoint = (point) => {
-        if (!point) return true;
-        if (containsEmoji(point)) return false;
-        if (hasLeadingSpace(point)) return false;
-        const pointRegex = /^[A-Za-z0-9\s,.-]+$/;
-        return pointRegex.test(point.trim());
-    };
-
+const validateShippingPoint = (point) => {
+    if (!point || typeof point !== 'string') return true;
+    if (containsEmoji(point)) return false;
+    if (hasLeadingSpace(point)) return false;
+    const pointRegex = /^[A-Za-z0-9\s,.-]+$/;
+    return pointRegex.test(point.trim());
+};
 
 
     const validateAllFields = () => {
-        const fieldsToValidate = [
-            { name: 'routeName', value: values.routeName, validator: validateRouteName },
-            { name: 'routeDestination', value: values.routeDestination, validator: validateDestination },
-            { name: 'shippingType', value: values.shippingType, validator: validateShippingType },
-            { name: 'intermediateStops', value: values.intermediateStops, validator: validateIntermediateStops },
-            { name: 'routeDistance', value: values.routeDistance, validator: validateDistance },
-            { name: 'transportationCost', value: values.transportationCost, validator: validateCost },
-            { name: 'carrier', value: values.carrier, validator: validateCarrier },
-            { name: 'transportationZone', value: values.transportationZone, validator: validateTransportationZone },
-            { name: 'shippingPoint', value: values.shippingPoint, validator: validateShippingPoint }
-        ];
+    const fieldsToValidate = [
+        { name: 'routeName', value: values.routeName, validator: validateRouteName },
+        { name: 'routeDestination', value: values.routeDestination, validator: validateDestination },
+        { name: 'shippingType', value: values.shippingType, validator: validateShippingType },
+        { name: 'intermediateStops', value: values.intermediateStops, validator: validateIntermediateStops },
+        { name: 'routeDistance', value: values.routeDistance, validator: validateDistance },
+        { name: 'transportationCost', value: values.transportationCost, validator: validateCost },
+        { name: 'carrier', value: values.carrier, validator: validateCarrier },
+        { name: 'transportationZone', value: values.transportationZone, validator: validateTransportationZone },
+        { name: 'shippingPoint', value: values.shippingPoint, validator: validateShippingPoint }
+    ];
 
-        let hasErrors = false;
-        const newErrors = {};
+    let hasErrors = false;
+    const newErrors = {};
 
-        for (let field of fieldsToValidate) {
-            if (field.value && !field.validator(field.value)) {
-                newErrors[field.name] = getValidationMessage(field.name, field.value);
-                hasErrors = true;
-            }
+    for (let field of fieldsToValidate) {
+        // Only validate if field has a value and validator exists
+        if (field.value && field.validator && !field.validator(field.value)) {
+            newErrors[field.name] = getValidationMessage(field.name, field.value);
+            hasErrors = true;
         }
+    }
 
-        setFieldErrors(newErrors);
-        return !hasErrors;
-    };
-
+    setFieldErrors(newErrors);
+    return !hasErrors;
+};
 
 
 
@@ -319,18 +321,7 @@ useEffect(() => {
         }
     };
 
-    // useEffect(() => {
-    //     try {
-    //         const obj = JSON.parse(sessionStorage.getItem("authUser"));
-    //         let plantcode = obj.data.plantCode;
-    //         setPlantCode(plantcode);
-    //         getAllRouteData(plantcode);
-    //     } catch (error) {
-    //         console.error("Error setting plant code:", error);
-    //         setPlantCode("PL002"); // Fallback
-    //         getAllRouteData("PL002");
-    //     }
-    // }, []);
+  
 
 
 
@@ -349,12 +340,15 @@ useEffect(() => {
         },
     };
 
-   const handleInputChange = (e) => {
+ const handleInputChange = (e) => {
     const { name, value } = e.target;
 
+    // Ensure value is a string before processing
+    const stringValue = value ? String(value) : '';
+
     // Prevent emoji input and leading spaces
-    if (typeof value === 'string') {
-        if (containsEmoji(value)) {
+    if (stringValue) {
+        if (containsEmoji(stringValue)) {
             // Set error message for emoji
             setFieldErrors(prev => ({
                 ...prev,
@@ -363,8 +357,8 @@ useEffect(() => {
             return; // Don't update state if emoji is detected
         }
 
-        // Prevent leading space by trimming start
-        const processedValue = value.trimStart();
+        // Prevent leading space by trimming start - only if it's a string
+        const processedValue = stringValue.trimStart();
 
         // Update state
         const newValues = {
@@ -385,9 +379,10 @@ useEffect(() => {
             validateField(name, processedValue, validator);
         }
     } else {
+        // Handle non-string values (like numbers, dates, etc.)
         const newValues = {
             ...values,
-            [name]: value || value.valueAsNumber,
+            [name]: value,
             ['plantCode']: Plant_Code,
         };
         setValues(newValues);
@@ -398,7 +393,6 @@ useEffect(() => {
         }
     }
 };
-
 
 // Add new function to check for changes
 const checkForChanges = (currentValues) => {
@@ -528,62 +522,62 @@ const checkForChanges = (currentValues) => {
 
 
     // Enhanced key press handler to prevent leading spaces and emojis
-    const handleKeyPress = (e) => {
-        const inputValue = e.target.value;
-        const key = e.key;
-        const fieldName = e.target.name;
+ const handleKeyPress = (e) => {
+    const inputValue = e.target.value || '';
+    const key = e.key;
+    const fieldName = e.target.name;
 
-        // Prevent space if it's the first character
-        if (key === ' ' && inputValue.length === 0) {
-            e.preventDefault();
-            setFieldErrors(prev => ({
-                ...prev,
-                [fieldName]: "Leading spaces are not allowed."
-            }));
-            return;
-        }
+    // Prevent space if it's the first character
+    if (key === ' ' && inputValue.length === 0) {
+        e.preventDefault();
+        setFieldErrors(prev => ({
+            ...prev,
+            [fieldName]: "Leading spaces are not allowed."
+        }));
+        return;
+    }
 
-        // Check for emoji input
-        if (containsEmoji(key)) {
-            e.preventDefault();
-            setFieldErrors(prev => ({
-                ...prev,
-                [fieldName]: "Emojis are not allowed in this field."
-            }));
-            return;
-        }
-    };
+    // Check for emoji input
+    if (containsEmoji(key)) {
+        e.preventDefault();
+        setFieldErrors(prev => ({
+            ...prev,
+            [fieldName]: "Emojis are not allowed in this field."
+        }));
+        return;
+    }
+};
 
     // Enhanced paste handler to prevent emoji and leading space paste
-    const handlePaste = (e) => {
-        const pastedText = e.clipboardData.getData('text');
-        const fieldName = e.target.name;
+ const handlePaste = (e) => {
+    const pastedText = e.clipboardData.getData('text') || '';
+    const fieldName = e.target.name;
 
-        if (containsEmoji(pastedText)) {
-            e.preventDefault();
-            setFieldErrors(prev => ({
-                ...prev,
-                [fieldName]: "Cannot paste text containing emojis."
-            }));
-            return;
-        }
+    if (containsEmoji(pastedText)) {
+        e.preventDefault();
+        setFieldErrors(prev => ({
+            ...prev,
+            [fieldName]: "Cannot paste text containing emojis."
+        }));
+        return;
+    }
 
-        if (hasLeadingSpace(pastedText)) {
-            e.preventDefault();
-            // Allow paste but trim leading spaces
-            const trimmedText = pastedText.trimStart();
-            e.target.value = trimmedText;
+    if (hasLeadingSpace(pastedText)) {
+        e.preventDefault();
+        // Allow paste but trim leading spaces
+        const trimmedText = pastedText.trimStart();
+        e.target.value = trimmedText;
 
-            // Trigger onChange manually
-            const syntheticEvent = {
-                target: {
-                    name: fieldName,
-                    value: trimmedText
-                }
-            };
-            handleInputChange(syntheticEvent);
-        }
-    };
+        // Trigger onChange manually
+        const syntheticEvent = {
+            target: {
+                name: fieldName,
+                value: trimmedText
+            }
+        };
+        handleInputChange(syntheticEvent);
+    }
+};
     // Updated error message function
     const getValidationMessage = (fieldName, value) => {
         if (containsEmoji(value)) {
@@ -1483,7 +1477,7 @@ const checkForChanges = (currentValues) => {
     className="btn btn-primary"
     disabled={isEdit && !hasChanges} // Disable in edit mode if no changes
 > 
-    {!!isEdit ? "Submit " : "Submit"} 
+    {!!isEdit ? "Update " : "Submit"} 
 </button>
                                                     </Col>
                                                 </Row>
