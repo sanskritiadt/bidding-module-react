@@ -850,7 +850,7 @@ const AllTasksTransporter = () => {
                               className="btn color-blue-bg"
                               style={{ padding: "5px" }}
                               onClick={() => handleCommitRejectClick(item, "committed")}
-                              disabled={item.soStatus === 2 || item.soStatus === 4}
+                              disabled={item.soStatus === 2 || item.soStatus === 4 || item.soStatus === 3}
                             >
                               Commit
                             </button>{" "}
@@ -858,7 +858,7 @@ const AllTasksTransporter = () => {
                               className="btn btn-danger"
                               style={{ padding: "5px" }}
                               onClick={() => handleCommitRejectClick(item, "rejected")}
-                              disabled={item.soStatus === 2 || item.soStatus === 4}
+                              disabled={item.soStatus === 2 || item.soStatus === 4 || item.soStatus === 3}
                             >
                               Reject
                             </button>

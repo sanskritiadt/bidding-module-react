@@ -7,6 +7,12 @@ import axios from "axios";
 
 const QuotaManagement = () => {
     document.title="Orders Management | Bid";
+    const [reloadKey, setReloadKey] = useState(0);
+
+    const triggerReload = () => {
+        setReloadKey(prev => prev + 1); // forces <Widgets /> to reload
+    };
+
     return (
         <React.Fragment>
             <div className="page-content">
@@ -17,9 +23,9 @@ const QuotaManagement = () => {
                     
                     <Row className="row-color-ff" style={{paddingTop:"14px",marginBottom:"-24px"}}>
                         <h2 className="order-mg">Orders Management</h2>
-                        <Widgets />
+                        <Widgets reloadKey={reloadKey} />
                     </Row>
-                    <AllTasks />
+                    <AllTasks onTasksUpdated={triggerReload} />
                 </Container>
             </div>
         </React.Fragment>

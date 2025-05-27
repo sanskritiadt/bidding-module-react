@@ -226,7 +226,7 @@ const PlantMapping = () => {
       }
 
       setCurrentTransporterCode(transporterCode);
-      setIsViewPlantModalOpen(true);
+      // setIsViewPlantModalOpen(true);
     } catch (error) {
       console.error("Error fetching plants for transporter:", error);
       setViewPlantData([]);

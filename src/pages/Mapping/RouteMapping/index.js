@@ -1065,9 +1065,9 @@ const RouteMapping = () => {
 
                 fetchTransporters();
 
-                if (currentTransporterCode) {
-                    handleViewRoutes(currentTransporterCode);
-                }
+                // if (currentTransporterCode) {
+                //     handleViewRoutes(currentTransporterCode);
+                // }
             } else {
                 console.error("Failed to assign routes. Status:", response.status);
 
