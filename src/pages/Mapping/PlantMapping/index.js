@@ -294,8 +294,8 @@ const PlantMapping = () => {
       }
 
       // Make the API call with proper authentication
-      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transporterPlantMap/bulkTransporterPlant`, {
-        method: 'POST',
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transporterPlantMap`, {
+        method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify(mappingData)
       });
@@ -485,7 +485,7 @@ const PlantMapping = () => {
       {
         Header: "Assign Plant",
         Cell: ({ row }) => (
-          <div className="d-flex justify-content-center align-items-center gap-2">
+          <div className="d-flex justify-content-center align-items-center">
             <button
               type="button"
               className="text-info"

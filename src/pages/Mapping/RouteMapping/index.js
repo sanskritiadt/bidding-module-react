@@ -1040,8 +1040,8 @@ const RouteMapping = () => {
 
             console.log("Attempting to assign routes:", mappingData);
 
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transportersRouteMap`, {
-                method: 'POST',
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/transportersRouteMap/update`, {
+                method: 'PUT',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(mappingData)
             });
