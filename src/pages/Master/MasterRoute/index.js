@@ -1,8 +1,9 @@
+//route type api is integrated in the add route and edit route 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Container, Row, Col, Card, CardHeader, Modal, Form, ModalBody, ModalFooter, ModalHeader, Label, Input, FormFeedback, Nav, NavItem, NavLink, TabContent, TabPane, CardBody } from "reactstrap";
 
 import { Link } from "react-router-dom";
-import axios from "axios";
+
 
 // Export Modal
 import ExportCSVModal from "../../../Components/Common/ExportCSVModal";
@@ -51,69 +52,140 @@ const MasterRoute = () => {
     const [latestHeader, setLatestHeader] = useState('');
     const [Plant_Code, setPlantCode] = useState('');
     const [routeCode, setRouteCode] = useState(null);
-
+const [originalValues, setOriginalValues] = useState({}); // Original API data store karne ke liye
+const [hasChanges, setHasChanges] = useState(false); // Track karne ke liye ki user ne changes kiye hain
+const [routeTypes, setRouteTypes] = useState([]); // For storing route types from API
+const [routeTypesLoading, setRouteTypesLoading] = useState(false);
     // Validation functions
+
+    const containsEmoji = (text) => {
+        const emojiRegex = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
+        return emojiRegex.test(text);
+    };
+
+    // Helper function to check for leading spaces
+    const hasLeadingSpace = (text) => {
+        return text !== text.trimStart();
+    };
+
+    // Add new state for field-level errors
+    const [fieldErrors, setFieldErrors] = useState({});
+
+    // Updated validation functions
     const validateRouteName = (name) => {
         if (!name) return true; // Allow empty initially
+        if (containsEmoji(name)) return false;
+        if (hasLeadingSpace(name)) return false;
         const nameRegex = /^[A-Za-z0-9\s-]+$/;
-        return nameRegex.test(name);
+        return nameRegex.test(name.trim());
     };
 
     const validateDestination = (destination) => {
         if (!destination) return true;
+        if (containsEmoji(destination)) return false;
+        if (hasLeadingSpace(destination)) return false;
         const destRegex = /^[A-Za-z\s,.-]+$/;
-        return destRegex.test(destination);
+        return destRegex.test(destination.trim());
     };
 
     const validateShippingType = (type) => {
         if (!type) return true;
+        if (containsEmoji(type)) return false;
+        if (hasLeadingSpace(type)) return false;
         const typeRegex = /^[A-Za-z0-9\s-/]+$/;
-        return typeRegex.test(type);
+        return typeRegex.test(type.trim());
     };
 
     const validateIntermediateStops = (stops) => {
         if (!stops) return true;
+        if (containsEmoji(stops)) return false;
+        if (hasLeadingSpace(stops)) return false;
         const stopsRegex = /^[A-Za-z0-9\s,.-]+$/;
-        return stopsRegex.test(stops);
+        return stopsRegex.test(stops.trim());
     };
 
     const validateDistance = (distance) => {
         if (!distance) return true;
-        const distanceRegex = /^\d+(\.\d{1,2})?$/; // Numbers with optional 2 decimal places
-        return distanceRegex.test(distance);
+        if (containsEmoji(distance)) return false;
+        if (hasLeadingSpace(distance)) return false;
+        const distanceRegex = /^\d+(\.\d{1,2})?$/;
+        return distanceRegex.test(distance.trim());
     };
 
     const validateCost = (cost) => {
         if (!cost) return true;
-        const costRegex = /^\d+(\.\d{1,2})?$/; // Numbers with optional 2 decimal places
-        return costRegex.test(cost);
+        if (containsEmoji(cost)) return false;
+        if (hasLeadingSpace(cost)) return false;
+        const costRegex = /^\d+(\.\d{1,2})?$/;
+        return costRegex.test(cost.trim());
     };
 
     const validateCarrier = (carrier) => {
         if (!carrier) return true;
+        if (containsEmoji(carrier)) return false;
+        if (hasLeadingSpace(carrier)) return false;
         const carrierRegex = /^[A-Za-z0-9\s&.-]+$/;
-        return carrierRegex.test(carrier);
+        return carrierRegex.test(carrier.trim());
     };
 
     const validateTransportationZone = (zone) => {
         if (!zone) return true;
+        if (containsEmoji(zone)) return false;
+        if (hasLeadingSpace(zone)) return false;
         const zoneRegex = /^[A-Za-z0-9\s-]+$/;
-        return zoneRegex.test(zone);
+        return zoneRegex.test(zone.trim());
     };
 
     const validateShippingPoint = (point) => {
         if (!point) return true;
+        if (containsEmoji(point)) return false;
+        if (hasLeadingSpace(point)) return false;
         const pointRegex = /^[A-Za-z0-9\s,.-]+$/;
-        return pointRegex.test(point);
+        return pointRegex.test(point.trim());
     };
 
-    const toggle = useCallback(() => {
-        if (modal) {
-            setModal(false);
-        } else {
-            setModal(true);
+
+
+    const validateAllFields = () => {
+        const fieldsToValidate = [
+            { name: 'routeName', value: values.routeName, validator: validateRouteName },
+            { name: 'routeDestination', value: values.routeDestination, validator: validateDestination },
+            { name: 'shippingType', value: values.shippingType, validator: validateShippingType },
+            { name: 'intermediateStops', value: values.intermediateStops, validator: validateIntermediateStops },
+            { name: 'routeDistance', value: values.routeDistance, validator: validateDistance },
+            { name: 'transportationCost', value: values.transportationCost, validator: validateCost },
+            { name: 'carrier', value: values.carrier, validator: validateCarrier },
+            { name: 'transportationZone', value: values.transportationZone, validator: validateTransportationZone },
+            { name: 'shippingPoint', value: values.shippingPoint, validator: validateShippingPoint }
+        ];
+
+        let hasErrors = false;
+        const newErrors = {};
+
+        for (let field of fieldsToValidate) {
+            if (field.value && !field.validator(field.value)) {
+                newErrors[field.name] = getValidationMessage(field.name, field.value);
+                hasErrors = true;
+            }
         }
-    }, [modal]);
+
+        setFieldErrors(newErrors);
+        return !hasErrors;
+    };
+
+
+
+
+   const toggle = useCallback(() => {
+    if (modal) {
+        setModal(false);
+        setHasChanges(false); // Reset changes state when closing modal
+        setFieldErrors({}); // Clear any field errors
+        setOriginalValues({}); // Clear original values
+    } else {
+        setModal(true);
+    }
+}, [modal]);
 
     const toggleView = useCallback(() => {
         if (viewModal) {
@@ -128,6 +200,69 @@ const MasterRoute = () => {
         setLatestHeader(HeaderName);
     }, []);
 
+const fetchRouteTypes = async () => {
+    setRouteTypesLoading(true);
+    try {
+        console.log("Fetching route types from API");
+        
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routeType/getAll`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Basic QW1hemluOlRFQE0tV0BSSw==',
+                'Connection': 'keep-alive',
+                'DNT': '1'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Route Types API Response:", data);
+
+        if (data && data.dto && Array.isArray(data.dto)) {
+            // Filter only active route types
+            const activeRouteTypes = data.dto.filter(item => item.status === 'A');
+            setRouteTypes(activeRouteTypes);
+            
+            if (data.meta && data.meta.message) {
+                console.log(data.meta.message);
+            }
+        } else {
+            console.warn("Unexpected route types API response format:", data);
+            setRouteTypes([]);
+            toast.error("Received unexpected data format from Route Types API", { autoClose: 3000 });
+        }
+    } catch (error) {
+        console.error("Error fetching route types:", error);
+        setRouteTypes([]);
+        toast.error(`Failed to fetch route types: ${error.message}`, { autoClose: 3000 });
+    } finally {
+        setRouteTypesLoading(false);
+    }
+};
+
+
+useEffect(() => {
+    try {
+        const obj = JSON.parse(sessionStorage.getItem("authUser"));
+        let plantcode = obj.data.plantCode;
+        setPlantCode(plantcode);
+        getAllRouteData(plantcode);
+        
+        // Fetch route types when component mounts
+        fetchRouteTypes();
+    } catch (error) {
+        console.error("Error setting plant code:", error);
+        setPlantCode("PL002"); // Fallback
+        getAllRouteData("PL002");
+        
+        // Still fetch route types even if plant code fails
+        fetchRouteTypes();
+    }
+}, []);
 
 
     const getAllRouteData = async (plantCode) => {
@@ -184,18 +319,18 @@ const MasterRoute = () => {
         }
     };
 
-    useEffect(() => {
-        try {
-            const obj = JSON.parse(sessionStorage.getItem("authUser"));
-            let plantcode = obj.data.plantCode;
-            setPlantCode(plantcode);
-            getAllRouteData(plantcode);
-        } catch (error) {
-            console.error("Error setting plant code:", error);
-            setPlantCode("PL002"); // Fallback
-            getAllRouteData("PL002");
-        }
-    }, []);
+    // useEffect(() => {
+    //     try {
+    //         const obj = JSON.parse(sessionStorage.getItem("authUser"));
+    //         let plantcode = obj.data.plantCode;
+    //         setPlantCode(plantcode);
+    //         getAllRouteData(plantcode);
+    //     } catch (error) {
+    //         console.error("Error setting plant code:", error);
+    //         setPlantCode("PL002"); // Fallback
+    //         getAllRouteData("PL002");
+    //     }
+    // }, []);
 
 
 
@@ -214,84 +349,289 @@ const MasterRoute = () => {
         },
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setValues({
+   const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Prevent emoji input and leading spaces
+    if (typeof value === 'string') {
+        if (containsEmoji(value)) {
+            // Set error message for emoji
+            setFieldErrors(prev => ({
+                ...prev,
+                [name]: "Emojis are not allowed in this field."
+            }));
+            return; // Don't update state if emoji is detected
+        }
+
+        // Prevent leading space by trimming start
+        const processedValue = value.trimStart();
+
+        // Update state
+        const newValues = {
+            ...values,
+            [name]: processedValue,
+            ['plantCode']: Plant_Code,
+        };
+        setValues(newValues);
+
+        // Check if any changes made (only in edit mode)
+        if (isEdit) {
+            checkForChanges(newValues);
+        }
+
+        // Validate field in real-time
+        const validator = getValidatorForField(name);
+        if (validator) {
+            validateField(name, processedValue, validator);
+        }
+    } else {
+        const newValues = {
             ...values,
             [name]: value || value.valueAsNumber,
             ['plantCode']: Plant_Code,
-        });
+        };
+        setValues(newValues);
+
+        // Check if any changes made (only in edit mode)
+        if (isEdit) {
+            checkForChanges(newValues);
+        }
+    }
+};
+
+
+// Add new function to check for changes
+const checkForChanges = (currentValues) => {
+    let changesDetected = false;
+    
+    // Compare all form fields with original values
+    const fieldsToCheck = [
+        'routeName', 'routeDestination', 'routeType', 'transportationType', 
+        'deliveryDate', 'shippingType', 'routeDetermination', 'intermediateStops',
+        'routeDistance', 'transportationCost', 'carrier', 'routeSelection',
+        'transportationZone', 'shippingPoint', 'status'
+    ];
+
+    for (let field of fieldsToCheck) {
+        // Handle date field specially
+        if (field === 'deliveryDate') {
+            const originalDate = originalValues[field] ? new Date(originalValues[field]).toISOString().slice(0, 16) : "";
+            const currentDate = currentValues[field] ? new Date(currentValues[field]).toISOString().slice(0, 16) : "";
+            if (originalDate !== currentDate) {
+                changesDetected = true;
+                break;
+            }
+        } else {
+            // For other fields, direct comparison
+            if ((originalValues[field] || "") !== (currentValues[field] || "")) {
+                changesDetected = true;
+                break;
+            }
+        }
+    }
+    
+    setHasChanges(changesDetected);
+};
+
+
+    const getValidatorForField = (fieldName) => {
+        const validators = {
+            'routeName': validateRouteName,
+            'routeDestination': validateDestination,
+            'shippingType': validateShippingType,
+            'intermediateStops': validateIntermediateStops,
+            'routeDistance': validateDistance,
+            'transportationCost': validateCost,
+            'carrier': validateCarrier,
+            'transportationZone': validateTransportationZone,
+            'shippingPoint': validateShippingPoint
+        };
+        return validators[fieldName];
     };
 
-    // 1. Replace your handleSubmit function with this:
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log("Form values:", values);
+    e.preventDefault();
+    console.log("Form values:", values);
 
-        try {
-            if (isEdit) {
-                // Update existing route
-                console.log("Updating route with routeCode:=================>>>>>>>>", routeCode);
-                const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${routeCode}`, {
-                    //   const response = await fetch(`http://localhost:8085/routes/${routeCode}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
-                    },
-                    body: JSON.stringify(values)
-                });
+    // Validate all fields before submission
+    if (!validateAllFields()) {
+        return; // Stop submission if validation fails
+    }
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
+    try {
+        if (isEdit) {
+            // Update existing route
+            console.log("Updating route with routeCode:=================>>>>>>>>", routeCode);
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/${routeCode}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+                },
+                body: JSON.stringify(values)
+            });
 
-                const data = await response.json();
-                console.log("Update response:", data);
-
-                // Check for success in meta object
-                if (data && data.meta && data.meta.message) {
-                    toast.success(data.meta.message, { autoClose: 3000 });
-                } else {
-                    toast.success("Route Updated Successfully", { autoClose: 3000 });
-                }
-            } else {
-                // Create new route - remove routeCode from values for new creation
-                const { routeCode, ...newRouteValues } = values;
-                console.log("Creating new route");
-                const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
-                    // const response = await fetch(`http://localhost:8085/routes`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
-                    },
-                    body: JSON.stringify(newRouteValues)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("Create response:", data);
-
-                // Check for success in meta object
-                if (data && data.meta && data.meta.message) {
-                    toast.success(data.meta.message, { autoClose: 3000 });
-                } else {
-                    toast.success("Route Added Successfully", { autoClose: 3000 });
-                }
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            // Refresh the data after submission
-            getAllRouteData(Plant_Code);
+            const data = await response.json();
+            console.log("Update response:", data);
 
-            // Close the modal
-            toggle();
-        } catch (error) {
-            console.error("API error:", error);
-            toast.error(`Operation failed: ${error.message}`, { autoClose: 3000 });
+            if (data && data.meta && data.meta.message) {
+                toast.success(data.meta.message, { autoClose: 3000 });
+            } else {
+                toast.success("Route Updated Successfully", { autoClose: 3000 });
+            }
+        } else {
+            // Create new route - remove routeCode from values for new creation
+            const { routeCode, ...newRouteValues } = values;
+            console.log("Creating new route");
+            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw==',
+                },
+                body: JSON.stringify(newRouteValues)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Create response:", data);
+
+            if (data && data.meta && data.meta.message) {
+                toast.success(data.meta.message, { autoClose: 3000 });
+            } else {
+                toast.success("Route Added Successfully", { autoClose: 3000 });
+            }
+        }
+
+        // Clear field errors on successful submission
+        setFieldErrors({});
+        setHasChanges(false); // Reset changes state after successful submission
+        setOriginalValues({}); // Clear original values
+
+        // Refresh the data after submission
+        getAllRouteData(Plant_Code);
+
+        // Close the modal
+        toggle();
+    } catch (error) {
+        console.error("API error:", error);
+        toast.error(`Operation failed: ${error.message}`, { autoClose: 3000 });
+    }
+};
+
+
+    // Enhanced key press handler to prevent leading spaces and emojis
+    const handleKeyPress = (e) => {
+        const inputValue = e.target.value;
+        const key = e.key;
+        const fieldName = e.target.name;
+
+        // Prevent space if it's the first character
+        if (key === ' ' && inputValue.length === 0) {
+            e.preventDefault();
+            setFieldErrors(prev => ({
+                ...prev,
+                [fieldName]: "Leading spaces are not allowed."
+            }));
+            return;
+        }
+
+        // Check for emoji input
+        if (containsEmoji(key)) {
+            e.preventDefault();
+            setFieldErrors(prev => ({
+                ...prev,
+                [fieldName]: "Emojis are not allowed in this field."
+            }));
+            return;
+        }
+    };
+
+    // Enhanced paste handler to prevent emoji and leading space paste
+    const handlePaste = (e) => {
+        const pastedText = e.clipboardData.getData('text');
+        const fieldName = e.target.name;
+
+        if (containsEmoji(pastedText)) {
+            e.preventDefault();
+            setFieldErrors(prev => ({
+                ...prev,
+                [fieldName]: "Cannot paste text containing emojis."
+            }));
+            return;
+        }
+
+        if (hasLeadingSpace(pastedText)) {
+            e.preventDefault();
+            // Allow paste but trim leading spaces
+            const trimmedText = pastedText.trimStart();
+            e.target.value = trimmedText;
+
+            // Trigger onChange manually
+            const syntheticEvent = {
+                target: {
+                    name: fieldName,
+                    value: trimmedText
+                }
+            };
+            handleInputChange(syntheticEvent);
+        }
+    };
+    // Updated error message function
+    const getValidationMessage = (fieldName, value) => {
+        if (containsEmoji(value)) {
+            return "Emojis are not allowed in this field.";
+        }
+        if (hasLeadingSpace(value)) {
+            return "Leading spaces are not allowed.";
+        }
+
+        switch (fieldName) {
+            case 'routeName':
+                return "Invalid route name. Only letters, numbers, spaces and hyphens are allowed.";
+            case 'routeDestination':
+                return "Invalid destination. Only letters, spaces, commas, dots and hyphens are allowed.";
+            case 'shippingType':
+                return "Invalid shipping type. Only letters, numbers, spaces, hyphens and slashes are allowed.";
+            case 'intermediateStops':
+                return "Invalid stops format. Only letters, numbers, spaces, commas, dots and hyphens are allowed.";
+            case 'routeDistance':
+                return "Distance must be a valid number (e.g., 25 or 25.50).";
+            case 'transportationCost':
+                return "Cost must be a valid amount (e.g., 1500 or 1500.50).";
+            case 'carrier':
+                return "Invalid carrier name. Only letters, numbers, spaces, &, dots and hyphens are allowed.";
+            case 'transportationZone':
+                return "Invalid zone format. Only letters, numbers, spaces and hyphens are allowed.";
+            case 'shippingPoint':
+                return "Invalid shipping point. Only letters, numbers, spaces, commas, dots and hyphens are allowed.";
+            default:
+                return "Invalid input format.";
+        }
+    };
+
+    const validateField = (fieldName, value, validator) => {
+        if (value && !validator(value)) {
+            const errorMessage = getValidationMessage(fieldName, value);
+            setFieldErrors(prev => ({
+                ...prev,
+                [fieldName]: errorMessage
+            }));
+            return false;
+        } else {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[fieldName];
+                return newErrors;
+            });
+            return true;
         }
     };
 
@@ -302,71 +642,67 @@ const MasterRoute = () => {
         toggle();
     };
 
-    // Update Data
 
-    // Updated handleCustomerClick to match the API field names
 
     // 4. Update the handleCustomerClick to fetch the current data before editing
-    const handleCustomerClick = useCallback(async (id) => {
-        setClickedRowId(id);
-        setIsEdit(true);
+   const handleCustomerClick = useCallback(async (id) => {
+    setClickedRowId(id);
+    setIsEdit(true);
+    setHasChanges(false); // Reset changes state
 
-        try {
-
-            const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
-                // const response = await fetch(`http://localhost:8085/routes/id/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+    try {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_URL_8082}/routes/id/${id}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Basic YW1hemluOlRFQE0tV0BSSw=='
             }
+        });
 
-            const data = await response.json();
-            console.log("Route details for editing:", data);
-
-            // Check response structure and get the route data
-            const routeData = data.data || data;
-
-            // Set form values with the fetched data
-            setValues({
-                routeCode: routeData.routeCode || "",
-                routeName: routeData.routeName || "",
-                plantCode: routeData.plantCode || Plant_Code,
-                routeDestination: routeData.routeDestination || "",
-                routeType: routeData.routeType || "",
-                transportationType: routeData.transportationType || "",
-                deliveryDate: routeData.deliveryDate || "",
-                shippingType: routeData.shippingType || "",
-                routeDetermination: routeData.routeDetermination || "",
-                intermediateStops: routeData.intermediateStops || "",
-                routeDistance: routeData.routeDistance || "",
-                transportationCost: routeData.transportationCost || "",
-                carrier: routeData.carrier || "",
-                routeSelection: routeData.routeSelection || "",
-                transportationZone: routeData.transportationZone || "",
-                shippingPoint: routeData.shippingPoint || "",
-                status: routeData.status || "A",
-            });
-            setRouteCode(data.data.routeCode);
-            setRouteCode(data.data.routeCode);
-
-            // Show success message if available
-            if (data.meta && data.meta.message) {
-                //  toast.success(data.meta.message, { autoClose: 3000 });
-            }
-
-            toggle();
-        } catch (error) {
-            console.error("Error fetching route details for editing:", error);
-            toast.error(`Failed to fetch route details: ${error.message}`, { autoClose: 3000 });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    }, [toggle, Plant_Code]);
-    // View Data
+
+        const data = await response.json();
+        console.log("Route details for editing:", data);
+
+        const routeData = data.data || data;
+
+        const formData = {
+            routeCode: routeData.routeCode || "",
+            routeName: routeData.routeName || "",
+            plantCode: routeData.plantCode || Plant_Code,
+            routeDestination: routeData.routeDestination || "",
+            routeType: routeData.routeType || "",
+            transportationType: routeData.transportationType || "",
+            deliveryDate: routeData.deliveryDate || "",
+            shippingType: routeData.shippingType || "",
+            routeDetermination: routeData.routeDetermination || "",
+            intermediateStops: routeData.intermediateStops || "",
+            routeDistance: routeData.routeDistance || "",
+            transportationCost: routeData.transportationCost || "",
+            carrier: routeData.carrier || "",
+            routeSelection: routeData.routeSelection || "",
+            transportationZone: routeData.transportationZone || "",
+            shippingPoint: routeData.shippingPoint || "",
+            status: routeData.status || "A",
+        };
+
+        // Store original values for comparison
+        setOriginalValues(formData);
+        setValues(formData);
+        setRouteCode(data.data.routeCode);
+
+        if (data.meta && data.meta.message) {
+            // toast.success(data.meta.message, { autoClose: 3000 });
+        }
+
+        toggle();
+    } catch (error) {
+        console.error("Error fetching route details for editing:", error);
+        toast.error(`Failed to fetch route details: ${error.message}`, { autoClose: 3000 });
+    }
+}, [toggle, Plant_Code]);
 
 
     // 3. Update your handleViewClick function to fetch detailed information
@@ -475,16 +811,16 @@ const MasterRoute = () => {
         },
     ];
 
-    const routeTypes = [
-        {
-            options: [
-                { label: "Select Type", value: "" },
-                { label: "Type A", value: "Type A" },
-                { label: "Type B", value: "Type B" },
-                { label: "Type C", value: "Type C" },
-            ],
-        },
-    ];
+    // const routeTypes = [
+    //     {
+    //         options: [
+    //             { label: "Select Type", value: "" },
+    //             { label: "Type A", value: "Type A" },
+    //             { label: "Type B", value: "Type B" },
+    //             { label: "Type C", value: "Type C" },
+    //         ],
+    //     },
+    // ];
 
     const transportationTypes = [
         {
@@ -739,7 +1075,7 @@ const MasterRoute = () => {
                                     </div>
 
                                     {/* Edit/Add Modal with improved spacing and validations */}
-                                    <Modal id="showModal" isOpen={modal} toggle={toggle} centered size="lg">
+                                  <Modal id="showModal" isOpen={modal} toggle={toggle} centered size="lg">
                                         <ModalHeader className="bg-light p-3" toggle={toggle}>
                                             {!!isEdit ? "Edit Route" : "Add Route"}
                                         </ModalHeader>
@@ -766,6 +1102,8 @@ const MasterRoute = () => {
                                                             />
                                                         </Col>
                                                     )}
+
+                                                    {/* Route Name Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="routeName" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Name<span style={{ color: "red" }}>*</span>
@@ -773,21 +1111,26 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.routeName && !validateRouteName(values.routeName) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.routeName ? 'is-invalid' : ''}`}
                                                             name="routeName"
                                                             id="routeName"
                                                             placeholder="Enter Route Name"
                                                             maxLength="100"
                                                             value={values.routeName}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.routeName && !validateRouteName(values.routeName) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid route name. Only letters, numbers, spaces and hyphens are allowed.
+                                                        {fieldErrors.routeName && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.routeName}
                                                             </div>
                                                         )}
                                                     </Col>
+
+                                                    {/* Route Destination Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="routeDestination" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Destination<span style={{ color: "red" }}>*</span>
@@ -795,41 +1138,55 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.routeDestination && !validateDestination(values.routeDestination) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.routeDestination ? 'is-invalid' : ''}`}
                                                             name="routeDestination"
                                                             id="routeDestination"
                                                             placeholder="Enter Route Destination"
                                                             value={values.routeDestination}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.routeDestination && !validateDestination(values.routeDestination) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid destination. Only letters, spaces, commas, dots and hyphens are allowed.
+                                                        {fieldErrors.routeDestination && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.routeDestination}
                                                             </div>
                                                         )}
                                                     </Col>
-                                                    <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
-                                                        <Label htmlFor="routeType" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
-                                                            Route Type<span style={{ color: "red" }}>*</span>
-                                                        </Label>
-                                                        <Input
-                                                            name="routeType"
-                                                            type="select"
-                                                            className="form-select"
-                                                            id="routeType"
-                                                            value={values.routeType}
-                                                            onChange={handleInputChange}
-                                                            required
-                                                            style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
-                                                        >
-                                                            {routeTypes.map((item, key) => (
-                                                                <React.Fragment key={key}>
-                                                                    {item.options.map((item, key) => (<option value={item.value} key={key}>{item.label}</option>))}
-                                                                </React.Fragment>
-                                                            ))}
-                                                        </Input>
-                                                    </Col>
+
+                                                <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
+    <Label htmlFor="routeType" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
+        Route Type<span style={{ color: "red" }}>*</span>
+    </Label>
+    <Input
+        name="routeType"
+        type="select"
+        className="form-select"
+        id="routeType"
+        value={values.routeType}
+        onChange={handleInputChange}
+        required
+        disabled={routeTypesLoading}
+        style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
+    >
+        <option value="">
+            {routeTypesLoading ? "Loading Route Types..." : "Select Type"}
+        </option>
+        {routeTypes.map((item) => (
+            <option value={item.routeType} key={item.id}>
+                {item.routeType}
+            </option>
+        ))}
+    </Input>
+    {routeTypesLoading && (
+        <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+            <i className="ri-loader-2-line"></i> Loading route types...
+        </small>
+    )}
+</Col>
+
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="transportationType" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Transportation Type<span style={{ color: "red" }}>*</span>
@@ -851,6 +1208,7 @@ const MasterRoute = () => {
                                                             ))}
                                                         </Input>
                                                     </Col>
+
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="deliveryDate" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Delivery Date<span style={{ color: "red" }}>*</span>
@@ -861,11 +1219,14 @@ const MasterRoute = () => {
                                                             className="form-control"
                                                             name="deliveryDate"
                                                             id="deliveryDate"
+                                                       min={new Date().toISOString().slice(0, 16)}
                                                             value={values.deliveryDate ? new Date(values.deliveryDate).toISOString().slice(0, 16) : ""}
                                                             onChange={handleInputChange}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
                                                     </Col>
+
+                                                    {/* Shipping Type Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="shippingType" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Shipping Type<span style={{ color: "red" }}>*</span>
@@ -873,20 +1234,24 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.shippingType && !validateShippingType(values.shippingType) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.shippingType ? 'is-invalid' : ''}`}
                                                             name="shippingType"
                                                             id="shippingType"
                                                             placeholder="Enter Shipping Type"
                                                             value={values.shippingType}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.shippingType && !validateShippingType(values.shippingType) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid shipping type. Only letters, numbers, spaces, hyphens and slashes are allowed.
+                                                        {fieldErrors.shippingType && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.shippingType}
                                                             </div>
                                                         )}
                                                     </Col>
+
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="routeDetermination" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Determination<span style={{ color: "red" }}>*</span>
@@ -908,6 +1273,8 @@ const MasterRoute = () => {
                                                             ))}
                                                         </Input>
                                                     </Col>
+
+                                                    {/* Intermediate Stops Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="intermediateStops" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Intermediate Stops<span style={{ color: "red" }}>*</span>
@@ -915,20 +1282,25 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.intermediateStops && !validateIntermediateStops(values.intermediateStops) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.intermediateStops ? 'is-invalid' : ''}`}
                                                             name="intermediateStops"
                                                             id="intermediateStops"
                                                             placeholder="Enter Intermediate Stops"
                                                             value={values.intermediateStops}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.intermediateStops && !validateIntermediateStops(values.intermediateStops) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid stops format. Only letters, numbers, spaces, commas, dots and hyphens are allowed.
+                                                        {fieldErrors.intermediateStops && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.intermediateStops}
                                                             </div>
                                                         )}
                                                     </Col>
+
+                                                    {/* Route Distance Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="routeDistance" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Distance<span style={{ color: "red" }}>*</span>
@@ -936,20 +1308,25 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.routeDistance && !validateDistance(values.routeDistance) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.routeDistance ? 'is-invalid' : ''}`}
                                                             name="routeDistance"
                                                             id="routeDistance"
                                                             placeholder="Enter Route Distance"
                                                             value={values.routeDistance}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.routeDistance && !validateDistance(values.routeDistance) && (
-                                                            <div className="invalid-feedback">
-                                                                Distance must be a valid number (e.g., 25 or 25.50).
+                                                        {fieldErrors.routeDistance && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.routeDistance}
                                                             </div>
                                                         )}
                                                     </Col>
+
+                                                    {/* Transportation Cost Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="transportationCost" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Transportation Cost<span style={{ color: "red" }}>*</span>
@@ -957,20 +1334,25 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.transportationCost && !validateCost(values.transportationCost) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.transportationCost ? 'is-invalid' : ''}`}
                                                             name="transportationCost"
                                                             id="transportationCost"
                                                             placeholder="Enter Transportation Cost"
                                                             value={values.transportationCost}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.transportationCost && !validateCost(values.transportationCost) && (
-                                                            <div className="invalid-feedback">
-                                                                Cost must be a valid amount (e.g., 1500 or 1500.50).
+                                                        {fieldErrors.transportationCost && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.transportationCost}
                                                             </div>
                                                         )}
                                                     </Col>
+
+                                                    {/* Carrier Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="carrier" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Carrier<span style={{ color: "red" }}>*</span>
@@ -978,20 +1360,24 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.carrier && !validateCarrier(values.carrier) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.carrier ? 'is-invalid' : ''}`}
                                                             name="carrier"
                                                             id="carrier"
                                                             placeholder="Enter Carrier"
                                                             value={values.carrier}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.carrier && !validateCarrier(values.carrier) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid carrier name. Only letters, numbers, spaces, &, dots and hyphens are allowed.
+                                                        {fieldErrors.carrier && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.carrier}
                                                             </div>
                                                         )}
                                                     </Col>
+
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="routeSelection" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Route Selection<span style={{ color: "red" }}>*</span>
@@ -1013,6 +1399,8 @@ const MasterRoute = () => {
                                                             ))}
                                                         </Input>
                                                     </Col>
+
+                                                    {/* Transportation Zone Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="transportationZone" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Transportation Zone<span style={{ color: "red" }}>*</span>
@@ -1020,20 +1408,25 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.transportationZone && !validateTransportationZone(values.transportationZone) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.transportationZone ? 'is-invalid' : ''}`}
                                                             name="transportationZone"
                                                             id="transportationZone"
                                                             placeholder="Enter Transportation Zone"
                                                             value={values.transportationZone}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.transportationZone && !validateTransportationZone(values.transportationZone) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid zone format. Only letters, numbers, spaces and hyphens are allowed.
+                                                        {fieldErrors.transportationZone && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.transportationZone}
                                                             </div>
                                                         )}
                                                     </Col>
+
+                                                    {/* Shipping Point Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                         <Label htmlFor="shippingPoint" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
                                                             Shipping Point<span style={{ color: "red" }}>*</span>
@@ -1041,20 +1434,24 @@ const MasterRoute = () => {
                                                         <Input
                                                             type="text"
                                                             required
-                                                            className={`form-control ${values.shippingPoint && !validateShippingPoint(values.shippingPoint) ? 'is-invalid' : ''}`}
+                                                            className={`form-control ${fieldErrors.shippingPoint ? 'is-invalid' : ''}`}
                                                             name="shippingPoint"
                                                             id="shippingPoint"
                                                             placeholder="Enter Shipping Point"
                                                             value={values.shippingPoint}
                                                             onChange={handleInputChange}
+                                                            onKeyPress={handleKeyPress}
+                                                            onPaste={handlePaste}
                                                             style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
                                                         />
-                                                        {values.shippingPoint && !validateShippingPoint(values.shippingPoint) && (
-                                                            <div className="invalid-feedback">
-                                                                Invalid shipping point. Only letters, numbers, spaces, commas, dots and hyphens are allowed.
+                                                        {fieldErrors.shippingPoint && (
+                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                <i className="ri-error-warning-line me-1"></i>
+                                                                {fieldErrors.shippingPoint}
                                                             </div>
                                                         )}
                                                     </Col>
+
                                                     {isEdit && (
                                                         <Col lg={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
                                                             <Label className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
@@ -1081,7 +1478,13 @@ const MasterRoute = () => {
                                                 <Row>
                                                     <Col md={12} className="hstack gap-2 justify-content-end" style={{ marginTop: '30px' }}>
                                                         <button type="button" className="btn btn-light" onClick={toggle}> Cancel  </button>
-                                                        <button type="submit" className="btn btn-success"> {!!isEdit ? "Update" : "Submit"} </button>
+<button 
+    type="submit" 
+    className="btn btn-primary"
+    disabled={isEdit && !hasChanges} // Disable in edit mode if no changes
+> 
+    {!!isEdit ? "Submit " : "Submit"} 
+</button>
                                                     </Col>
                                                 </Row>
                                             </ModalBody>
