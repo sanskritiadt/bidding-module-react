@@ -29,7 +29,7 @@ const ViewAllBids = () => {
     const [soDetails, setSoDetails] = useState([]);
     const [loadingSoDetails, setLoadingSoDetails] = useState(false);
     const [loginCode, setLoginCode] = useState('');
- 
+
 
     // Export Modal
     const [isExportCSV, setIsExportCSV] = useState(false);
@@ -299,7 +299,7 @@ const ViewAllBids = () => {
                     <Row>
                         <Col lg={12}>
                             <Card id="bidsList">
-                                <CardHeader className="border-0">
+                                {/* <CardHeader className="border-0">
                                     <Row className="align-items-center">
                                         <Col>
                                             <div className="d-flex align-items-center justify-content-between">
@@ -334,6 +334,56 @@ const ViewAllBids = () => {
                                             </div>
                                         </Col>
                                     </Row>
+                                </CardHeader> */}
+                                <CardHeader className="border-0 py-3 px-4">
+                                    <div className="d-flex align-items-center justify-content-between w-100">
+                                        {/* Title Section */}
+                                        <div className="flex-shrink-0" style={{ width: "400px" }}>
+                                            <h5 className="card-title mb-0 px-4 py-2 bg-light rounded text-muted" style={{ width: "100%" }}>
+                                                Bids Management
+                                            </h5>
+                                        </div>
+
+                                        {/* Search and Filter Section */}
+                                        <div className="d-flex align-items-center" style={{ gap: "12px" }}>
+                                            {/* Search Box */}
+                                            <div className="search-box">
+                                                <Input
+                                                    type="text"
+                                                    className="form-control"
+                                                    placeholder="Search..."
+                                                    value={searchTerm}
+                                                    onChange={handleSearchChange}
+                                                    style={{
+                                                        width: "280px",
+                                                        height: "38px",
+                                                        fontSize: "14px"
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {/* Status Filter */}
+                                            <div className="filter-box">
+                                                <Input
+                                                    type="select"
+                                                    className="form-select"
+                                                    value={statusFilter}
+                                                    onChange={handleStatusChange}
+                                                    style={{
+                                                        width: "150px",
+                                                        height: "38px",
+                                                        fontSize: "14px"
+                                                    }}
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="All">All</option>
+                                                    <option value="Running">Running</option>
+                                                    <option value="Completed">Completed</option>
+                                                    <option value="To Be Started">To Be Started</option>
+                                                </Input>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </CardHeader>
                                 <div className="card-body pt-0">
                                     <div>

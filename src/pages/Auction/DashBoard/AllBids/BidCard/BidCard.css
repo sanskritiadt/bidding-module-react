@@ -48,8 +48,8 @@
 }
 
 .bid-number1 {
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .divider {
@@ -60,7 +60,7 @@
 }
 
 .bid-time {
-  font-size: 12px;
+  font-size: 16px;
   color: #ecf0f1;
 }
 
@@ -203,16 +203,16 @@
 }
 
 .info-label {
-  font-size: 12px;
+  font-size: 16px;
+   color: #000000;
   font-weight: 700;
-  color: #2c3e50;
   margin-bottom: 2px;
   text-align: center;
 }
 
 .info-value {
-  font-size: 14px;
-  color: #34495e;
+  font-size: 16px;
+  color: #000000;
   text-align: center;
 }
 
@@ -300,4 +300,25 @@
 
 .bid-history-btn:hover {
   color: white;
+}
+
+.winner-img {
+  width: 125px;
+  height: 148px;
+  max-width: 100px;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.info-label-bold {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 600;
+}
+
+.info-label-black {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 400;
 }

@@ -1,126 +1,175 @@
-/* Dashboard.css */
+/* =====================================================
+   BASIC VARIABLES
+   ===================================================== */
+:root {
+  --primary-color: #364574;
+  --secondary-color: #4069e6;
+  --success-color: #0F8704;
+  --warning-color: #FFD56A;
+  --danger-color: #FF7072;
+  --muted-color: #8a909d;
+  --border-color: #e9ebec;
+  --text-muted: #495057;
+}
 
-thead {   
-  background-color: #364574 !important; 
-}  
+/* =====================================================
+   DASHBOARD LAYOUT
+   ===================================================== */
+.dashboard-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
 
-/* Dashboard Container */ 
-.dashboard-container { 
-  background: white; 
-  padding: 20px; 
-  border-radius: 8px; 
-}  
+.dashboard-header {
+  margin-bottom: 8px;
+}
 
+.dashboard-title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
 
-.dashboard-header { 
-  /* margin-bottom: 1.5rem;  */
-}  
+.view-all-link {
+  color: var(--secondary-color);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
 
-.dashboard-title { 
-  font-weight: 600; 
-  margin-bottom: 0; 
-}  
+.bid-cards-container {
+  margin-bottom: 16px;
+}
 
-.calendar-input { 
-  width: auto; 
-}  
+/* =====================================================
+   TABLE STYLING
+   ===================================================== */
+thead {
+  background-color: var(--primary-color) !important;
+}
 
-.view-all-link { 
-  color: #4069e6; 
-  text-decoration: none; 
-  display: inline-flex; 
-  align-items: center; 
-}  
+.table-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+}
 
+.table-card .card-body {
+  padding-bottom: 0;
+}
 
+.table thead th {
+  white-space: nowrap;
+  padding: 12px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+}
 
-/* Table Card */ 
-.table-card { 
-  border: 1px solid #e9ebec; 
-  border-radius: 8px; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
-  margin-bottom: 1.5rem; 
-}  
+.table tbody td {
+  padding: 10px 8px;
+  font-size: 13px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
 
-/* Status Badges */ 
-.status-badge-container { 
-  display: inline-block; 
-  min-width: 85px; 
-  white-space: nowrap; 
-}  
+.table-responsive {
+  margin-top: 0;
+}
 
-.status-badge { 
-  padding: 6px 12px; 
-  border-radius: 4px; 
-  font-size: 12px; 
-  display: inline-block; 
-  width: 100%; 
-  text-align: center; 
-  white-space: nowrap; 
-}  
+/* Text truncation utility */
+.text-truncate-custom {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 
-.status-running { 
-  background-color: #22a565; 
-  color: white; 
-}  
+/* =====================================================
+   STATUS BADGES
+   ===================================================== */
+.status-badge-container {
+  display: inline-block;
+  min-width: 85px;
+  white-space: nowrap;
+}
 
-.status-to-be-start { 
-  background-color: #f8cd4a; 
-  color: #000; 
-}  
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+}
 
-.status-cancel-bid { 
-  background-color: #8a909d; 
-  color: white; 
-}  
+.status-running {
+  background-color: var(--success-color);
+  color: white;
+}
 
-.status-completed { 
-  background-color: #f06548; 
-  color: white; 
-}  
+.status-to-be-start {
+  background-color: var(--warning-color);
+  color: black;
+}
 
-/* Action Buttons */ 
-.action-icon { 
-  color: #4069e6; 
-  font-size: 16px; 
-}  
+.status-cancel-bid {
+  background-color: var(--muted-color);
+  color: white;
+}
 
-.action-icon-close { 
-  color: #f06548; 
-}  
+.status-completed {
+  background-color: var(--danger-color);
+  color: white;
+}
 
-/* Action buttons styling */
+/* =====================================================
+   ACTION BUTTONS
+   ===================================================== */
 .action-buttons-container {
   display: flex;
   align-items: center;
+  gap: 8px;
   justify-content: flex-start;
   white-space: nowrap;
 }
 
 .action-icon {
-  color: #4069e6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  text-decoration: none;
   font-size: 16px;
-  margin-right: 5px;
+  transition: all 0.2s ease;
+}
+
+.action-icon:hover {
+  background-color: #f8f9fa;
+  color: var(--secondary-color);
+  text-decoration: none;
 }
 
 .action-icon-close {
-  color: #f06548;
+  color: var(--danger-color);
 }
 
-/* Status badge for the action column */
-.status-completed {
-  background-color: #f06548 !important;
-  color: white !important;
-  border: none !important;
-  padding: 4px 10px !important;
-  font-size: 12px !important;
-  border-radius: 4px !important;
-  cursor: default !important;
+.action-icon-close:hover {
+  background-color: #f8d7da;
+  color: #dc3545;
 }
 
-/* Confirm Order button */
 .confirm-order-btn {
-  background-color: #364574 !important;
+  background-color: var(--primary-color) !important;
   border: none !important;
   color: white !important;
   padding: 4px 10px !important;
@@ -129,49 +178,21 @@ thead {
   white-space: nowrap !important;
 }
 
-.confirm-button:hover { 
-  background-color: #364574; 
-}  
-
-/* Responsive Styles */ 
-@media (max-width: 768px) { 
-  .page-content {   
-    padding: 70px 10px 60px; 
-  }  
-  
-  .dashboard-container {   
-    padding: 15px; 
-  }  
-  
-  .card-body {   
-    padding: 15px 10px; 
-  }  
-  
-  .table-container {   
-    overflow-x: auto; 
-  }  
-  
-  .bid-number {   
-    width: 120px;   
-    font-size: 12px; 
-  }  
-  
-  .time-circle {   
-    width: 65px;   /* Further reduced for mobile */
-    height: 65px; 
-    margin: 5px auto;
-  } 
-
-  .time-label {
-    font-size: 11px;
-  }
-  
-  .time-value {
-    font-size: 1rem;
-  }
+.confirm-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  line-height: 1.2;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
-/* Sales Order Modal Styles */
+.confirm-button:hover {
+  background-color: #2a3660;
+}
+
+/* =====================================================
+   MODAL STYLES
+   ===================================================== */
 .sales-order-modal .modal-header {
   border-bottom: none;
   padding-bottom: 0;
@@ -206,7 +227,7 @@ thead {
 }
 
 .sales-order-modal .sales-order-table th {
-  background-color: #364574 !important;
+  background-color: var(--primary-color) !important;
   color: #fff !important;
   font-weight: 600;
   padding: 12px 15px;
@@ -224,19 +245,18 @@ thead {
 .sales-order-modal .pagination .page-link {
   border-radius: 4px;
   margin: 0 3px;
-  color: #4069e6;
+  color: var(--secondary-color);
 }
 
 .sales-order-modal .pagination .active .page-link {
-  background-color: #364574;
-  border-color: #364574;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .sales-order-modal .modal-body {
   padding: 15px 20px;
 }
 
-/* Bid confirmation modal styling */
 .bid-confirmation-modal .modal-header {
   background-color: #f8f9fa;
   padding: 16px 24px;
@@ -259,7 +279,6 @@ thead {
   z-index: 1;
 }
 
-/* Modal styles */
 .modal-header {
   border-bottom: 1px solid #eaedf1;
 }
@@ -270,4 +289,132 @@ thead {
 
 .bid-cancel-btn {
   min-width: 100px;
+}
+
+/* =====================================================
+   SEARCH AND FILTERS
+   ===================================================== */
+.calendar-input {
+  width: auto;
+}
+
+.dataTables_filter {
+  margin-bottom: 12px;
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+   ===================================================== */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 70px 10px 60px;
+  }
+
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .card-body {
+    padding: 15px 10px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .bid-number {
+    width: 120px;
+    font-size: 12px;
+  }
+
+  .time-circle {
+    width: 65px;
+    height: 65px;
+    margin: 5px auto;
+  }
+
+  .time-label {
+    font-size: 11px;
+  }
+
+  .time-value {
+    font-size: 1rem;
+  }
+
+  .table thead th {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+
+  .table tbody td {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+
+  .action-buttons-container {
+    gap: 4px;
+  }
+
+  .action-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .confirm-btn {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+
+  .dashboard-title {
+    font-size: 16px;
+  }
+
+  .view-all-link {
+    font-size: 12px;
+  }
+
+  .action-buttons-container {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+
+/* =====================================================
+   UTILITY CLASSES
+   ===================================================== */
+.nowrap-header {
+  white-space: nowrap;
+}
+
+.no-hover-effect:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.custom-header-css.single-line-headers th {
+  white-space: nowrap;
+}
+
+.table-fixed-layout {
+  table-layout: fixed;
+}
+
+.th-no-wrap {
+  white-space: nowrap;
+}
+
+.table-header-override th {
+  white-space: nowrap;
+}
+
+/* Card spacing reset */
+.card {
+  margin-bottom: 0;
 }

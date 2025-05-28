@@ -48,8 +48,8 @@
 }
 
 .bid-number1 {
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .divider {
@@ -60,7 +60,7 @@
 }
 
 .bid-time {
-  font-size: 12px;
+  font-size: 16px;
   color: #ecf0f1;
 }
 
@@ -145,7 +145,7 @@
   left: -5px;
   right: -5px;
   bottom: 0;
-  background-image: 
+  background-image:
     radial-gradient(circle, #ffcd00 2px, transparent 2px),
     radial-gradient(circle, #ffcd00 2px, transparent 2px),
     radial-gradient(circle, #ffcd00 2px, transparent 2px),
@@ -153,8 +153,8 @@
     radial-gradient(circle, #ffcd00 2px, transparent 2px),
     radial-gradient(circle, #ffcd00 2px, transparent 2px);
   background-size: 10px 10px;
-  background-position: 
-    0 0, 10px 10px, 20px 0, 
+  background-position:
+    0 0, 10px 10px, 20px 0,
     0 10px, 20px 10px, 10px 0;
   background-repeat: no-repeat;
 }
@@ -203,16 +203,16 @@
 }
 
 .info-label {
-  font-size: 12px;
+  font-size: 16px;
+  color: #000000;
   font-weight: 700;
-  color: #2c3e50;
   margin-bottom: 2px;
   text-align: center;
 }
 
 .info-value {
-  font-size: 14px;
-  color: #34495e;
+  font-size: 16px;
+  color: #000000;
   text-align: center;
 }
 
@@ -227,31 +227,31 @@
   padding: 0 10px;
 }
 
-.time-circle { 
-  width: 80px; 
-  height: 80px; 
-  background-color: #f8f9fa; 
+.time-circle {
+  width: 80px;
+  height: 80px;
+  background-color: #f8f9fa;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0; 
-  border-radius: 50%; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
-  margin: 0 auto; 
+  border: 1px solid #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 }
 
-.time-label { 
+.time-label {
   font-size: 13px;
-  font-weight: bold; 
-  color: #828284; 
-  margin-bottom: 0; 
+  font-weight: bold;
+  color: #828284;
+  margin-bottom: 0;
   line-height: 1.2;
-}  
+}
 
-.time-value { 
-  font-size: 1.25rem; 
-  font-weight: 600; 
+.time-value {
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #0a2985;
 }
 
@@ -266,7 +266,8 @@
 }
 
 /* Button Styles */
-.view-detail-btn, .bid-history-btn {
+.view-detail-btn,
+.bid-history-btn {
   display: block;
   text-align: center;
   padding: 8px 0;
@@ -289,7 +290,8 @@
   font-weight: normal;
 }
 
-.view-detail-btn:hover, .bid-history-btn:hover {
+.view-detail-btn:hover,
+.bid-history-btn:hover {
   opacity: 0.95;
   text-decoration: none;
 }
@@ -300,4 +302,25 @@
 
 .bid-history-btn:hover {
   color: white;
+}
+
+.winner-img {
+  width: 128px;
+  height: 160px;
+  /* max-width: 100px; */
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.info-label-bold {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 600;
+}
+
+.info-label-black {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 400;
 }

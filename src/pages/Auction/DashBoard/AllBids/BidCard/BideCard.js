@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./BidCard.css";
@@ -74,17 +73,14 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
     return (
         <div className="bid-card mb-3">
             {/* Header with navy background, status pill, bid info and route info */}
-            <div className="bid-header">
-                <div className={`status-pill ${getStatusClass(bid.status)}`}>
-                    {bid.status}
-                </div>
-                <div className="flex-1 flex items-center justify-between px-4 meta-group">
-                    <span className="bid-number1">Bid No.: {bid.biddingOrderNo}</span>
-                    <span className="divider"></span>
-                    <span className="bid-time">Bid Start Time: {formatDate(bid.bidFrom)}</span>
+            <div className="bid-header d-flex align-items-center justify-content-between">
+                <div className="d-flex align-items-center">
+                    <div className={`status-pill ${getStatusClass(bid.status)}`}>{bid.status}</div>
+                    <span className="bid-number1 ms-3">Bid No.: {bid.biddingOrderNo}</span>
+                    <span className="bid-time ms-3">Bid Start Time: {formatDate(bid.bidFrom)}</span>
                 </div>
                 <div className="route-label">
-                    Route No.: {bid.routeNo || "RN123"}
+                    Route No.: {bid.routeNo}
                 </div>
             </div>
  
@@ -93,19 +89,13 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
                 {/* Transporter section */}
                 <div className="section transporter-section">
                     {bid.status === "Completed" ? (
-                        <div className="d-flex flex-column align-items-center p-2 position-relative">
-                            <div className="position-relative text-center">
-                                <img
-                                    src={winnerlogo}
-                                    alt="Winner"
-                                    className="mb-1"
-                                    style={{ width: '130px', height: 'auto' }}
-                                />
-                                <div className="position-absolute top-50 start-50 translate-middle text-white fw-bold fs-6">
-                                    Winner
-                                </div>
-                            </div>
-                            <div className="text-primary fw-bold fs-5 mt-1">
+                        <div className="d-flex flex-column align-items-center p-2">
+                            <img
+                                src={winnerlogo}
+                                alt="Winner"
+                                className="mb-1 winner-img"
+                            />
+                            <div className="text-primary fw-bold fs-5 mt-1 text-center">
                                 {bid.transporterName}
                             </div>
                         </div>
@@ -120,66 +110,62 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
                 </div>
                 
                 {/* From/To Location section */}
-                <div className="section location-section">
+                <div className="section location-section text-center">
                     <div className="info-item">
-                        <div className="info-label">From Location</div>
+                        <div className="info-label info-label-bold">From Location</div>
                         <div className="info-value">{bid.fromLocation}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">To Location</div>
+                        <div className="info-label info-label-bold">To Location</div>
                         <div className="info-value">{bid.toLocation}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Distance</div>
-                        <div className="info-value">{bid.distance || "765 KM"}</div>
+                        <div className="info-label"><span className="info-label-bold">Distance</span> : {bid.distance}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Time</div>
-                        <div className="info-value">{bid.lastTimeExtension} Hours</div>
+                        <div className="info-label"><span className="info-label-bold">Time</span> : {bid.lastTimeExtension} Hours</div>
                     </div>
                 </div>
  
                 {/* Material section */}
-                <div className="section material-section">
+                <div className="section material-section text-center">
                     <div className="info-item">
-                        <div className="info-label">Material</div>
+                        <div className="info-label info-label-bold">Material</div>
                         <div className="info-value">{bid.material}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Quantity</div>
+                        <div className="info-label info-label-bold">Quantity</div>
                         <div className="info-value">{bid.quantity}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Multiple Order</div>
-                        <div className="info-value">{bid.multiMaterial == 1 ? "YES" : "NO"}</div>
+                        <div className="info-label"><span className="info-label-bold">Multiple Order</span> : {bid.multiMaterial == 1 ? "Yes" : "No"}</div>
                     </div>
                 </div>
  
                 {/* Price section */}
-                <div className="section price-section">
+                <div className="section price-section text-center">
                     <div className="info-item">
-                        <div className="info-label">Ceiling Price</div>
+                        <div className="info-label info-label-bold">Ceiling Price</div>
                         <div className="info-value">{bid.ceilingPrice}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Interval Price</div>
+                        <div className="info-label info-label-bold">Interval Price</div>
                         <div className="info-value">{bid.intervalPrice}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Last Bid</div>
-                        <div className="info-value">{bid.lastBidAmount || bid.ceilingPrice}</div>
+                        <div className="info-label" >Last Bid : {bid.lastBidAmount || bid.ceilingPrice}</div>
                     </div>
                 </div>
  
                 {/* City/Line section */}
                 <div className="section city-section">
                     <div className="info-item">
-                        <div className="info-label">City Name</div>
+                        <div className="info-label info-label-bold">City Name</div>
                         <div className="info-value">{bid.city}</div>
                     </div>
                     <div className="info-item">
-                        <div className="info-label">Line No.</div>
-                        <div className="info-value">{bid.lineNo || "205"}</div>
+                        <div className="info-label info-label-bold">Line No.</div>
+                        <div className="info-value">{bid.lineNo}</div>
                     </div>
                 </div>
  
@@ -216,10 +202,16 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
                     </Link>
                     <Link
                         to="#"
-                        className="bid-history-btn"
+                        className={`bid-history-btn ${(bid.status === 'Running' || bid.status === 'To Be Started') ? 'disabled' : ''}`}
                         onClick={() => handleHistoryClick(bid.biddingOrderNo)}
+                        style={{
+                            pointerEvents: (bid.status === 'Running' || bid.status === 'To Be Started') ? 'none' : 'auto',
+                            opacity: (bid.status === 'Running' || bid.status === 'To Be Started') ? 0.6 : 1,
+                            cursor: (bid.status === 'Running' || bid.status === 'To Be Started') ? 'not-allowed' : 'pointer',
+                            backgroundColor: (bid.status === 'Running' || bid.status === 'To Be Started') ? '#cccccc' : '#4D5499',
+                            color: (bid.status === 'Running' || bid.status === 'To Be Started') ? '#666666' : 'white'
+                        }}
                     >
-                      
                         BID HISTORY
                     </Link>
                 </div>
