@@ -145,7 +145,22 @@ const ViewModal = ({ isOpen, toggle, viewData }) => {
                 </div>
             </ModalBody>
             <ModalFooter>
-                <button type="button" className="btn btn-light btn-sm" onClick={toggle}>Close</button>
+                <button
+                    type="button"
+                    onClick={toggle}
+                    style={{
+                        backgroundColor: '#EEECEC',  // dark grey
+                        color: '#212529',
+                        fontWeight: 'bold',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '4px'
+                    }}
+                >
+                    Cancel
+                </button>
+
+
             </ModalFooter>
         </Modal>
     );

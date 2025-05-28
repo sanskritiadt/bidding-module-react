@@ -1,4 +1,3 @@
-/* Main container styles */
 .so-based-order-container {
   max-width: 1100px;
   margin: 0 auto;
@@ -15,7 +14,7 @@
 
 .so-based-order-form-group {
   flex: 1;
-  min-width: calc(25% - 20px);
+  min-width: calc(25% - 20px);   
   max-width: calc(25% - 20px);
 }
 
@@ -23,7 +22,7 @@
 .so-based-order-label {
   display: block;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 1000;
   margin-bottom: 8px;
   color: #000;
 }
@@ -65,7 +64,7 @@
 }
 
 .so-based-order-next-button {
-  background-color: #4361ee;
+  background-color: #405189;
   border: none;
   color: #fff;
   display: flex;
@@ -76,15 +75,45 @@
   font-weight: 500;
 }
 
+.custom-step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.custom-step-icon.active {
+  transform: scale(1.05);
+  background-color: #4361ee;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.custom-step-icon.completed {
+  transform: scale(1);
+  background-color: #00A389;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.custom-step-icon:not(.active):not(.completed) {
+  background-color: #e0e0e0;
+  color: #666;
+}
+
 /* Enhanced Stepper container */
 .so-based-order-stepper-container {
-  /* padding: 24px 0 36px; */
-  margin-bottom: 20px;
+
+  margin-bottom: 15px;
   background-color: #f9fbfd;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   overflow-x: auto;
-  /* Add horizontal scroll for small screens */
+
 }
 
 /* Material-UI v4 specific overrides for green connector lines */
@@ -95,6 +124,10 @@
 .so-based-order-stepper-container .MuiStepConnector-active .MuiStepConnector-line,
 .so-based-order-stepper-container .MuiStepConnector-completed .MuiStepConnector-line {
   border-color: #00A389 !important;
+}
+
+.so-based-order-stepper-container .MuiStepper-root {
+  padding: 0 !important;
 }
 
 /* Button container */
@@ -188,19 +221,9 @@
   cursor: not-allowed;
 }
 
-/* Custom step icon animations */
-.custom-step-icon {
-  position: relative;
-  transition: transform 0.2s ease, background-color 0.3s ease;
-}
 
-.custom-step-icon.active {
-  transform: scale(1.05);
-}
 
-.custom-step-icon.completed {
-  transform: scale(1);
-}
+
 
 /* Pulse animation for completed steps */
 .custom-step-icon.completed::after {
@@ -213,23 +236,24 @@
   border-radius: 50%;
   border: 2px solid #00A389;
   opacity: 0;
-  animation: pulse 1.5s infinite;
+  animation: pulse 2s infinite;
+  box-sizing: border-box;
 }
 
 @keyframes pulse {
   0% {
-    transform: scale(0.95);
-    opacity: 0.7;
+    transform: scale(0.9);
+    opacity: 0.8;
   }
 
   50% {
-    transform: scale(1);
-    opacity: 0.3;
+    transform: scale(1.05);
+    opacity: 0.4;
   }
 
   100% {
-    transform: scale(0.95);
-    opacity: 0.7;
+    transform: scale(0.9);
+    opacity: 0.8;
   }
 }
 
@@ -245,7 +269,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #3F51B5;
+  background-color: #405189;
   color: white;
   font-weight: 500;
   cursor: pointer;
@@ -355,6 +379,7 @@
 /* Preview step styles */
 .so-based-order-section-title {
   font-size: 16px;
+  background: #F8F6FF;
   font-weight: 600;
   color: #000;
   margin-top: 30px;
@@ -385,7 +410,7 @@
 .so-based-order-preview-tag {
   display: inline-flex;
   align-items: center;
-  background-color: #4361ee;
+  background-color: #4052;
   color: #fff;
   border-radius: 4px;
   padding: 4px 10px;
@@ -481,25 +506,45 @@ input[type="text"][placeholder="HH:MM:SS"] {
 
 /* Transporter selection dropdown - make it more responsive */
 .so-based-order-dropdown {
-  position: absolute;
-  width: 100%;
-  z-index: 10;
+   position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   background-color: #fff;
+  z-index: 1000;
   border: 1px solid #ddd;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 4px;
-  max-height: 300px;
   overflow-y: auto;
+  max-height: 300px;
+}
+
+.so-based-order-dropdown.show {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .so-based-order-transporter-selector:hover+.so-based-order-dropdown {
+    display: block;
+  }
 }
 
 .so-based-order-dropdown-header {
   padding: 8px;
-  background-color: #fff;
+  background-color: #405189;
   border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
   z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+    cursor: default;
+}
+
+.input-container {
+  position: relative;
 }
 
 .so-based-order-dropdown-search {
@@ -578,12 +623,6 @@ input[type="text"][placeholder="HH:MM:SS"] {
     font-size: 18px;
   }
 
-  /* Make custom step icons smaller on mobile */
-  .custom-step-icon {
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 14px !important;
-  }
 }
 
 /* Small devices (landscape phones, 576px to 767px) */
@@ -759,7 +798,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
 
 .spin {
   animation: spin 1s linear infinite;
-  display: inline-block;
+
 }
 
 /* Style for error state finish screen */
@@ -794,11 +833,22 @@ input[type="text"][placeholder="HH:MM:SS"] {
 @keyframes spin {
   from {
     transform: rotate(0deg);
-    
   }
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
@@ -821,17 +871,17 @@ input[type="text"][placeholder="HH:MM:SS"] {
 
 .custom-step-icon.active {
   background-color: #4361ee;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .custom-step-icon.completed {
   background-color: #00A389;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .custom-step-icon:not(.active):not(.completed) {
   background-color: #e0e0e0;
-  box-shadow: none;
+  color: #666;
 }
 
 /* Transporter Selector styles */
@@ -910,6 +960,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   flex: 0 0 40px;
   display: flex;
   justify-content: center;
+   margin-right: 10px;
 }
 
 .so-based-order-dropdown-header input[type="checkbox"] {
@@ -1075,7 +1126,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
 }
 
 .preview-transporter-tag {
-  background-color: #4361ee;
+  background-color: #405189;
   color: white;
   padding: 5px 12px;
   border-radius: 4px;
@@ -1116,7 +1167,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1128,7 +1179,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .transporter-modal-header {
@@ -1816,7 +1867,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  
+
   .sm\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1826,7 +1877,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   .md\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  
+
   .md\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -1836,7 +1887,7 @@ input[type="text"][placeholder="HH:MM:SS"] {
   .lg\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  
+
   .lg\:grid-cols-5 {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
