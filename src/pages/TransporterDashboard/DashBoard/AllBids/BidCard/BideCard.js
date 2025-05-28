@@ -974,7 +974,7 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
             className="view-detail-btn"
             onClick={() => handleSoDetailsClick(bid.biddingOrderNo)}
           >
-            SO DETAILS
+            VIEW DETAILS
           </Link>
           <Link
             to="#"
