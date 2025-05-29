@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { Form, Input, Label } from "reactstrap";
 import { Stepper, Step, StepLabel, StepConnector } from '@material-ui/core';
@@ -1062,7 +1061,7 @@ const BulkOrder = ({ bidNo }) => {
         }
 
         // Show success toast with the message from API
-        toast.success(successMessage, { autoClose: 3000 });
+        toast.success(successMessage, { stashautoClose: 3000 });
 
         // Show success modal
         setShowSuccessModal(true);
@@ -1212,11 +1211,11 @@ const BulkOrder = ({ bidNo }) => {
     if (activeStep === 2) {
       const validationErrors = {};
 
-      if (!values.fromLocation) {
+      if (!values.fromLocation || values.fromLocation === "Select") {
         validationErrors.fromLocation = "Please select from location";
       }
 
-      if (!values.toLocation) {
+      if (!values.toLocation || values.toLocation === "Select") {
         validationErrors.toLocation = "Please select to location";
       }
 
@@ -1234,6 +1233,21 @@ const BulkOrder = ({ bidNo }) => {
 
       if (!values.gracePeriodToReachPlant) {
         validationErrors.gracePeriodToReachPlant = "Please enter grace period to reach plant";
+      }
+
+      // Time format validation using regex
+      const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+
+      if (values.intervalTimeForAllocatingVehicle && !timeRegex.test(values.intervalTimeForAllocatingVehicle)) {
+        validationErrors.intervalTimeForAllocatingVehicle = "Please enter a valid time format (HH:MM)";
+      }
+
+      if (values.intervalTimeToReachPlant && !timeRegex.test(values.intervalTimeToReachPlant)) {
+        validationErrors.intervalTimeToReachPlant = "Please enter a valid time format (HH:MM)";
+      }
+
+      if (values.gracePeriodToReachPlant && !timeRegex.test(values.gracePeriodToReachPlant)) {
+        validationErrors.gracePeriodToReachPlant = "Please enter a valid time format (HH:MM)";
       }
 
       // Update the errors state
@@ -1417,7 +1431,7 @@ const BulkOrder = ({ bidNo }) => {
                     className="bulk-order-city-selector"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}
                     style={{
-                      height: "38px",
+                      height: "42px",
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
@@ -1677,7 +1691,7 @@ const BulkOrder = ({ bidNo }) => {
                     className="bulk-order-material-selector"
                     onClick={() => setShowMaterialDropdown(!showMaterialDropdown)}
                     style={{
-                      height: "38px",
+                      height: "42px",
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
@@ -1855,11 +1869,8 @@ const BulkOrder = ({ bidNo }) => {
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* Second row: 2 fields */}
-            <div className="bulk-order-row">
-              <div className="bulk-order-form-group">
+ <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   Display To Transporter <span style={{ color: "red" }}>*</span>
                 </Label>
@@ -1900,6 +1911,13 @@ const BulkOrder = ({ bidNo }) => {
                   )}
                 </div>
               </div>
+
+
+            </div>
+
+            {/* Second row: 2 fields */}
+            <div className="bulk-order-row">
+             
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   Select Transporter <span style={{ color: "red" }}>*</span>
@@ -2146,16 +2164,15 @@ const BulkOrder = ({ bidNo }) => {
                   From Location <span style={{ color: "red" }}>*</span>
                 </Label>
                 <div style={{ position: "relative" }} className="from-location-dropdown-container">
-                  {/* Main selector that shows the current selection */}
                   <div
                     className="bulk-order-location-selector"
                     onClick={() => setShowFromLocationDropdown(!showFromLocationDropdown)}
                     style={{
-                      height: "38px",
+                      height: "42px",
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                      border: "1px solid #ddd",
+                      border: `2px solid ${errors.fromLocation ? "#dc3545" : "#ced4da"}`,
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff",
@@ -2168,7 +2185,17 @@ const BulkOrder = ({ bidNo }) => {
                       <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
                     </span>
                   </div>
-
+                  {errors.fromLocation && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.fromLocation}
+                    </div>
+                  )}
+                  
                   {/* From Location dropdown with search functionality */}
                   {showFromLocationDropdown && (
                     <div className="bulk-order-dropdown" style={{
@@ -2202,8 +2229,7 @@ const BulkOrder = ({ bidNo }) => {
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px",
-                            outline: "none"
+                            fontSize: "14px"
                           }}
                         />
                       </div>
@@ -2282,30 +2308,23 @@ const BulkOrder = ({ bidNo }) => {
                       )}
                     </div>
                   )}
-                  {errors.fromLocation && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
-                      {errors.fromLocation}
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* NEW TO LOCATION FIELD */}
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   To Location <span style={{ color: "red" }}>*</span>
                 </Label>
                 <div style={{ position: "relative" }} className="to-location-dropdown-container">
-                  {/* Main selector that shows the current selection */}
                   <div
                     className="bulk-order-location-selector"
                     onClick={() => setShowToLocationDropdown(!showToLocationDropdown)}
                     style={{
-                      height: "38px",
+                      height: "42px",
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                      border: "1px solid #ddd",
+                      border: `2px solid ${errors.toLocation ? "#dc3545" : "#ced4da"}`,
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff",
@@ -2318,7 +2337,17 @@ const BulkOrder = ({ bidNo }) => {
                       <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
                     </span>
                   </div>
-
+                  {errors.toLocation && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.toLocation}
+                    </div>
+                  )}
+                  
                   {/* To Location dropdown with search functionality */}
                   {showToLocationDropdown && (
                     <div className="bulk-order-dropdown" style={{
@@ -2352,8 +2381,7 @@ const BulkOrder = ({ bidNo }) => {
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px",
-                            outline: "none"
+                            fontSize: "14px"
                           }}
                         />
                       </div>
@@ -2428,30 +2456,23 @@ const BulkOrder = ({ bidNo }) => {
                       )}
                     </div>
                   )}
-                  {errors.toLocation && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
-                      {errors.toLocation}
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* ROUTE FIELD - MOVED FROM SECOND POSITION */}
               <div className="bulk-order-form-group route-dropdown-container">
                 <Label className="bulk-order-label">
                   Route <span style={{ color: "red" }}>*</span>
                 </Label>
                 <div style={{ position: "relative" }}>
-                  {/* Main selector that shows the current selection */}
                   <div
                     className="bulk-order-route-selector"
                     onClick={() => setShowRouteDropdown(!showRouteDropdown)}
                     style={{
-                      height: "38px",
+                      height: "42px",
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                      border: "1px solid #ddd",
+                      border: `2px solid ${errors.route ? "#dc3545" : "#ced4da"}`,
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff",
@@ -2464,7 +2485,17 @@ const BulkOrder = ({ bidNo }) => {
                       <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
                     </span>
                   </div>
-
+                  {errors.route && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.route}
+                    </div>
+                  )}
+                  
                   {/* Route dropdown with search functionality */}
                   {showRouteDropdown && (
                     <div className="bulk-order-dropdown" style={{
@@ -2498,8 +2529,7 @@ const BulkOrder = ({ bidNo }) => {
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px",
-                            outline: "none"
+                            fontSize: "14px"
                           }}
                         />
                       </div>
@@ -2545,7 +2575,6 @@ const BulkOrder = ({ bidNo }) => {
                               }}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // Only set route if it's not the 'Select' option
                                 if (route !== 'Select') {
                                   setValues(prevValues => ({
                                     ...prevValues,
@@ -2580,11 +2609,6 @@ const BulkOrder = ({ bidNo }) => {
                           ))}
                         </div>
                       )}
-                    </div>
-                  )}
-                  {errors.route && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
-                      {errors.route}
                     </div>
                   )}
                 </div>
@@ -2626,10 +2650,24 @@ const BulkOrder = ({ bidNo }) => {
                     name="intervalTimeForAllocatingVehicle"
                     value={values.intervalTimeForAllocatingVehicle}
                     onChange={handleInputChange}
-                    required
+                   
                     className="bulk-order-input black-placeholder"
-                    style={{ color: "#000" }}
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.intervalTimeForAllocatingVehicle ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px"
+                    }}
                   />
+                  {errors.intervalTimeForAllocatingVehicle && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.intervalTimeForAllocatingVehicle}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2644,10 +2682,24 @@ const BulkOrder = ({ bidNo }) => {
                     name="intervalTimeToReachPlant"
                     value={values.intervalTimeToReachPlant}
                     onChange={handleInputChange}
-                    required
+                   
                     className="bulk-order-input black-placeholder"
-                    style={{ color: "#000" }}
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.intervalTimeToReachPlant ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px"
+                    }}
                   />
+                  {errors.intervalTimeToReachPlant && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.intervalTimeToReachPlant}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2662,10 +2714,24 @@ const BulkOrder = ({ bidNo }) => {
                     name="gracePeriodToReachPlant"
                     value={values.gracePeriodToReachPlant}
                     onChange={handleInputChange}
-                    required
+                  
                     className="bulk-order-input black-placeholder"
-                    style={{ color: "#000" }}
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.gracePeriodToReachPlant ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px"
+                    }}
                   />
+                  {errors.gracePeriodToReachPlant && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.gracePeriodToReachPlant}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
