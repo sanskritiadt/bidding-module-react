@@ -109,7 +109,7 @@
 /* Enhanced Stepper container */
 .so-based-order-stepper-container {
 
-  margin-bottom: 15px;
+
   background-color: #f9fbfd;
   border-radius: 8px;
   overflow-x: auto;
@@ -126,9 +126,7 @@
   border-color: #00A389 !important;
 }
 
-.so-based-order-stepper-container .MuiStepper-root {
-  padding: 0 !important;
-}
+
 
 /* Button container */
 .so-based-order-button-container {
@@ -207,7 +205,7 @@
 }
 
 .so-based-order-modal-button {
-  background-color: #4361ee;
+  background-color: #405189;
   color: white;
   border: none;
   padding: 8px 20px;

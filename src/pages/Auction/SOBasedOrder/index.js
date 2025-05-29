@@ -3536,8 +3536,6 @@ const SOBasedOrder = ({ bidNo }) => {
             </div>
           </div>
         )}
-
-
       </Form>
 
       {/* Add ToastContainer for notifications */}
@@ -3555,7 +3553,6 @@ const SOBasedOrder = ({ bidNo }) => {
         theme="light"
         toastClassName="bg-light"
       />
-
       {/* Show success modal */}
       {showSuccessModal && <SuccessModal />}
     </>

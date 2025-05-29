@@ -150,7 +150,7 @@ const BidCard = ({ bid, handleViewClick, handleHistoryClick, handleSoDetailsClic
                     </div>
                     <div className="info-item">
                         <div className="info-label info-label-bold">Interval Price</div>
-                        <div className="info-value">{bid.intervalPrice}</div>
+                        <div className="info-value">{bid.intervalAmount}</div>
                     </div>
                     <div className="info-item">
                         <div className="info-label" >Last Bid : {bid.lastBidAmount || bid.ceilingPrice}</div>
