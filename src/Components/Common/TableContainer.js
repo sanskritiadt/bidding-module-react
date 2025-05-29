@@ -10,7 +10,7 @@ import {
   usePagination,
   useRowSelect
 } from "react-table";
-import { Table, Row, Col, Button, Input, CardBody, Nav, NavItem, NavLink, } from "reactstrap";
+import { Table, Row, Col, Button, Input, CardBody, Nav, NavItem, NavLink, Card} from "reactstrap";
 import { Filter, DefaultColumnFilter } from "./filters";
 import {
   ProductsGlobalFilter,
@@ -542,12 +542,31 @@ const TableContainer = ({
                           );
                         })}
                       </tr>
-                      {row.isExpanded && (
+                  {row.isExpanded && (
                       <tr>
                         <td colSpan={columns.length}>
                           <div className="bg-light p-2">
                             {/* Replace with desired expanded content */}
-                            <strong>Details:</strong> {row.values.name}
+                            {/* <strong>Details:</strong> {row.values.name} */}
+                            <Row>
+                              {row.original.vehicles.map((Item, index) => (
+                                <Col lg={3} key={index}>
+                                  <div>
+                                    <Card className="mb-1 ribbon-box ribbon-fill ribbon-sm shadow_light">
+                                      <div className={`ribbon ribbon-info element`}> <i className="ri-truck-line" ></i> </div>
+                                      <CardBody style={{ padding: "10px 0px 5px 0", textAlign: "center" }}>
+                                        <div className="flex-grow-1 ms-3">
+                                          <h6 className="fs-12 mb-1">{Item.registrationNumber} | {Item.vehicleCapacityMax}MT</h6>
+                                        </div>
+                                      </CardBody>
+                                    </Card>
+                                  </div>
+                                </Col>
+                              ))}
+ 
+ 
+                            </Row>
+ 
                           </div>
                         </td>
                       </tr>

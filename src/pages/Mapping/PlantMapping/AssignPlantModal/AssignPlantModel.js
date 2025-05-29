@@ -905,7 +905,7 @@ const AssignPlantModal = ({
             borderRadius: '4px'
           }}
         >
-          Assign ({selectedPlants.length})
+          Assign 
         </Button>
       </ModalFooter>
     </Modal>

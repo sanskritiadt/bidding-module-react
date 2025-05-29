@@ -14,7 +14,7 @@
 
 .so-based-order-form-group {
   flex: 1;
-  min-width: calc(25% - 20px);   
+  min-width: calc(25% - 20px);
   max-width: calc(25% - 20px);
 }
 

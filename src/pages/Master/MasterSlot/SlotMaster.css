@@ -15,15 +15,34 @@ right: 30px !important; */
 .css-13cymwt-control {
     background: none !important;
 }
-
+/* 
 .fc-h-event {
     background-color: #37d8c536;
-
+} */
+.event-status-a{
+  background-color: #FF961B1A;
+}
+.event-status-a .fc-event-main {
+  color: #FF9F2D !important;
+}
+.event-status-b{
+   background-color: #0085FF1A;
+}
+.event-status-b .fc-event-main {
+  color: #0085FF !important;
 }
 
-.fc-h-event .fc-event-main {
+.event-status-c{
+  background-color: #20744A1A;
+}
+.event-status-c .fc-event-main {
+  color: #0F8704 !important;
+}
+
+
+/* .fc-h-event .fc-event-main {
     color: #03A9F4 !important;
-}
+} */
 
 .slotmasterCss {
     border: none !important;

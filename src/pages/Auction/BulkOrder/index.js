@@ -2777,6 +2777,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from "axios";
 
+
 // Create a custom connector with withStyles (Material-UI v4 approach)
 const GreenConnector = withStyles({
   alternativeLabel: {
@@ -3215,19 +3216,47 @@ const BulkOrder = ({ bidNo }) => {
 
   // Filter transporters based on search term
   const filteredTransporters = useMemo(() => {
-    const filtered = transporterOptions.filter(
-      t => t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.id.includes(searchTerm)
-    );
-    console.log("FILTERED TRANSPORTERS CALCULATED:", {
-      transporterOptions: transporterOptions.length,
-      filtered: filtered.length,
-      searchTerm
+    if (!searchTerm || searchTerm.trim() === '') {
+      return transporterOptions;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase().trim();
+    const filtered = transporterOptions.filter(t => {
+      // Ensure transporter object exists
+      if (!t) return false;
+
+      // Add safe null/undefined checks for all properties
+      const name = (t.name || '').toString().toLowerCase();
+      const id = (t.id || '').toString();
+      const code = (t.code || '').toString();
+      const contactPerson = (t.contactPerson || '').toString().toLowerCase();
+      const contactNumber = (t.contactNumber || '').toString();
+
+      return name.includes(searchTermLower) ||
+        id.includes(searchTermLower) ||
+        code.includes(searchTermLower) ||
+        contactPerson.includes(searchTermLower) ||
+        contactNumber.includes(searchTermLower);
     });
+
+    console.log("Search Results:", {
+      searchTerm: searchTermLower,
+      total: transporterOptions.length,
+      filtered: filtered.length,
+      results: filtered
+    });
+
     return filtered;
   }, [transporterOptions, searchTerm]);
-
-
+  // Update the search term handler to properly handle input
+  const handleTransporterSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    // Ensure dropdown stays open while searching
+    if (!showTransporterDropdown) {
+      setShowTransporterDropdown(true);
+    }
+  };
 
   // const obj = JSON.parse(sessionStorage.getItem("authUser"));
   // let plantcode = obj.data.plantCode;
@@ -3247,15 +3276,10 @@ const BulkOrder = ({ bidNo }) => {
 
 
   const fetchTransportersByFlag = async (flag, filterParam) => {
-
-
     setLoadingTransporters(true);
     try {
-      // Use the actual parameter or default
-      //    let actualFilterParam = filterParam;
       const obj = JSON.parse(sessionStorage.getItem("authUser"));
       let plantcode = obj.data.plantCode;
-
 
       const apiUrl = `${process.env.REACT_APP_LOCAL_URL_8082}/api/transporters/allTransportersByFlag?flag=${flag}&filterParam=${plantcode}`;
       console.log("Fetching transporters from:", apiUrl);
@@ -3272,22 +3296,24 @@ const BulkOrder = ({ bidNo }) => {
       const result = await response.json();
       console.log("API response data:", result);
 
-      // Check if result has the expected structure with data array
       if (result && result.data && Array.isArray(result.data) && result.data.length > 0) {
-        // Map the API response fields to match your requirements
+        // Map the API response fields to match TransporterViewer requirements
         const mappedTransporters = result.data.map(transporter => ({
           id: transporter.code,
-          name: transporter.name.trim() // Trim to remove extra spaces
+          code: transporter.code,
+          name: transporter.name.trim(),
+          contactPerson: transporter.contactPerson || 'N/A',
+          contactNumber: transporter.contactNumber || transporter.phoneNo || 'N/A',
+          contactEmail: transporter.contactEmail || 'N/A',
+          // Store the complete data for reference
+          fullData: transporter
         }));
 
         console.log("Mapped transporters:", mappedTransporters);
-
-        // Update the state
         setTransporterOptions(mappedTransporters);
         setShowTransporterDropdown(true);
       } else {
         setTransporterOptions([]);
-
       }
     } catch (error) {
       console.error("Error fetching transporters:", error);
@@ -3299,113 +3325,146 @@ const BulkOrder = ({ bidNo }) => {
   };
 
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
- const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  // if (name === 'ceilingAmount' && value.length > 10) {
-  //   return;
-  // }
-  
-  // Update the values state
-  setValues(prevValues => {
-    const newValues = {
-      ...prevValues,
-      [name]: value === 'Select' ? '' : value
-    };
+    // Update the values state
+    setValues(prevValues => {
+      const newValues = {
+        ...prevValues,
+        [name]: value === 'Select' ? '' : value
+      };
 
-    // These console logs will help debug
-    if (name === 'displayToTransporter' || name === 'route' || name === 'fromLocation') {
-      console.log(`Changed ${name} to "${value}"`);
-      console.log(`Current values: fromLocation=${newValues.fromLocation}, route=${newValues.route}, displayToTransporter=${newValues.displayToTransporter}`);
-    }
+      // Clear the error for this field if it exists
+      if (errors[name]) {
+        setErrors(prevErrors => {
+          const newErrors = { ...prevErrors };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
 
-    return newValues;
-  });
+      // Special handling for city field
+      if (name === 'city' && value) {
+        setErrors(prevErrors => {
+          const newErrors = { ...prevErrors };
+          delete newErrors.city;
+          return newErrors;
+        });
+      }
 
-  // Clear the error for this field if it exists
-  if (errors[name]) {
-    setErrors(prevErrors => {
-      const newErrors = { ...prevErrors };
-      delete newErrors[name];
-      return newErrors;
+      // Date validation for Bid Start To
+      if (name === 'bidStartTo' && value && values.bidStartingFrom) {
+        const startDate = new Date(values.bidStartingFrom);
+        const endDate = new Date(value);
+
+        if (endDate <= startDate) {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            bidStartTo: "Bid Start To must be greater than Bid Starting From"
+          }));
+        }
+      }
+
+      // Date validation for Bid Starting From
+      if (name === 'bidStartingFrom' && value && values.bidStartTo) {
+        const startDate = new Date(value);
+        const endDate = new Date(values.bidStartTo);
+
+        if (endDate <= startDate) {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            bidStartTo: "Bid Start To must be greater than Bid Starting From"
+          }));
+        } else {
+          // Clear the error if dates are now valid
+          setErrors(prevErrors => {
+            const newErrors = { ...prevErrors };
+            delete newErrors.bidStartTo;
+            return newErrors;
+          });
+        }
+      }
+
+      // Extension Quantity validation
+      if (name === 'extensionQuantity' && value) {
+        const extensionQty = parseFloat(value);
+        const quantity = parseFloat(values.quantity);
+
+        if (quantity && extensionQty > quantity) {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            extensionQuantity: "Extension Quantity cannot be greater than Quantity"
+          }));
+        } else {
+          setErrors(prevErrors => {
+            const newErrors = { ...prevErrors };
+            delete newErrors.extensionQuantity;
+            return newErrors;
+          });
+        }
+      }
+
+      // Also validate when quantity changes
+      if (name === 'quantity' && value) {
+        const quantity = parseFloat(value);
+        const extensionQty = parseFloat(values.extensionQuantity);
+
+        if (extensionQty && extensionQty > quantity) {
+          setErrors(prevErrors => ({
+            ...prevErrors,
+            extensionQuantity: "Extension Quantity cannot be greater than Quantity"
+          }));
+        } else {
+          setErrors(prevErrors => {
+            const newErrors = { ...prevErrors };
+            delete newErrors.extensionQuantity;
+            return newErrors;
+          });
+        }
+      }
+
+      // Handle special case for Display To Transporter dropdown
+      if (name === 'displayToTransporter') {
+        // Reset selected transporters when changing display mode
+        newValues.selectTransporter = [];
+
+        const obj = JSON.parse(sessionStorage.getItem("authUser"));
+        let plantCode1 = obj.data.plantCode;
+
+        if (value === 'All') {
+          fetchTransportersByFlag('A', plantCode1);
+        }
+        else if (value === 'Route Based') {
+          fetchTransportersByFlag('R', plantCode1);
+        }
+        else if (value === 'Plant Based') {
+          fetchTransportersByFlag('P', plantCode1);
+        }
+        else if (value === 'Select' || value === '') {
+          // Clear the transporter options when 'Select' is chosen
+          setTransporterOptions([]);
+          setShowTransporterDropdown(false);
+        }
+      }
+
+      // Update related fields for Route changes
+      if (name === 'route' && values.displayToTransporter === 'Route Based') {
+        if (value && value !== 'Select') {
+          fetchTransportersByFlag('R', value);
+        }
+      }
+
+      // Update related fields for From Location changes
+      if (name === 'fromLocation' && values.displayToTransporter === 'Plant Based') {
+        if (value && value !== 'Select') {
+          fetchTransportersByFlag('P', value);
+        }
+      }
+
+      return newValues;
     });
-  }
-
-  // Date validation for Bid Start To
-  if (name === 'bidStartTo' && value && values.bidStartingFrom) {
-    const startDate = new Date(values.bidStartingFrom);
-    const endDate = new Date(value);
-    
-    if (endDate <= startDate) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        bidStartTo: "Bid Start To must be greater than Bid Starting From"
-      }));
-    }
-  }
-
-  // Date validation for Bid Starting From
-  if (name === 'bidStartingFrom' && value && values.bidStartTo) {
-    const startDate = new Date(value);
-    const endDate = new Date(values.bidStartTo);
-    
-    if (endDate <= startDate) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        bidStartTo: "Bid Start To must be greater than Bid Starting From"
-      }));
-    } else {
-      // Clear the error if dates are now valid
-      setErrors(prevErrors => {
-        const newErrors = { ...prevErrors };
-        delete newErrors.bidStartTo;
-        return newErrors;
-      });
-    }
-  }
-
-  // Rest of your existing code...
-  // Handle special case for Display To Transporter dropdown
-  if (name === 'displayToTransporter') {
-    // Reset selected transporters when changing display mode
-    setValues(prevValues => ({
-      ...prevValues,
-      selectTransporter: []
-    }));
-
-    const obj = JSON.parse(sessionStorage.getItem("authUser"));
-    let plantCode1 = obj.data.plantCode;
-
-    if (value === 'All') {
-      fetchTransportersByFlag('A', plantCode1);
-    }
-    else if (value === 'Route Based') {
-      fetchTransportersByFlag('R', plantCode1);
-    }
-    else if (value === 'Plant Based') {
-      fetchTransportersByFlag('P', plantCode1);
-    }
-    else if (value === 'Select' || value === '') {
-      // Clear the transporter options when 'Select' is chosen
-      setTransporterOptions([]);
-      setShowTransporterDropdown(false);
-    }
-  }
-
-  // Update related fields for Route changes
-  if (name === 'route' && values.displayToTransporter === 'Route Based') {
-    if (value && value !== 'Select') {
-      fetchTransportersByFlag('R', value);
-    }
-  }
-
-  // Update related fields for From Location changes
-  if (name === 'fromLocation' && values.displayToTransporter === 'Plant Based') {
-    if (value && value !== 'Select') {
-      fetchTransportersByFlag('P', value);
-    }
-  }
-};
+  };
 
 
   const config = {
@@ -3512,11 +3571,32 @@ const BulkOrder = ({ bidNo }) => {
   const handleTransporterSelect = (transporter) => {
     console.log("Selecting transporter:", transporter);
 
-    // Check if the transporter is already selected by ID
-    if (!values.selectTransporter.some(t => t.id === transporter.id)) {
+    // Check if the transporter is already selected by ID to prevent duplicates
+    const isAlreadySelected = values.selectTransporter.some(t => t.id === transporter.id);
+
+    if (!isAlreadySelected) {
       setValues(prevValues => {
-        const newSelection = [...prevValues.selectTransporter, transporter];
+        const newSelection = [...prevValues.selectTransporter, {
+          id: transporter.id,
+          code: transporter.code || transporter.id, // Use code if available, fallback to id
+          name: transporter.name || 'N/A',
+          contactPerson: transporter.contactPerson || 'N/A',
+          contactNumber: transporter.contactNumber || 'N/A',
+          // Store the complete data for reference
+          fullData: transporter
+        }];
+
         console.log("Updated selection:", newSelection);
+
+        // Clear the selectTransporter error when at least one transporter is selected
+        if (newSelection.length > 0) {
+          setErrors(prevErrors => {
+            const newErrors = { ...prevErrors };
+            delete newErrors.selectTransporter;
+            return newErrors;
+          });
+        }
+
         return {
           ...prevValues,
           selectTransporter: newSelection
@@ -3526,7 +3606,6 @@ const BulkOrder = ({ bidNo }) => {
       console.log("Transporter already selected, skipping");
     }
   };
-
   const handleRemoveTransporter = (transporterId, e) => {
     if (e) e.stopPropagation();
     setValues(prevValues => ({
@@ -3581,20 +3660,24 @@ const BulkOrder = ({ bidNo }) => {
     return filteredTransporters.every(t => selectedIds.has(t.id));
   };
 
-  // Update useEffect to correctly set the selectAll state
   useEffect(() => {
     // This ensures filteredTransporters is always up-to-date with transporterOptions
     console.log("transporterOptions changed:", transporterOptions);
 
     // Since searchTerm might not have changed, we need to manually update the filtered list
-    const newFilteredTransporters = transporterOptions.filter(
-      t => t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.id.includes(searchTerm)
-    );
+    if (transporterOptions && transporterOptions.length > 0) {
+      const newFilteredTransporters = transporterOptions.filter(t => {
+        if (!t) return false;
 
-    console.log("New filtered transporters:", newFilteredTransporters);
+        const name = (t.name || '').toString().toLowerCase();
+        const id = (t.id || '').toString();
 
-    // If this doesn't trigger a re-render, we might need to use a different approach
+        return name.includes((searchTerm || '').toLowerCase()) ||
+          id.includes(searchTerm || '');
+      });
+
+      console.log("New filtered transporters:", newFilteredTransporters);
+    }
   }, [transporterOptions, searchTerm]);
 
 
@@ -3640,6 +3723,7 @@ const BulkOrder = ({ bidNo }) => {
 
   // Function to map form values to API payload
   // Function to map form values to API payload
+
   const mapFormValuesToPayload = () => {
     // Remove duplicates from the selected transporters before creating the biddings
     const uniqueTransporters = [...new Map(values.selectTransporter.map(item => [item.id, item])).values()];
@@ -3649,7 +3733,6 @@ const BulkOrder = ({ bidNo }) => {
       // Extract the numeric part from route if possible
       let routeValue = 0;
       if (values.route && values.route !== "Select") {
-        // Try to extract number from route string (e.g. "Route 2" -> 2)
         const routeMatch = values.route.match(/\d+/);
         if (routeMatch) {
           routeValue = parseFloat(routeMatch[0]);
@@ -3658,12 +3741,11 @@ const BulkOrder = ({ bidNo }) => {
 
       // Create the biddingMaster object for this transporter
       const biddingMaster = {
-
         transporterCode: transporter.id, // Use the transporter ID from selection
         ceilingPrice: parseFloat(values.ceilingAmount) || 0,
-        uom: values.uom || "MT", // Default to MT if not provided
-        bidFrom: formatDate(values.bidStartingFrom), // ISO format with T
-        bidTo: formatDate(values.bidStartTo), // ISO format with T
+        uom: values.uom || "MT",
+        bidFrom: formatDate(values.bidStartingFrom),
+        bidTo: formatDate(values.bidStartTo),
         lastTimeExtension: timeToMinutes(values.lastMinutesExtension),
         extentionQuantity: parseInt(values.extensionQuantity) || 0,
         bidUnit: 1,
@@ -3679,15 +3761,19 @@ const BulkOrder = ({ bidNo }) => {
         bidType: "STANDARD",
         biddingOrderNo: bidNo,
         createdDate: new Date().toISOString().split('T')[0],
-        route: routeValue, // Use the numeric value instead of the string
+        route: routeValue,
         multiMaterial: values.multiMaterial === "Yes" ? 1 : 0,
         city: values.city || "",
-        material: values.material || "Steel", // Default to Steel if not provided
+        material: values.material || "Steel",
         quantity: parseInt(values.quantity) || 0,
         extentionQty: parseInt(values.extensionQuantity) || 0,
         autoAllocationSalesOrder: 1,
-        fromLocation: values.fromLocation || "Location A", // Default if missing
-        toLocation: values.toLocation || "Location B" // Default if missing
+        fromLocation: values.fromLocation || "Location A",
+        toLocation: values.toLocation || "Location B",
+        // Include transporter contact details if needed for API
+        transporterName: transporter.name,
+        transporterContactPerson: transporter.contactPerson,
+        transporterContactNumber: transporter.contactNumber
       };
 
       return {
@@ -3696,61 +3782,13 @@ const BulkOrder = ({ bidNo }) => {
       };
     });
 
-    // If no transporters are selected, create a single entry with blank transporterCode
-    if (biddings.length === 0) {
-      // Extract the numeric part from route if possible
-      let routeValue = 0;
-      if (values.route && values.route !== "Select") {
-        // Try to extract number from route string (e.g. "Route 2" -> 2)
-        const routeMatch = values.route.match(/\d+/);
-        if (routeMatch) {
-          routeValue = parseFloat(routeMatch[0]);
-        }
-      }
-
-      biddings.push({
-        biddingMaster: {
-          id: 1,
-          transporterCode: "",
-          ceilingPrice: parseFloat(values.ceilingAmount) || 0,
-          uom: values.uom || "MT", // Default to MT if not provided
-          bidFrom: formatDate(values.bidStartingFrom), // ISO format with T
-          bidTo: formatDate(values.bidStartTo), // ISO format with T
-          lastTimeExtension: timeToMinutes(values.lastMinutesExtension),
-          extentionQuantity: parseInt(values.extensionQuantity) || 0,
-          bidUnit: 1,
-          addOn: "EXTRA_COST",
-          intervalAmount: parseFloat(values.intervalAmount) || 0,
-          noOfInput: 3,
-          intervalAllocate: timeToMinutes(values.intervalTimeForAllocatingVehicle),
-          intervalReach: timeToMinutes(values.intervalTimeToReachPlant),
-          gracePeriod: timeToMinutes(values.gracePeriodToReachPlant),
-          status: "A",
-          autoAllocation: values.autoAllocateTo === "Yes" ? 1 : 0,
-          bid: 1,
-          bidType: "STANDARD",
-          biddingOrderNo: `ORD-${Date.now()}`,
-          createdDate: new Date().toISOString().split('T')[0],
-          route: routeValue, // Use the numeric value instead of the string
-          multiMaterial: values.multiMaterial === "Yes" ? 1 : 0,
-          city: values.city || "",
-          material: values.material || "Steel", // Default to Steel if not provided
-          quantity: parseInt(values.quantity) || 0,
-          extentionQty: parseInt(values.extensionQuantity) || 0,
-          autoAllocationSalesOrder: 1,
-          fromLocation: values.fromLocation || "Location A", // Default if missing
-          toLocation: values.toLocation || "Location B" // Default if missing
-        },
-        salesOrders: null
-      });
-    }
-
-    // Now construct the bulk payload structure
+    // Return the bulk payload structure
     return {
       bulk: true,
       biddings: biddings
     };
   };
+
 
   const submitFormData = async () => {
     setIsSubmitting(true);
@@ -3849,6 +3887,7 @@ const BulkOrder = ({ bidNo }) => {
     if (activeStep === 0) {
       const validationErrors = {};
 
+      // Only validate required fields
       if (!values.bidStartingFrom) {
         validationErrors.bidStartingFrom = "Please select bid starting date";
       }
@@ -3861,7 +3900,7 @@ const BulkOrder = ({ bidNo }) => {
       if (values.bidStartingFrom && values.bidStartTo) {
         const startDate = new Date(values.bidStartingFrom);
         const endDate = new Date(values.bidStartTo);
-        
+
         if (endDate <= startDate) {
           validationErrors.bidStartTo = "Bid Start To must be greater than Bid Starting From";
         }
@@ -3871,11 +3910,11 @@ const BulkOrder = ({ bidNo }) => {
         validationErrors.intervalAmount = "Please enter interval amount";
       }
 
-      if (!values.uom || values.uom === "Select") {
+      if (!values.uom || values.uom === "Select" || values.uom.trim() === "") {
         validationErrors.uom = "Please select UOM";
       }
 
-      if (!values.city) {
+      if (!values.city || values.city.trim() === "") {
         validationErrors.city = "Please select city";
       }
 
@@ -3884,29 +3923,42 @@ const BulkOrder = ({ bidNo }) => {
 
       // If there are validation errors, don't proceed
       if (Object.keys(validationErrors).length > 0) {
-        console.log("Validation errors:", validationErrors);
         return;
       }
+
+      // If validation passes, move to next step
+      setActiveStep(prevStep => prevStep + 1);
+      return;
     }
 
     // Step 1 validation
     if (activeStep === 1) {
       const validationErrors = {};
 
-      if (!values.material) {
+      if (!values.material || values.material === "Select") {
         validationErrors.material = "Please select material";
       }
 
-      if (!values.quantity) {
+      if (!values.quantity || values.quantity.trim() === "") {
         validationErrors.quantity = "Please enter quantity";
+      } else if (isNaN(values.quantity) || parseFloat(values.quantity) <= 0) {
+        validationErrors.quantity = "Please enter a valid quantity greater than 0";
       }
 
-      if (!values.extensionQuantity) {
+      if (!values.extensionQuantity || values.extensionQuantity.trim() === "") {
         validationErrors.extensionQuantity = "Please enter extension quantity";
+      } else if (isNaN(values.extensionQuantity) || parseFloat(values.extensionQuantity) <= 0) {
+        validationErrors.extensionQuantity = "Please enter a valid extension quantity greater than 0";
+      } else if (parseFloat(values.extensionQuantity) > parseFloat(values.quantity)) {
+        validationErrors.extensionQuantity = "Extension Quantity cannot be greater than Quantity";
       }
 
       if (!values.displayToTransporter || values.displayToTransporter === "Select") {
         validationErrors.displayToTransporter = "Please select display to transporter";
+      }
+
+      if (!values.selectTransporter || values.selectTransporter.length === 0) {
+        validationErrors.selectTransporter = "Please select at least one transporter";
       }
 
       // Update the errors state
@@ -3914,9 +3966,12 @@ const BulkOrder = ({ bidNo }) => {
 
       // If there are validation errors, don't proceed
       if (Object.keys(validationErrors).length > 0) {
-        console.log("Validation errors:", validationErrors);
         return;
       }
+
+      // If validation passes, move to next step
+      setActiveStep(prevStep => prevStep + 1);
+      return;
     }
 
     // Step 2 validation
@@ -3952,9 +4007,12 @@ const BulkOrder = ({ bidNo }) => {
 
       // If there are validation errors, don't proceed
       if (Object.keys(validationErrors).length > 0) {
-        console.log("Validation errors:", validationErrors);
         return;
       }
+
+      // If validation passes, move to next step
+      setActiveStep(prevStep => prevStep + 1);
+      return;
     }
 
     // If we're at the preview step (3), submit the form
@@ -3962,9 +4020,6 @@ const BulkOrder = ({ bidNo }) => {
       await submitFormData();
       return;
     }
-
-    // If we've passed all validations, move to the next step
-    setActiveStep(prevStep => prevStep + 1);
   };
 
   const handleBackPage = () => {
@@ -4062,53 +4117,64 @@ const BulkOrder = ({ bidNo }) => {
                     name="bidStartingFrom"
                     value={values.bidStartingFrom}
                     onChange={handleInputChange}
-                    required
                     min={new Date().toISOString().slice(0, 16)}
                     className="bulk-order-input"
-                    style={{ color: "#000" }}
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.bidStartingFrom ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px"
+                    }}
                   />
+                  {errors.bidStartingFrom && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.bidStartingFrom}
+                    </div>
+                  )}
                 </div>
               </div>
 
-           <div className="bulk-order-form-group">
-  <Label className="bulk-order-label">
-    Bid Start To  <span style={{ color: "red" }}>*</span>
-  </Label>
-  <div style={{ position: "relative" }}>
-    <Input
-      type="datetime-local"
-      name="bidStartTo"
-      value={values.bidStartTo}
-      min={new Date().toISOString().slice(0, 16)}
-      onChange={handleInputChange}
-      className={`bulk-order-input ${errors.bidStartTo ? "is-invalid" : ""}`}
-      style={{ 
-        color: "#000",
-        borderColor: errors.bidStartTo ? "#dc3545" : "",
-        borderWidth: errors.bidStartTo ? "2px" : ""
-      }}
-    />
-    {errors.bidStartTo && (
-      <div style={{ 
-        display: "block", 
-        color: "#dc3545", 
-        fontSize: "12px", 
-        marginTop: "4px",
-        fontWeight: "500"
-      }}>
-        {errors.bidStartTo}
-      </div>
-    )}
-  </div>
-</div>
+              <div className="bulk-order-form-group">
+                <Label className="bulk-order-label">
+                  Bid Start To <span style={{ color: "red" }}>*</span>
+                </Label>
+                <div style={{ position: "relative" }}>
+                  <Input
+                    type="datetime-local"
+                    name="bidStartTo"
+                    value={values.bidStartTo}
+                    min={new Date().toISOString().slice(0, 16)}
+                    onChange={handleInputChange}
+                    className="bulk-order-input"
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.bidStartTo ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px"
+                    }}
+                  />
+                  {errors.bidStartTo && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.bidStartTo}
+                    </div>
+                  )}
+                </div>
+              </div>
 
 
               <div className="bulk-order-form-group city-dropdown-container">
                 <Label className="bulk-order-label">
-                  City  <span style={{ color: "red" }}>*</span>
+                  City <span style={{ color: "red" }}>*</span>
                 </Label>
                 <div style={{ position: "relative" }}>
-                  {/* Main selector that shows the current selection */}
                   <div
                     className="bulk-order-city-selector"
                     onClick={() => setShowCityDropdown(!showCityDropdown)}
@@ -4117,7 +4183,7 @@ const BulkOrder = ({ bidNo }) => {
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                      border: "1px solid #ced4da",
+                      border: `1px solid ${errors.city ? "#dc3545" : "#ced4da"}`,
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff"
@@ -4130,6 +4196,17 @@ const BulkOrder = ({ bidNo }) => {
                       <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
                     </span>
                   </div>
+
+                  {errors.city && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.city}
+                    </div>
+                  )}
 
                   {/* City dropdown with search functionality */}
                   {showCityDropdown && (
@@ -4151,13 +4228,12 @@ const BulkOrder = ({ bidNo }) => {
                         backgroundColor: "#fff",
                         borderBottom: "1px solid #ddd"
                       }}>
-
                         <input
                           type="text"
                           placeholder="Search"
                           value={citySearchTerm}
                           onChange={(e) => setCitySearchTerm(e.target.value)}
-                          onClick={(e) => e.stopPropagation()} // This prevents the dropdown from closing
+                          onClick={(e) => e.stopPropagation()}
                           className="bulk-order-dropdown-search"
                           style={{
                             width: "100%",
@@ -4170,31 +4246,7 @@ const BulkOrder = ({ bidNo }) => {
                         />
                       </div>
 
-                      {/* Loading indicator */}
-                      {loadingCities && (
-                        <div style={{
-                          padding: "20px",
-                          textAlign: "center",
-                          color: "#4361ee"
-                        }}>
-                          <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
-                          <div style={{ marginTop: "8px" }}>Loading cities...</div>
-                        </div>
-                      )}
-
-                      {/* Empty state */}
-                      {!loadingCities && filteredCities.length === 0 && (
-                        <div style={{
-                          padding: "20px",
-                          textAlign: "center",
-                          color: "#666"
-                        }}>
-                          <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
-                          <div style={{ marginTop: "8px" }}>No cities found</div>
-                        </div>
-                      )}
-
-                      {/* City list items styled to match transporter style */}
+                      {/* City list items */}
                       {!loadingCities && filteredCities.length > 0 && (
                         <div className="bulk-order-dropdown-content">
                           {filteredCities.map((city, index) => (
@@ -4215,6 +4267,12 @@ const BulkOrder = ({ bidNo }) => {
                                   ...prevValues,
                                   city: city
                                 }));
+                                // Clear city error when a city is selected
+                                setErrors(prevErrors => {
+                                  const newErrors = { ...prevErrors };
+                                  delete newErrors.city;
+                                  return newErrors;
+                                });
                                 setCitySearchTerm("");
                                 setShowCityDropdown(false);
                               }}
@@ -4237,7 +4295,7 @@ const BulkOrder = ({ bidNo }) => {
 
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
-                  Ceiling Amount
+                  Ceiling Amount (MT)
                 </Label>
                 <Input
                   type="number"
@@ -4247,7 +4305,6 @@ const BulkOrder = ({ bidNo }) => {
                   min="0"
                   value={values.ceilingAmount}
                   onChange={handleInputChange}
-
                   className="bulk-order-input"
                   style={{ color: "#000" }}
                 />
@@ -4260,16 +4317,34 @@ const BulkOrder = ({ bidNo }) => {
                 <Label className="bulk-order-label">
                   Interval Amount <span style={{ color: "red" }}>*</span>
                 </Label>
-                <Input
-                  type="number"
-                  placeholder="Add Amount"
-                  name="intervalAmount"
-                  value={values.intervalAmount}
-                  onChange={handleInputChange}
-                  required
-                  className="bulk-order-input"
-                  style={{ color: "#000" }}
-                />
+                <div style={{ position: "relative" }}>
+                  <Input
+                    type="number"
+                    placeholder="Add Amount"
+                    name="intervalAmount"
+                    value={values.intervalAmount}
+                    onChange={handleInputChange}
+                    className="bulk-order-input"
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.intervalAmount ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px",
+                      backgroundColor: "#fff"
+                    }}
+                  />
+                  {errors.intervalAmount && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500",
+                      position: "absolute",
+                      width: "100%"
+                    }}>
+                      {errors.intervalAmount}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="bulk-order-form-group">
@@ -4284,7 +4359,11 @@ const BulkOrder = ({ bidNo }) => {
                     onChange={handleInputChange}
                     required
                     className="bulk-order-select"
-                    style={{ color: "#000" }}
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.uom ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px"
+                    }}
                   >
                     {uomOptions.map((uom, index) => (
                       <option key={index} value={uom} style={{ color: "#000" }}>
@@ -4292,6 +4371,16 @@ const BulkOrder = ({ bidNo }) => {
                       </option>
                     ))}
                   </Input>
+                  {errors.uom && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.uom}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -4306,7 +4395,7 @@ const BulkOrder = ({ bidNo }) => {
                     name="lastMinutesExtension"
                     value={values.lastMinutesExtension}
                     onChange={handleInputChange}
-                    required
+
                     className="bulk-order-input black-placeholder"
                     style={{ color: "#000" }}
                   />
@@ -4376,10 +4465,11 @@ const BulkOrder = ({ bidNo }) => {
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                      border: "1px solid #ced4da",
+                      border: `1px solid ${errors.material ? "#dc3545" : "#ced4da"}`,
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
-                      backgroundColor: "#fff"
+                      backgroundColor: "#fff",
+                      outline: "none"
                     }}
                   >
                     <span className="bulk-order-material-selector-placeholder" style={{ color: "#000" }}>
@@ -4389,7 +4479,16 @@ const BulkOrder = ({ bidNo }) => {
                       <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
                     </span>
                   </div>
-
+                  {errors.material && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.material}
+                    </div>
+                  )}
                   {/* Material dropdown with search functionality */}
                   {showMaterialDropdown && (
                     <div className="bulk-order-dropdown" style={{
@@ -4423,7 +4522,8 @@ const BulkOrder = ({ bidNo }) => {
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px"
+                            fontSize: "14px",
+                            outline: "none"
                           }}
                         />
                       </div>
@@ -4448,6 +4548,12 @@ const BulkOrder = ({ bidNo }) => {
                                 ...prevValues,
                                 material: material
                               }));
+                              // Clear material error when a material is selected
+                              setErrors(prevErrors => {
+                                const newErrors = { ...prevErrors };
+                                delete newErrors.material;
+                                return newErrors;
+                              });
                               setMaterialSearchTerm("");
                               setShowMaterialDropdown(false);
                             }}
@@ -4470,34 +4576,68 @@ const BulkOrder = ({ bidNo }) => {
 
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
-                  Quantity <span style={{ color: "red" }}>*</span>
+                  Quantity (MT) <span style={{ color: "red" }}>*</span>
                 </Label>
-                <Input
-                  type="text"
-                  placeholder="Add Quantity"
-                  name="quantity"
-                  value={values.quantity}
-                  onChange={handleInputChange}
-                  required
-                  className="bulk-order-input"
-                  style={{ color: "#000" }}
-                />
+                <div style={{ position: "relative" }}>
+                  <Input
+                    type="text"
+                    placeholder="Add Quantity"
+                    name="quantity"
+                    value={values.quantity}
+                    onChange={handleInputChange}
+
+                    className="bulk-order-input"
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.quantity ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px",
+                      outline: "none"
+                    }}
+                  />
+                  {errors.quantity && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.quantity}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
-                  Extension Quantity <span style={{ color: "red" }}>*</span>
+                  Extension Quantity (MT) <span style={{ color: "red" }}>*</span>
                 </Label>
-                <Input
-                  type="text"
-                  placeholder="Add Quantity"
-                  name="extensionQuantity"
-                  value={values.extensionQuantity}
-                  onChange={handleInputChange}
-                  required
-                  className="bulk-order-input"
-                  style={{ color: "#000" }}
-                />
+                <div style={{ position: "relative" }}>
+                  <Input
+                    type="text"
+                    placeholder="Add Quantity"
+                    name="extensionQuantity"
+                    value={values.extensionQuantity}
+                    onChange={handleInputChange}
+
+                    className="bulk-order-input"
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.extensionQuantity ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px",
+                      outline: "none"
+                    }}
+                  />
+                  {errors.extensionQuantity && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.extensionQuantity}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -4513,9 +4653,14 @@ const BulkOrder = ({ bidNo }) => {
                     name="displayToTransporter"
                     value={values.displayToTransporter}
                     onChange={handleInputChange}
-                    required
+
                     className="bulk-order-select"
-                    style={{ color: "#000" }}
+                    style={{
+                      color: "#000",
+                      border: `1px solid ${errors.displayToTransporter ? "#dc3545" : "#ced4da"}`,
+                      borderRadius: "4px",
+                      outline: "none"
+                    }}
                   >
                     {displayToTransporterOptions.map((option, index) => (
                       <option
@@ -4527,186 +4672,215 @@ const BulkOrder = ({ bidNo }) => {
                       </option>
                     ))}
                   </Input>
+                  {errors.displayToTransporter && (
+                    <div style={{
+                      color: "#dc3545",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                      fontWeight: "500"
+                    }}>
+                      {errors.displayToTransporter}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   Select Transporter <span style={{ color: "red" }}>*</span>
                 </Label>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <div style={{ flex: 1, position: "relative" }}>
+                <div className="form-group-with-viewer">
+                  <div className="input-container" style={{ position: "relative" }}>
                     <div
                       className="bulk-order-transporter-selector"
                       onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
                       style={{
-                        height: "38px",
-                        color: "#000",
+                        minHeight: "38px",
+                        width: "100%",
+                        color: values.selectTransporter.length > 0 ? "#000" : "#667085",
                         display: "flex",
                         alignItems: "center",
-                        border: "1px solid #ced4da",
+                        border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
                         borderRadius: "4px",
                         padding: "0.375rem 0.75rem",
-                        backgroundColor: "#fff"
+                        backgroundColor: "#fff",
+                        cursor: "pointer",
+                        justifyContent: "space-between",
+                        outline: "none",
+                        transition: "border-color 0.15s ease-in-out"
                       }}
                     >
-                      {/* Display correct count of selected transporters */}
-                      <span className="bulk-order-transporter-selector-placeholder" style={{ color: "#000" }}>
+                      <span style={{ flex: 1 }}>
                         {values.selectTransporter.length > 0
-                          ? `${values.selectTransporter.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).length} Selected`
-                          : 'Select'}
+                          ? `${values.selectTransporter.length} Selected`
+                          : "Select"}
                       </span>
-                      <span style={{ marginLeft: "auto" }}>
-                        <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
-                      </span>
+                      <i className="ri-arrow-down-s-line" style={{ fontSize: "20px", color: "#667085", marginLeft: "8px" }}></i>
                     </div>
-
-                    {/* Transporter dropdown with select all functionality */}
-                    {/* Transporter dropdown list with checkboxes as shown in figma */}
-                    {showTransporterDropdown && (
-                      <div className="bulk-order-dropdown" style={{
-                        position: "absolute",
-                        width: "100%",
-                        zIndex: 10,
-                        backgroundColor: "#fff",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    {errors.selectTransporter && (
+                      <div style={{
+                        color: "#dc3545",
+                        fontSize: "12px",
                         marginTop: "4px",
-                        maxHeight: "300px",
-                        overflowY: "auto"
+                        fontWeight: "500",
+                        position: "absolute",
+                        width: "100%"
                       }}>
-                        {/* Search header */}
-                        <div className="bulk-order-dropdown-header" style={{
-                          padding: "8px",
-                          backgroundColor: "#fff",
-                          borderBottom: "1px solid #ddd"
-                        }}>
-                          <div style={{ display: "flex", alignItems: "center" }}>
-                            <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
-                              <input
-                                type="checkbox"
-                                checked={areAllFilteredTransportersSelected()}
-                                onChange={handleSelectAllTransporters}
-                                onClick={(e) => e.stopPropagation()}
-                                style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer"
-                                }}
-                              />
-                            </div>
-                            <input
-                              type="text"
-                              placeholder="Search"
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                              onClick={(e) => e.stopPropagation()}
-                              className="bulk-order-dropdown-search"
-                              style={{
-                                flex: 1,
-                                padding: "8px 12px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                color: "#000",
-                                fontSize: "14px"
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Loading indicator */}
-                        {loadingTransporters && (
-                          <div style={{
-                            padding: "20px",
-                            textAlign: "center",
-                            color: "#4361ee"
-                          }}>
-                            <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
-                            <div style={{ marginTop: "8px" }}>Loading transporters...</div>
-                          </div>
-                        )}
-
-                        {/* Empty state */}
-                        {!loadingTransporters && filteredTransporters.length === 0 && (
-                          <div style={{
-                            padding: "20px",
-                            textAlign: "center",
-                            color: "#666"
-                          }}>
-                            <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
-                            <div style={{ marginTop: "8px" }}>No transporters found</div>
-                          </div>
-                        )}
-
-                        {/* Transporter list items styled to match figma design */}
-                        {!loadingTransporters && filteredTransporters.length > 0 && (
-                          <div className="bulk-order-dropdown-content">
-                            {filteredTransporters.map((transporter, index) => (
-                              <div
-                                key={index}
-                                className="bulk-order-dropdown-item"
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  padding: "10px 8px",
-                                  borderBottom: "1px solid #eee",
-                                  color: "#000",
-                                  cursor: "pointer"
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const isSelected = values.selectTransporter.some(t => t.id === transporter.id);
-                                  if (!isSelected) {
-                                    handleTransporterSelect(transporter);
-                                  } else {
-                                    handleRemoveTransporter(transporter.id, e);
-                                  }
-                                }}
-                              >
-                                <div style={{ flex: "0 0 40px", display: "flex", justifyContent: "center" }}>
-                                  <input
-                                    type="checkbox"
-                                    checked={values.selectTransporter.some(t => t.id === transporter.id)}
-                                    onChange={(e) => {
-                                      e.stopPropagation();
-                                      if (e.target.checked) {
-                                        handleTransporterSelect(transporter);
-                                      } else {
-                                        handleRemoveTransporter(transporter.id, e);
-                                      }
-                                    }}
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      cursor: "pointer"
-                                    }}
-                                  />
-                                </div>
-                                <div style={{
-                                  flex: "0 0 120px",
-                                  paddingRight: "15px",
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  fontSize: "14px"
-                                }}>
-                                  {transporter.id}
-                                </div>
-                                <div style={{
-                                  flex: 1,
-                                  fontSize: "14px"
-                                }}>
-                                  {transporter.name}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {errors.selectTransporter}
                       </div>
                     )}
+                 {showTransporterDropdown && (
+  <div className="bulk-order-dropdown" style={{
+    position: "absolute",
+    width: "100%",
+    zIndex: 1000,
+    marginTop: "4px",
+    backgroundColor: "#fff",
+    border: "1px solid #ced4da",
+    borderRadius: "4px",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+    maxHeight: "300px",
+    overflowY: "auto"
+  }}>
+    {/* Updated header with proper structure matching SOBasedOrder */}
+    <div className="bulk-order-dropdown-header" style={{
+      padding: "8px",
+      backgroundColor: "#405189",
+      borderBottom: "1px solid #ddd",
+      position: "sticky",
+      top: 0,
+      zIndex: 1,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      cursor: "default"
+    }}>
+      <div className="dropdown-controls" style={{
+        display: "flex",
+        alignItems: "center"
+      }}>
+        <div className="checkbox-container" style={{
+          flex: "0 0 40px",
+          display: "flex",
+          justifyContent: "center",
+          marginRight: "10px"
+        }}>
+          <input
+            type="checkbox"
+            checked={areAllFilteredTransportersSelected()}
+            onChange={handleSelectAllTransporters}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "18px",
+              height: "18px",
+              cursor: "pointer",
+              accentColor: "#fff"
+            }}
+          />
+        </div>
+        <input
+          type="text"
+          placeholder="Search"
+          value={searchTerm}
+          onChange={handleTransporterSearch}
+          onClick={(e) => e.stopPropagation()}
+          className="bulk-order-dropdown-search"
+          style={{
+            flex: 1,
+            padding: "8px 12px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            color: "#000",
+            fontSize: "14px",
+            backgroundColor: "#fff"
+          }}
+        />
+      </div>
+    </div>
+
+    <div className="bulk-order-dropdown-content">
+      {loadingTransporters ? (
+        <div className="so-sales-orders-loading">
+          <i className="ri-loader-4-line spin"></i>
+          <span className="loading-text">Loading transporters...</span>
+        </div>
+      ) : !filteredTransporters || filteredTransporters.length === 0 ? (
+        <div className="so-sales-orders-empty">
+          <i className="ri-inbox-line"></i>
+          <span className="empty-text">
+            {searchTerm ? 'No transporters found matching your search' : 'No transporters found'}
+          </span>
+        </div>
+      ) : (
+        filteredTransporters.map((transporter, index) => {
+          if (!transporter || !transporter.id) {
+            return null;
+          }
+          
+          return (
+            <div
+              key={`${transporter.id}-${index}`}
+              className="bulk-order-dropdown-item"
+              onClick={() => handleTransporterSelect(transporter)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "8px 12px",
+                cursor: "pointer",
+                transition: "background-color 0.2s"
+              }}
+            >
+              <div className="checkbox-container" style={{
+                flex: "0 0 40px",
+                display: "flex",
+                justifyContent: "center",
+                marginRight: "10px"
+              }}>
+                <input
+                  type="checkbox"
+                  checked={values.selectTransporter.some(t => t.id === transporter.id)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    if (e.target.checked) {
+                      handleTransporterSelect(transporter);
+                    } else {
+                      handleRemoveTransporter(transporter.id);
+                    }
+                  }}
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    accentColor: "#405189"
+                  }}
+                />
+              </div>
+              <div className="transporter-id" style={{
+                flex: "0 0 120px",
+                paddingRight: "15px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                fontSize: "14px",
+                color: "#667085"
+              }}>
+                {transporter.id || 'N/A'}
+              </div>
+              <div className="transporter-name" style={{
+                flex: 1,
+                fontSize: "14px",
+                color: "#101828"
+              }}>
+                {transporter.name || 'N/A'}
+              </div>
+            </div>
+          );
+        }).filter(Boolean)
+      )}
+    </div>
+  </div>
+)}
                   </div>
 
-                  {/* Add the TransporterViewer component if there are any selected transporters */}
+                  {/* ADD THIS: TransporterViewer component - same as SOBasedOrder */}
                   {values.selectTransporter.length > 0 && (
                     <TransporterViewer
                       selectedTransporters={values.selectTransporter}
@@ -4812,7 +4986,8 @@ const BulkOrder = ({ bidNo }) => {
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px"
+                            fontSize: "14px",
+                            outline: "none"
                           }}
                         />
                       </div>
@@ -4901,64 +5076,85 @@ const BulkOrder = ({ bidNo }) => {
 
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
-                  To Location <span style={{ color: "red" }}>*</span>
+                  Select Transporter <span style={{ color: "red" }}>*</span>
                 </Label>
-                <div style={{ position: "relative" }} className="to-location-dropdown-container">
-                  {/* Main selector that shows the current selection */}
-                  <div
-                    className="bulk-order-location-selector"
-                    onClick={() => setShowToLocationDropdown(!showToLocationDropdown)}
-                    style={{
-                      height: "38px",
-                      color: "#000",
-                      display: "flex",
-                      alignItems: "center",
-                      // border: "1px solid #ced4da",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      padding: "0.375rem 0.75rem",
-                      backgroundColor: "#fff",
-                      // borderColor: errors.toLocation ? "#dc3545" : "",
-                      // borderWidth: errors.toLocation ? "2px" : ""
-                    }}
-                  >
-                    <span className="bulk-order-location-selector-placeholder" style={{ color: "#000" }}>
-                      {values.toLocation || 'Select'}
-                    </span>
-                    <span style={{ marginLeft: "auto" }}>
-                      <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
-                    </span>
-                  </div>
-
-                  {/* To Location dropdown with search functionality */}
-                  {showToLocationDropdown && (
-                    <div className="bulk-order-dropdown" style={{
-                      position: "absolute",
-                      width: "100%",
-                      zIndex: 10,
-                      backgroundColor: "#fff",
-                      border: "1px solid #ddd",
-                      borderRadius: "4px",
-                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                      marginTop: "4px",
-                      maxHeight: "300px",
-                      overflowY: "auto"
-                    }}>
-                      {/* Search header */}
-                      <div className="bulk-order-dropdown-header" style={{
-                        padding: "8px",
+                <div className="form-group-with-viewer">
+                  <div className="input-container" style={{ position: "relative" }}>
+                    <div
+                      className="bulk-order-transporter-selector"
+                      onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
+                      style={{
+                        minHeight: "38px",
+                        width: "100%",
+                        color: values.selectTransporter.length > 0 ? "#000" : "#667085",
+                        display: "flex",
+                        alignItems: "center",
+                        border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
+                        borderRadius: "4px",
+                        padding: "0.375rem 0.75rem",
                         backgroundColor: "#fff",
-                        borderBottom: "1px solid #ddd"
+                        cursor: "pointer",
+                        justifyContent: "space-between",
+                        outline: "none",
+                        transition: "border-color 0.15s ease-in-out"
+                      }}
+                    >
+                      <span style={{ flex: 1 }}>
+                        {values.selectTransporter.length > 0
+                          ? `${values.selectTransporter.length} Selected`
+                          : "Select"}
+                      </span>
+                      <i className="ri-arrow-down-s-line" style={{ fontSize: "20px", color: "#667085", marginLeft: "8px" }}></i>
+                    </div>
+                    {errors.selectTransporter && (
+                      <div style={{
+                        color: "#dc3545",
+                        fontSize: "12px",
+                        marginTop: "4px",
+                        fontWeight: "500",
+                        position: "absolute",
+                        width: "100%"
                       }}>
+                        {errors.selectTransporter}
+                      </div>
+                    )}
+                    {showTransporterDropdown && (
+                      <div className="bulk-order-dropdown" style={{
+                        position: "absolute",
+                        width: "100%",
+                        zIndex: 1000,
+                        marginTop: "4px",
+                        backgroundColor: "#fff",
+                        border: "1px solid #ced4da",
+                        borderRadius: "4px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        maxHeight: "300px",
+                        overflowY: "auto"
+                      }}>
+                        {/* Rest of the dropdown content */}
+                        <div className="checkbox-container">
+                          <input
+                            type="checkbox"
+                            checked={areAllFilteredTransportersSelected()}
+                            onChange={handleSelectAllTransporters}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              width: "18px",
+                              height: "18px",
+                              cursor: "pointer",
+                              accentColor: "#405189"
+                            }}
+                          />
+                        </div>
                         <input
                           type="text"
-                          placeholder="Search"
-                          value={toLocationSearchTerm}
-                          onChange={(e) => setToLocationSearchTerm(e.target.value)}
+                          placeholder="Search by name, ID, contact..."
+                          value={searchTerm}
+                          onChange={handleTransporterSearch}
                           onClick={(e) => e.stopPropagation()}
                           className="bulk-order-dropdown-search"
                           style={{
-                            width: "100%",
+                            flex: 1,
                             padding: "8px 12px",
                             border: "1px solid #ddd",
                             borderRadius: "4px",
@@ -4966,82 +5162,69 @@ const BulkOrder = ({ bidNo }) => {
                             fontSize: "14px"
                           }}
                         />
-                      </div>
-
-                      {/* Loading indicator */}
-                      {loadingCities && (
-                        <div style={{
-                          padding: "20px",
-                          textAlign: "center",
-                          color: "#4361ee"
-                        }}>
-                          <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
-                          <div style={{ marginTop: "8px" }}>Loading locations...</div>
-                        </div>
-                      )}
-
-                      {/* Empty state */}
-                      {!loadingCities && filteredToLocations.length === 0 && (
-                        <div style={{
-                          padding: "20px",
-                          textAlign: "center",
-                          color: "#666"
-                        }}>
-                          <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
-                          <div style={{ marginTop: "8px" }}>No locations found</div>
-                        </div>
-                      )}
-
-                      {/* To Location list items */}
-                      {!loadingCities && filteredToLocations.length > 0 && (
                         <div className="bulk-order-dropdown-content">
-                          {filteredToLocations.map((location, index) => (
-                            <div
-                              key={index}
-                              className="bulk-order-dropdown-item"
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                padding: "10px 8px",
-                                borderBottom: "1px solid #eee",
-                                color: "#000",
-                                cursor: "pointer"
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setValues(prevValues => ({
-                                  ...prevValues,
-                                  toLocation: location
-                                }));
-                                setToLocationSearchTerm("");
-                                setShowToLocationDropdown(false);
-                                // Clear error if it exists
-                                if (errors.toLocation) {
-                                  setErrors(prevErrors => {
-                                    const newErrors = { ...prevErrors };
-                                    delete newErrors.toLocation;
-                                    return newErrors;
-                                  });
-                                }
-                              }}
-                            >
-                              <div style={{
-                                flex: 1,
-                                fontSize: "14px",
-                                paddingLeft: "10px"
-                              }}>
-                                {location}
-                              </div>
+                          {loadingTransporters ? (
+                            <div className="so-sales-orders-loading">
+                              <i className="ri-loader-4-line spin"></i>
+                              <span className="loading-text">Loading transporters...</span>
                             </div>
-                          ))}
+                          ) : !filteredTransporters || filteredTransporters.length === 0 ? (
+                            <div className="so-sales-orders-empty">
+                              <i className="ri-inbox-line"></i>
+                              <span className="empty-text">
+                                {searchTerm ? 'No transporters found matching your search' : 'No transporters found'}
+                              </span>
+                            </div>
+                          ) : (
+                            filteredTransporters.map((transporter, index) => {
+                              // Add safety check for transporter object
+                              if (!transporter || !transporter.id) {
+                                return null;
+                              }
+
+                              return (
+                                <div
+                                  key={`${transporter.id}-${index}`}
+                                  className="bulk-order-dropdown-item"
+                                  onClick={() => handleTransporterSelect(transporter)}
+                                >
+                                  <div className="checkbox-container">
+                                    <input
+                                      type="checkbox"
+                                      checked={values.selectTransporter.some(t => t.id === transporter.id)}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        if (e.target.checked) {
+                                          handleTransporterSelect(transporter);
+                                        } else {
+                                          handleRemoveTransporter(transporter.id);
+                                        }
+                                      }}
+                                    />
+                                  </div>
+                                  <div className="transporter-id">
+                                    {transporter.id || 'N/A'}
+                                  </div>
+                                  <div className="transporter-name">
+                                    {transporter.name || 'N/A'}
+                                  </div>
+                                </div>
+                              );
+                            }).filter(Boolean) // Remove any null entries
+                          )}
                         </div>
-                      )}
-                    </div>
-                  )}
-                  {errors.toLocation && (
-                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
-                      {errors.toLocation}
-                    </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Add TransporterViewer component */}
+                  {values.selectTransporter.length > 0 && (
+                    <TransporterViewer
+                      selectedTransporters={values.selectTransporter}
+                      onRemove={(transporterId) => {
+                        handleRemoveTransporter(transporterId);
+                      }}
+                    />
                   )}
                 </div>
               </div>
@@ -5108,7 +5291,8 @@ const BulkOrder = ({ bidNo }) => {
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px"
+                            fontSize: "14px",
+                            outline: "none"
                           }}
                         />
                       </div>

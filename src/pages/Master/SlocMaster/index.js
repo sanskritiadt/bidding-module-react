@@ -154,6 +154,9 @@ const SlocMaster = () => {
           if (res.status.msg === 'Slot Commited Successfully') {
             toast.success('Vehicle Commit Successfully', { autoClose: 3000 });
             toggle();
+          } else {
+            toast.error(res.status.msg, { autoClose: 3000 });
+            toggle();
           }
 
         })
@@ -200,9 +203,9 @@ const SlocMaster = () => {
     try {
       await axios.post(`${process.env.REACT_APP_LOCAL_URL_8082}/vehicleslotdetails/allocate`, data, config)
         .then((res) => {
-          if (res.status.data === '200 OK') {
+          if (res.status.msg === 'Vehicle Slot Details Saved Successfully') {
             toast.success("Allocated Truck SuccessFully", { autoClose: 3000 });
-          }else{
+          } else {
             toast.error(res.status.msg, { autoClose: 3000 });
           }
 
@@ -440,7 +443,7 @@ const SlocMaster = () => {
 
   const submitMultiEvent = async (id) => {
     debugger;
-    const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/SlocMaster/getSlot/${id}`, config);
+    const res = await axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/slotmaster/getSlot/${id}`, config);
     const st_date = res.slotDateFromFormatted;
     const ed_date = res.slotDateToFormatted;
 
@@ -490,8 +493,10 @@ const SlocMaster = () => {
       state: res.state,
     });
 
-    setslotModalSize(false);
-    setIsEdit(false);
+    setslotModalSize(true);
+    // setslotModalSize(false);
+    setIsEdit(true);
+    //  setIsEdit(false);
     setIsEditButton(true);
     toggle();
   };
@@ -676,6 +681,7 @@ const SlocMaster = () => {
    * Handling the modal state
    */
   const toggle = () => {
+    debugger
     if (modal) {
       setSelectedTransporters([]);
       if (!slotModalSize) {
@@ -1070,6 +1076,7 @@ const SlocMaster = () => {
       slotNumber: item.slotNumber,
       title: item.plantName,
       state: item.state,
+      status: item.status,
       maxTtCommitTr: item.maxTtCommitTr,
       noOfTtRq: item.noOfTtRq,
       // start: `2025-04-${day}`,
@@ -1244,6 +1251,16 @@ const SlocMaster = () => {
 
                             return "none"; // prevent FullCalendar default popup
                           }}
+                          eventClassNames={(arg) => {
+                            // Example: add a class based on event status or any custom logic
+                            const status = arg.event.extendedProps.status; // assuming you have status in event
+                            return [
+                              "custom-event",                      // default class
+                              status === "A" ? "event-status-a" :
+                                status === "B" ? "event-status-b" :
+                                  "event-status-c"
+                            ];
+                          }}
 
                           moreLinkDidMount={(info) => {
                             info.el.innerText = "View All";
@@ -1356,13 +1373,13 @@ const SlocMaster = () => {
                       <InfoRow iconClass={A9} text={format(event?.remarks)} />
                       <input type="hidden" id="id_param" value={event?.id} />
                     </div>
-
+                    {/* 
                     <div className="hstack gap-2 justify-content-end">
                       {event?.status === 'A' && <button
                         type="submit"
                         className="btn mt-3  custom-blue-button"
                         id="btn-save-event"
-                        onClick={() => { setCommitSlocModal(true); setValues([]); }}
+                        onClick={() => { setCommitSlocModal(true); setIsEdit(true); setValues([]); setModal(false); }}
                       >
                         Commit SLOC
                       </button>
@@ -1376,9 +1393,30 @@ const SlocMaster = () => {
                         Allocate Truck
                       </button>}
 
-                    </div>
+                    </div> */}
 
                   </Form>
+
+                  <div className="hstack gap-2 justify-content-end">
+                    {event?.status === 'A' && <button
+                      type="submit"
+                      className="btn mt-3  custom-blue-button"
+                      id="btn-save-event"
+                      onClick={() => { setCommitSlocModal(true); setIsEdit(true); setValues([]); }}
+                    >
+                      Commit SLOT
+                    </button>
+                    }
+                    {event?.status === 'B' && <button
+                      type="submit"
+                      className="btn mt-3 sm-3 custom-blue-button"
+                      id="btn-save-event"
+                      onClick={allocateModal}
+                    >
+                      Allocate Truck
+                    </button>}
+
+                  </div>
                   <Form>
                     <Row>
                       {CommitSlocModal ?
@@ -1449,23 +1487,27 @@ const SlocMaster = () => {
         <ModalBody>
           {
             eventList.map((item, index) => (
-              <div key={index} className="card d-flex flex-row shadow-sm border-0" style={{ maxWidth: '500px' }}>
+              <div key={index} className="card d-flex flex-row shadow-sm border-0" dataid={item.status} style={{ maxWidth: '500px' }}>
                 <div style={{
-                  backgroundColor: "rgb(10 179 156)",
-                  width: "5px",
+                  backgroundColor: item.status === 'A' ? '#FFBA0C' : item.status === 'B' ? '#0085FF' : "#r0F8704",
+                  width: "10px",
                   borderTopLeftRadius: "5px",
                   borderBottomLeftRadius: "5px",
                 }}></div>
 
                 <div className="d-flex flex-column justify-content-center align-items-center px-3 text-center" style={{ width: "173px", fontSize: 'large', color: 'black' }}>
                   <small className="fw-semibold">{formatDate(item.start)} - </small>
-                  <small className="fw-semibold">{formatDate(item.end)}</small>
+                  {/* <small className="fw-semibold">{formatDate(item.end)}</small> */}
+                  <small className="fw-semibold">
+                    {formatDate(new Date(new Date(item.end).setDate(new Date(item.end).getDate() - 1)))}
+                  </small>
+
                 </div>
 
                 <div className="border-start px-3 py-2 w-100">
                   <div style={{ display: 'flex' }}>
                     <h6 className="fw-bold mb-2" style={{ color: 'black' }}>{item.title}</h6>
-                    {/* <button className="btn btn-success btn-sm" type="button" style={{ marginLeft: 'auto' }} onClick={() => submitMultiEvent(item.id)}>Edit</button> */}
+                    <button className="btn btn-success btn-sm" type="button" style={{ marginLeft: 'auto' }} onClick={() => { submitMultiEvent(item.slotNumber); setCommitSlocModal(false); }}>Commit</button>
                   </div>
 
                   <p className="mb-1"><i className="bi bi-truck"></i> {item.noOfTtRq} Truck Required</p>

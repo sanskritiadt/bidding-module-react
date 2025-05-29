@@ -86,6 +86,7 @@ const SlotMaster = () => {
   const [TruckData, setTruckData] = useState([]);
   const [SlotData, setSlotData] = useState([]);
   const [slotModalSize, setslotModalSize] = useState(false);
+  const [MaxTrErrorMsg, setMaxTrErrorMsg] = useState(false);
 
 
   const { events, categories, isEventUpdated } = useSelector((state) => ({
@@ -201,6 +202,8 @@ const SlotMaster = () => {
   };
 
 
+
+
   const getPlantData = () => {
     axios.get(`${process.env.REACT_APP_LOCAL_URL_8082}/plants/getAllPlants`, config)
       .then(res => {
@@ -259,6 +262,7 @@ const SlotMaster = () => {
     // setSelectedDateEvents(eventList); // or however you're managing modal data
     setOpenModal(true);
   };
+
 
 
 
@@ -322,8 +326,10 @@ const SlotMaster = () => {
       state: res.state,
     });
 
-    setslotModalSize(false);
-    setIsEdit(false);
+    setslotModalSize(true);
+    // setslotModalSize(false);
+    setIsEdit(true);
+    //  setIsEdit(false);
     setIsEditButton(true);
     toggle();
   };
@@ -348,7 +354,7 @@ const SlotMaster = () => {
   // };
 
   // Handle input change function
-  const handleInputChange = (e) => {
+  const handleInputChange = (e) => {debugger
     const { name, value } = e.target;
 
     // Update time (startTime or endTime)
@@ -357,6 +363,7 @@ const SlotMaster = () => {
         ...prevValues,
         [name]: value,  // Update only the time-related field
       }));
+    
       setEvent((prevEvent) => ({
         ...prevEvent,
         [name]: value,  // Update only the time-related field
@@ -372,6 +379,7 @@ const SlotMaster = () => {
         [name]: value || value.valueAsNumber,  // Update specific field
       }));
     }
+  
   };
 
   // const submitEventData = async (e) => {
@@ -686,12 +694,12 @@ const SlotMaster = () => {
       ed_date == null
         ? date_r(st_date)
         : date_r(st_date) + " to " + date_r(ed_date);
-        const convertTo24HourFormat = (timeStr) => {
-  const date = new Date(`1970-01-01T${timeStr}`);
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}:00`;
-};
+    const convertTo24HourFormat = (timeStr) => {
+      const date = new Date(`1970-01-01T${timeStr}`);
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}:00`;
+    };
 
     setSlotDateFrom(date_r(res.slotDateFromFormatted));
     setSlotDateTo(date_r(res.slotDateToFormatted));
@@ -734,35 +742,37 @@ const SlotMaster = () => {
    */
   const handleDeleteEvent = () => {
     dispatch(onDeleteEvent(event));
+    deleteSlotMasterData();
     setDeleteModal(false);
+    setOpenModal(false);
     toggle();
   };
 
   // events validation
- const convertTo24HourFormat = (timeStr) => {
-  if (!timeStr || typeof timeStr !== "string") return "";
+  const convertTo24HourFormat = (timeStr) => {
+    if (!timeStr || typeof timeStr !== "string") return "";
 
-  const [time, modifier] = timeStr.trim().split(" ");
-  if (!time || !modifier) return "";
+    const [time, modifier] = timeStr.trim().split(" ");
+    if (!time || !modifier) return "";
 
-  let [hours, minutes] = time.split(":");
-  if (!hours || !minutes) return "";
+    let [hours, minutes] = time.split(":");
+    if (!hours || !minutes) return "";
 
-  hours = parseInt(hours, 10);
-  minutes = parseInt(minutes, 10);
+    hours = parseInt(hours, 10);
+    minutes = parseInt(minutes, 10);
 
-  if (modifier.toUpperCase() === "AM" && hours === 12) {
-    hours = 0;
-  } else if (modifier.toUpperCase() === "PM" && hours !== 12) {
-    hours += 12;
-  }
+    if (modifier.toUpperCase() === "AM" && hours === 12) {
+      hours = 0;
+    } else if (modifier.toUpperCase() === "PM" && hours !== 12) {
+      hours += 12;
+    }
 
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-};
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+  };
 
   const validation = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
-    
+
     enableReinitialize: true,
     initialValues: {
       //id: (event && event.id) || null,
@@ -843,6 +853,8 @@ const SlotMaster = () => {
       setSelectedDay(null);
       setSelectedNewDay(null);
       toggle();
+      setOpenModal(false);
+
     },
   });
 
@@ -1079,8 +1091,9 @@ const SlotMaster = () => {
       });
   }
 
-  const addOneDay = (dateStr) => {
+  const addOneDay = (dateStr) => {debugger
     const date = new Date(dateStr);
+    // date.setDate(date.getDate());
     date.setDate(date.getDate() + 1);
     return date.toISOString().split("T")[0]; // return as YYYY-MM-DD
   };
@@ -1094,12 +1107,14 @@ const SlotMaster = () => {
       slotNumber: item.slotNumber,
       title: item.plantName,
       state: item.state,
+      status: item.status,
       maxTtCommitTr: item.maxTtCommitTr,
       noOfTtRq: item.noOfTtRq,
       // start: `2025-04-${day}`,
       // end: `2025-04-${nextDay}`,
       start: item.slotDateFrom,
       end: addOneDay(item.slotDateTo),
+      // end: item.slotDateTo,
       allDay: true,
       extendedProps: {
         materialId: item.plantName,
@@ -1203,7 +1218,7 @@ const SlotMaster = () => {
                         <Link
                           //   to="/apps-ecommerce-add-product"
                           className="btn btn-success"
-                          onClick={toggle}
+                          onClick={() => { toggle(); setSelectedTransporters([]); }}
                         >
                           <i className="ri-add-line align-bottom me-1"></i> Add
                           New Slot
@@ -1257,7 +1272,7 @@ const SlotMaster = () => {
                               endDate.setHours(0, 0, 0, 0);
 
                               // Check if clicked date is within the range [start, end)
-                              return clickedDate >= startDate && clickedDate < endDate;
+                              return clickedDate >= startDate && clickedDate <= endDate;
                             });
 
                             // Optional: show a warning if no events exist on that day
@@ -1268,6 +1283,16 @@ const SlotMaster = () => {
                             multipleEventData(eventsForDate, clickedDateStr); // pass data to your modal/dialog
 
                             return "none"; // prevent FullCalendar default popup
+                          }}
+                          eventClassNames={(arg) => {
+                            // Example: add a class based on event status or any custom logic
+                            const status = arg.event.extendedProps.status; // assuming you have status in event
+                            return [
+                              "custom-event",                      // default class
+                              status === "A" ? "event-status-a" :
+                                status === "B" ? "event-status-b" :
+                                  "event-status-c"
+                            ];
                           }}
 
                           moreLinkDidMount={(info) => {
@@ -1344,143 +1369,6 @@ const SlotMaster = () => {
                       return false;
                     }}
                   >
-
-
-
-                    {/* <div className="event-details">
-                      <div className="d-flex mb-2">
-                        <div className="flex-grow-1 d-flex align-items-center">
-                          <div className="flex-shrink-0 me-3">
-                            <i className="ri-truck-fill fs-23"></i>
-                          </div>
-                          <div className="flex-grow-1">
-                            <p
-                              className="d-block mb-0 text-black"
-                              id="event-start-date-tag"
-                            >
-                              {event ? event.plantName : ""}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="d-flex mb-2">
-                        <div className="flex-grow-1 d-flex align-items-center">
-                          <div className="flex-shrink-0 me-3">
-                            <i className="ri-truck-line fs-23"></i>
-                          </div>
-                          <div className="flex-grow-1">
-                            <p
-                              className="d-block mb-0 text-black"
-                              id="event-start-date-tag"
-                            >
-                              {event ? event.noOfTtRq + "    Truck Required" : ""}
-                              <button type="button" className="btn btn-sm" title="VIEW" onClick={slotModal}><i className="ri-eye-fill text-success fs-18" style={{lineHeight:0}}></i></button>
-                            </p>
-
-                          </div>
-                        </div>
-                      </div>
-                      <div className="d-flex mb-2">
-                        <div className="flex-grow-1 d-flex align-items-center">
-                          <div className="flex-shrink-0 me-3">
-                            <i className="ri-mind-map fs-23"></i>
-                          </div>
-                          <div className="flex-grow-1">
-                            <p
-                              className="d-block mb-0 text-black"
-                              id="event-start-date-tag"
-                            >
-                              {event ? "Max.   "+event.maxTtCommitTr+"   Truck Per Transporter /" : ""}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="d-flex mb-2">
-                        <div className="flex-grow-1 d-flex align-items-center">
-                          <div className="flex-shrink-0 me-3">
-                            <i className="ri-calendar-event-fill fs-23"></i>
-                          </div>
-                          <div className="flex-grow-1">
-                            <p
-                              className="d-block  mb-0 text-black"
-                              id="event-start-date-tag"
-                            >
-                              {event ? event.defaultDate  : ""}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="d-flex mb-2">
-                        <div className="flex-grow-1 d-flex align-items-center">
-                          <div className="flex-shrink-0 me-3">
-                            <i className="ri-time-line fs-23"></i>
-                          </div>
-                          <div className="flex-grow-1">
-                            <p
-                              className="d-block mb-0 text-black"
-                              id="event-start-date-tag"
-                            >
-                              {event ? event.startTime+"  to  " +event.endTime  : ""}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center mb-2">
-                        <div className="flex-shrink-0 me-3">
-                          <i className="ri-map-pin-fill fs-23"></i>
-                        </div>
-                        <div className="flex-grow-1">
-                          <p className="d-block  mb-0 text-black">
-                            {" "}
-                            <span id="event-location-tag">
-                              {event && event.state !== undefined ? event.state : ""}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center mb-2">
-                        <div className="flex-shrink-0 me-3">
-                          <i className="ri-stack-line fs-23"></i>
-                        </div>
-                        <div className="flex-grow-1">
-                          <p className="d-block  mb-0 text-black">
-                            {" "}
-                            <span id="event-location-tag">
-                              {event && event.location !== undefined ? event.location : ""}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center mb-2">
-                        <div className="flex-shrink-0 me-3">
-                          <i className="ri-pulse-line fs-23"></i>
-                        </div>
-                        <div className="flex-grow-1">
-                          <p className="d-block  mb-0 text-black">
-                            {" "}
-                            <span id="event-location-tag">
-                              {event && event.location !== undefined ? event.location : ""}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="d-flex mb-3">
-                        <div className="flex-shrink-0 me-3">
-                          <i className="ri-discuss-fill fs-23"></i>
-                        </div>
-                        <div className="flex-grow-1">
-                          <p
-                            className="d-block mb-0 text-black"
-                            id="event-description-tag"
-                          >
-                            {event && event.remarks !== undefined ? event.remarks : ""}
-                          </p>
-                        </div>
-                      </div>
-
-
-
-                    </div> */}
 
                     <div className="event-details">
                       <InfoRow iconClass={A1} text={format(event?.transporterNames)} />
@@ -1569,7 +1457,7 @@ const SlotMaster = () => {
                         </div>
                       </Col>
                       <Col lg={8}>
-                        <div>
+                        <div className="transporterSlection" >
                           <Label className="form-label fw-bold" style={{ fontSize: 'medium' }}  >Transporter</Label><span style={{ color: "red" }}>*</span>
 
                           <Select className="slotmasterCss"
@@ -1585,7 +1473,7 @@ const SlotMaster = () => {
                             components={{ Option: CustomOption }}
                             selectedValues={selectedValues} // custom prop
                             onCheckboxChange={handleCheckboxChange} // custom handler
-                            onChange={(selectedOptions, actionMeta) => {
+                            onChange={(selectedOptions, actionMeta) => {debugger
                               // Only handle REMOVE action to support "X" button
                               if (actionMeta.action === "remove-value" || actionMeta.action === "pop-value" || actionMeta.action === "clear") {
                                 const safeSelected = selectedOptions || [];
@@ -1652,14 +1540,25 @@ const SlotMaster = () => {
                       </Col>
                       <Col lg={4} className="mt-3">
                         <div>
-                          <Label className="form-label fw-bold" style={{ fontSize: 'medium' }}  >Max. Truck Commit by TR</Label><span style={{ color: "red" }}>*</span>
-                          <Input type="number" required className="form-control slotmasterCss"
+                          <Label className="form-label fw-bold" style={{ fontSize: 'medium' }}  >Max. Truck Commit by TR</Label>
+                          <Input type="number"  className="form-control slotmasterCss"
                             name="maxTtCommitTr"
                             maxlength="15"
                             placeholder="Add Truck"
                             value={validation.values.maxTtCommitTr}
-                            onChange={handleInputChange}
+                            // onChange={handleInputChange}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value, 10);
+                              if (value <= validation.values.noOfTtRq || e.target.value === '') {
+                                handleInputChange(e);
+                                setMaxTrErrorMsg(false);
+                              } else {
+                                setMaxTrErrorMsg(true);
+                              }
+                            }}
                           />
+                          {MaxTrErrorMsg && <span style={{ color: "red" }}>Max. Truck should be less than Total no. Truck Required</span>}
+
                         </div>
                       </Col>
                       <Col xs={4} className="mt-3">
@@ -1682,6 +1581,7 @@ const SlotMaster = () => {
                               options={{
                                 mode: "range",
                                 dateFormat: "Y-m-d",
+                                minDate: "today",
                               }}
                               // onChange={(date) => {
                               //   setSelectedNewDay(date);
@@ -1712,7 +1612,7 @@ const SlotMaster = () => {
                         </div>
                       </Col>
                       <Col md={4} className="mt-3">
-                        <Label htmlFor="validationDefault04" style={{ fontSize: 'medium' }} className="form-label fw-bold">Start Time</Label><span style={{ color: "red" }}>*</span>
+                        <Label htmlFor="validationDefault04" style={{ fontSize: 'medium' }} className="form-label fw-bold">Start Time</Label>
                         <div className="">
                           <Flatpickr
                             className="form-control slotmasterCss"
@@ -1743,7 +1643,7 @@ const SlotMaster = () => {
                         </div>
                       </Col>
                       <Col md={4} className="">
-                        <Label htmlFor="validationDefault04" style={{ fontSize: 'medium' }} className="form-label fw-bold">End Time</Label><span style={{ color: "red" }}>*</span>
+                        <Label htmlFor="validationDefault04" style={{ fontSize: 'medium' }} className="form-label fw-bold">End Time</Label>
                         <div className="">
                           <Flatpickr
                             className="form-control slotmasterCss"
@@ -1825,33 +1725,40 @@ const SlotMaster = () => {
                         </div>
                       </Col> */}
                     </Row>
-                    <div className="hstack gap-4 justify-content-end">
-                      <div className="hstack gap-4 justify-content-end event-details">
+                    {event?.status === 'B' ? '' :
+
+                      <div className="hstack gap-4 justify-content-end">
+                        <div className="hstack gap-4 justify-content-end event-details">
+                          <button
+                            type="button"
+                            className="btn btn-soft-danger"
+                            id="btn-delete-event"
+                            style={{ fontWeight: 'bold' }}
+                            onClick={() => { setDeleteModal(true); }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                         <button
                           type="button"
-                          className="btn btn-soft-danger"
+                          className="btn btn-soft-success event-details"
                           id="btn-delete-event"
-                          onClick={() => { setDeleteModal(true); deleteSlotMasterData() }}
+                          style={{ fontWeight: 'bold' }}
+
+                          onClick={(e) => {
+                            e.preventDefault();
+                            submitOtherEvent();
+                            return false;
+                          }}
                         >
-                          Delete
+                          {/* <i className="ri-close-line align-bottom"></i> */}
+                          Edit
                         </button>
+
                       </div>
-                      <button
-                        type="button"
-                        className="btn btn-soft-primary event-details"
-                        id="btn-delete-event"
 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          submitOtherEvent();
-                          return false;
-                        }}
-                      >
-                        {/* <i className="ri-close-line align-bottom"></i> */}
-                        Edit
-                      </button>
+                    }
 
-                    </div>
                     <div className="hstack gap-4 justify-content-end event-details1">
                       <button
                         type="button"
@@ -1924,17 +1831,22 @@ const SlotMaster = () => {
         <ModalBody>
           {
             eventList.map((item, index) => (
-              <div key={index} className="card d-flex flex-row shadow-sm border-0" style={{ maxWidth: '500px' }}>
+              <div key={index} className="card d-flex flex-row shadow-sm border-0" dataid={item.status} style={{ maxWidth: '500px' }}>
                 <div style={{
-                  backgroundColor: "rgb(10 179 156)",
-                  width: "5px",
+                  // backgroundColor: "rgb(10 179 156)",
+                  backgroundColor: item.status === 'A' ? "#FF9F2D" : item.status === 'B' ? '#0085FF' : '#0F8704',
+                  width: "10px",
                   borderTopLeftRadius: "5px",
                   borderBottomLeftRadius: "5px",
                 }}></div>
 
                 <div className="d-flex flex-column justify-content-center align-items-center px-3 text-center" style={{ width: "173px", fontSize: 'large', color: 'black' }}>
                   <small className="fw-semibold">{formatDate(item.start)} - </small>
-                  <small className="fw-semibold">{formatDate(item.end)}</small>
+                  {/* <small className="fw-semibold">{formatDate(item.end)}</small> */}
+                  <small className="fw-semibold">
+                    {formatDate(new Date(item.end).setDate(new Date(item.end).getDate() - 1))}
+                  </small>
+                   
                 </div>
 
                 <div className="border-start px-3 py-2 w-100">

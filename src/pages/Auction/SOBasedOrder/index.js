@@ -2439,12 +2439,50 @@ const SOBasedOrder = ({ bidNo }) => {
   }, [salesOrders]);
 
   // Use memo to improve performance when filtering transporters
+  // Use memo to improve performance when filtering transporters
   const filteredTransporters = useMemo(() => {
-    return transporterOptions.filter(
-      t => t.name.toLowerCase().includes(transporterSearchTerm.toLowerCase()) ||
-        t.id.includes(transporterSearchTerm)
-    );
+    if (!transporterSearchTerm || transporterSearchTerm.trim() === '') {
+      return transporterOptions;
+    }
+
+    const searchTermLower = transporterSearchTerm.toLowerCase().trim();
+    const filtered = transporterOptions.filter(t => {
+      // Ensure transporter object exists
+      if (!t) return false;
+
+      // Add safe null/undefined checks for all properties
+      const name = (t.name || '').toString().toLowerCase();
+      const id = (t.id || '').toString();
+      const code = (t.code || '').toString();
+      const contactPerson = (t.contactPerson || '').toString().toLowerCase();
+      const contactNumber = (t.contactNumber || '').toString();
+
+      return name.includes(searchTermLower) ||
+        id.includes(searchTermLower) ||
+        code.includes(searchTermLower) ||
+        contactPerson.includes(searchTermLower) ||
+        contactNumber.includes(searchTermLower);
+    });
+
+    console.log("Search Results:", {
+      searchTerm: searchTermLower,
+      total: transporterOptions.length,
+      filtered: filtered.length,
+      results: filtered
+    });
+
+    return filtered;
   }, [transporterOptions, transporterSearchTerm]);
+
+  // Update the search term handler to properly handle input
+  const handleTransporterSearchChange = (e) => {
+    const value = e.target.value;
+    setTransporterSearchTerm(value);
+    // Ensure dropdown stays open while searching
+    if (!showTransporterDropdown) {
+      setShowTransporterDropdown(true);
+    }
+  };
 
   // Function to reset the form and go back to the first step
   const handleBackToCreateBid = () => {
@@ -2624,7 +2662,25 @@ const SOBasedOrder = ({ bidNo }) => {
     // Check if all filtered transporters are in the selected set
     return filteredTransporters.every(t => selectedIds.has(t.id));
   };
+  useEffect(() => {
+    // This ensures filteredTransporters is always up-to-date with transporterOptions
+    console.log("transporterOptions changed:", transporterOptions);
 
+    // Since transporterSearchTerm might not have changed, we need to manually update the filtered list
+    if (transporterOptions && transporterOptions.length > 0) {
+      const newFilteredTransporters = transporterOptions.filter(t => {
+        if (!t) return false;
+
+        const name = (t.name || '').toString().toLowerCase();
+        const id = (t.id || '').toString();
+
+        return name.includes((transporterSearchTerm || '').toLowerCase()) ||
+          id.includes(transporterSearchTerm || '');
+      });
+
+      console.log("New filtered transporters:", newFilteredTransporters);
+    }
+  }, [transporterOptions, transporterSearchTerm]);
   // Update useEffect to correctly set the selectAll state
   useEffect(() => {
     const allSelected = areAllFilteredTransportersSelected();
@@ -2707,7 +2763,7 @@ const SOBasedOrder = ({ bidNo }) => {
 
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Ceiling Amount
+                  Ceiling Amount(MT)
                 </Label>
                 <Input
                   type="number"
@@ -2813,7 +2869,7 @@ const SOBasedOrder = ({ bidNo }) => {
             <div className="so-based-order-row">
               <div className="so-based-order-form-group">
                 <Label className="so-based-order-label">
-                  Extension Quantity <span className="color-error">*</span>
+                  Extension Quantity(MT) <span className="color-error">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -2897,9 +2953,18 @@ const SOBasedOrder = ({ bidNo }) => {
                               type="text"
                               placeholder="Search"
                               value={transporterSearchTerm}
-                              onChange={(e) => setTransporterSearchTerm(e.target.value)}
+                              onChange={handleTransporterSearchChange}
                               onClick={(e) => e.stopPropagation()}
                               className="so-based-order-dropdown-search"
+                              style={{
+                                flex: 1,
+                                padding: "8px 12px",
+                                border: "1px solid #ddd",
+                                borderRadius: "4px",
+                                color: "#000",
+                                fontSize: "14px",
+                                backgroundColor: "#fff"
+                              }}
                             />
                           </div>
                         </div>
