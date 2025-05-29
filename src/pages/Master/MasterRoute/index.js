@@ -588,8 +588,6 @@ const checkForChanges = (currentValues) => {
         }
 
         switch (fieldName) {
-            case 'routeName':
-                return "Invalid route name. Only letters, numbers, spaces and hyphens are allowed.";
             case 'routeDestination':
                 return "Invalid destination. Only letters, spaces, commas, dots and hyphens are allowed.";
             case 'shippingType':
@@ -1098,31 +1096,33 @@ const checkForChanges = (currentValues) => {
                                                     )}
 
                                                     {/* Route Name Field - With Field Error */}
-                                                    <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
-                                                        <Label htmlFor="routeName" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
-                                                            Route Name<span style={{ color: "red" }}>*</span>
-                                                        </Label>
-                                                        <Input
-                                                            type="text"
-                                                            required
-                                                            className={`form-control ${fieldErrors.routeName ? 'is-invalid' : ''}`}
-                                                            name="routeName"
-                                                            id="routeName"
-                                                            placeholder="Enter Route Name"
-                                                            maxLength="100"
-                                                            value={values.routeName}
-                                                            onChange={handleInputChange}
-                                                            onKeyPress={handleKeyPress}
-                                                            onPaste={handlePaste}
-                                                            style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
-                                                        />
-                                                        {fieldErrors.routeName && (
-                                                            <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-                                                                <i className="ri-error-warning-line me-1"></i>
-                                                                {fieldErrors.routeName}
-                                                            </div>
-                                                        )}
-                                                    </Col>
+                                                    {isEdit && (
+                                                        <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
+                                                            <Label htmlFor="routeName" className="form-label" style={{ marginBottom: '0', fontSize: '0.85rem' }}>
+                                                                Route Name<span style={{ color: "red" }}>*</span>
+                                                            </Label>
+                                                            <Input
+                                                                type="text"
+                                                                required
+                                                                className={`form-control ${fieldErrors.routeName ? 'is-invalid' : ''}`}
+                                                                name="routeName"
+                                                                id="routeName"
+                                                                placeholder="Enter Route Name"
+                                                                maxLength="100"
+                                                                value={values.routeName}
+                                                                onChange={handleInputChange}
+                                                                onKeyPress={handleKeyPress}
+                                                                onPaste={handlePaste}
+                                                                style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem', minHeight: '32px' }}
+                                                            />
+                                                            {fieldErrors.routeName && (
+                                                                <div className="invalid-feedback d-block" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                                                    <i className="ri-error-warning-line me-1"></i>
+                                                                    {fieldErrors.routeName}
+                                                                </div>
+                                                            )}
+                                                        </Col>
+                                                    )}
 
                                                     {/* Route Destination Field - With Field Error */}
                                                     <Col md={4} style={{ paddingTop: '0.25rem', paddingBottom: '0.25rem' }}>
