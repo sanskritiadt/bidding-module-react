@@ -4728,156 +4728,156 @@ const BulkOrder = ({ bidNo }) => {
                         {errors.selectTransporter}
                       </div>
                     )}
-                 {showTransporterDropdown && (
-  <div className="bulk-order-dropdown" style={{
-    position: "absolute",
-    width: "100%",
-    zIndex: 1000,
-    marginTop: "4px",
-    backgroundColor: "#fff",
-    border: "1px solid #ced4da",
-    borderRadius: "4px",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-    maxHeight: "300px",
-    overflowY: "auto"
-  }}>
-    {/* Updated header with proper structure matching SOBasedOrder */}
-    <div className="bulk-order-dropdown-header" style={{
-      padding: "8px",
-      backgroundColor: "#405189",
-      borderBottom: "1px solid #ddd",
-      position: "sticky",
-      top: 0,
-      zIndex: 1,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      cursor: "default"
-    }}>
-      <div className="dropdown-controls" style={{
-        display: "flex",
-        alignItems: "center"
-      }}>
-        <div className="checkbox-container" style={{
-          flex: "0 0 40px",
-          display: "flex",
-          justifyContent: "center",
-          marginRight: "10px"
-        }}>
-          <input
-            type="checkbox"
-            checked={areAllFilteredTransportersSelected()}
-            onChange={handleSelectAllTransporters}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "18px",
-              height: "18px",
-              cursor: "pointer",
-              accentColor: "#fff"
-            }}
-          />
-        </div>
-        <input
-          type="text"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={handleTransporterSearch}
-          onClick={(e) => e.stopPropagation()}
-          className="bulk-order-dropdown-search"
-          style={{
-            flex: 1,
-            padding: "8px 12px",
-            border: "1px solid #ddd",
-            borderRadius: "4px",
-            color: "#000",
-            fontSize: "14px",
-            backgroundColor: "#fff"
-          }}
-        />
-      </div>
-    </div>
+                    {showTransporterDropdown && (
+                      <div className="bulk-order-dropdown" style={{
+                        position: "absolute",
+                        width: "100%",
+                        zIndex: 1000,
+                        marginTop: "4px",
+                        backgroundColor: "#fff",
+                        border: "1px solid #ced4da",
+                        borderRadius: "4px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        maxHeight: "300px",
+                        overflowY: "auto"
+                      }}>
+                        {/* Updated header with proper structure matching SOBasedOrder */}
+                        <div className="bulk-order-dropdown-header" style={{
+                          padding: "8px",
+                          backgroundColor: "#405189",
+                          borderBottom: "1px solid #ddd",
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 1,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          cursor: "default"
+                        }}>
+                          <div className="dropdown-controls" style={{
+                            display: "flex",
+                            alignItems: "center"
+                          }}>
+                            <div className="checkbox-container" style={{
+                              flex: "0 0 40px",
+                              display: "flex",
+                              justifyContent: "center",
+                              marginRight: "10px"
+                            }}>
+                              <input
+                                type="checkbox"
+                                checked={areAllFilteredTransportersSelected()}
+                                onChange={handleSelectAllTransporters}
+                                onClick={(e) => e.stopPropagation()}
+                                style={{
+                                  width: "18px",
+                                  height: "18px",
+                                  cursor: "pointer",
+                                  accentColor: "#fff"
+                                }}
+                              />
+                            </div>
+                            <input
+                              type="text"
+                              placeholder="Search"
+                              value={searchTerm}
+                              onChange={handleTransporterSearch}
+                              onClick={(e) => e.stopPropagation()}
+                              className="bulk-order-dropdown-search"
+                              style={{
+                                flex: 1,
+                                padding: "8px 12px",
+                                border: "1px solid #ddd",
+                                borderRadius: "4px",
+                                color: "#000",
+                                fontSize: "14px",
+                                backgroundColor: "#fff"
+                              }}
+                            />
+                          </div>
+                        </div>
 
-    <div className="bulk-order-dropdown-content">
-      {loadingTransporters ? (
-        <div className="so-sales-orders-loading">
-          <i className="ri-loader-4-line spin"></i>
-          <span className="loading-text">Loading transporters...</span>
-        </div>
-      ) : !filteredTransporters || filteredTransporters.length === 0 ? (
-        <div className="so-sales-orders-empty">
-          <i className="ri-inbox-line"></i>
-          <span className="empty-text">
-            {searchTerm ? 'No transporters found matching your search' : 'No transporters found'}
-          </span>
-        </div>
-      ) : (
-        filteredTransporters.map((transporter, index) => {
-          if (!transporter || !transporter.id) {
-            return null;
-          }
-          
-          return (
-            <div
-              key={`${transporter.id}-${index}`}
-              className="bulk-order-dropdown-item"
-              onClick={() => handleTransporterSelect(transporter)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "8px 12px",
-                cursor: "pointer",
-                transition: "background-color 0.2s"
-              }}
-            >
-              <div className="checkbox-container" style={{
-                flex: "0 0 40px",
-                display: "flex",
-                justifyContent: "center",
-                marginRight: "10px"
-              }}>
-                <input
-                  type="checkbox"
-                  checked={values.selectTransporter.some(t => t.id === transporter.id)}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    if (e.target.checked) {
-                      handleTransporterSelect(transporter);
-                    } else {
-                      handleRemoveTransporter(transporter.id);
-                    }
-                  }}
-                  style={{
-                    width: "16px",
-                    height: "16px",
-                    accentColor: "#405189"
-                  }}
-                />
-              </div>
-              <div className="transporter-id" style={{
-                flex: "0 0 120px",
-                paddingRight: "15px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                fontSize: "14px",
-                color: "#667085"
-              }}>
-                {transporter.id || 'N/A'}
-              </div>
-              <div className="transporter-name" style={{
-                flex: 1,
-                fontSize: "14px",
-                color: "#101828"
-              }}>
-                {transporter.name || 'N/A'}
-              </div>
-            </div>
-          );
-        }).filter(Boolean)
-      )}
-    </div>
-  </div>
-)}
+                        <div className="bulk-order-dropdown-content">
+                          {loadingTransporters ? (
+                            <div className="so-sales-orders-loading">
+                              <i className="ri-loader-4-line spin"></i>
+                              <span className="loading-text">Loading transporters...</span>
+                            </div>
+                          ) : !filteredTransporters || filteredTransporters.length === 0 ? (
+                            <div className="so-sales-orders-empty">
+                              <i className="ri-inbox-line"></i>
+                              <span className="empty-text">
+                                {searchTerm ? 'No transporters found matching your search' : 'No transporters found'}
+                              </span>
+                            </div>
+                          ) : (
+                            filteredTransporters.map((transporter, index) => {
+                              if (!transporter || !transporter.id) {
+                                return null;
+                              }
+
+                              return (
+                                <div
+                                  key={`${transporter.id}-${index}`}
+                                  className="bulk-order-dropdown-item"
+                               //   onClick={() => handleTransporterSelect(transporter)}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    padding: "8px 12px",
+                                    cursor: "pointer",
+                                    transition: "background-color 0.2s"
+                                  }}
+                                >
+                                  <div className="checkbox-container" style={{
+                                    flex: "0 0 40px",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    marginRight: "10px"
+                                  }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={values.selectTransporter.some(t => t.id === transporter.id)}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        if (e.target.checked) {
+                                          handleTransporterSelect(transporter);
+                                        } else {
+                                          handleRemoveTransporter(transporter.id);
+                                        }
+                                      }}
+                                      style={{
+                                        width: "16px",
+                                        height: "16px",
+                                        accentColor: "#405189"
+                                      }}
+                                    />
+                                  </div>
+                                  <div className="transporter-id" style={{
+                                    flex: "0 0 120px",
+                                    paddingRight: "15px",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    fontSize: "14px",
+                                    color: "#667085"
+                                  }}>
+                                    {transporter.id || 'N/A'}
+                                  </div>
+                                  <div className="transporter-name" style={{
+                                    flex: 1,
+                                    fontSize: "14px",
+                                    color: "#101828"
+                                  }}>
+                                    {transporter.name || 'N/A'}
+                                  </div>
+                                </div>
+                              );
+                            }).filter(Boolean)
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* ADD THIS: TransporterViewer component - same as SOBasedOrder */}
@@ -4921,6 +4921,9 @@ const BulkOrder = ({ bidNo }) => {
         {activeStep === 2 && (
           <div className="bulk-order-container">
             {/* First row: 4 fields */}
+           
+
+            {/* First row: 4 fields - UPDATED */}
             <div className="bulk-order-row">
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
@@ -4936,13 +4939,10 @@ const BulkOrder = ({ bidNo }) => {
                       color: "#000",
                       display: "flex",
                       alignItems: "center",
-                      //border: "1px solid #ced4da",
                       border: "1px solid #ddd",
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff",
-                      // borderColor: errors.fromLocation ? "#dc3545" : "",
-                      // borderWidth: errors.fromLocation ? "2px" : ""
                     }}
                   >
                     <span className="bulk-order-location-selector-placeholder" style={{ color: "#000" }}>
@@ -5074,161 +5074,153 @@ const BulkOrder = ({ bidNo }) => {
                 </div>
               </div>
 
+              {/* NEW TO LOCATION FIELD */}
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
-                  Select Transporter <span style={{ color: "red" }}>*</span>
+                  To Location <span style={{ color: "red" }}>*</span>
                 </Label>
-                <div className="form-group-with-viewer">
-                  <div className="input-container" style={{ position: "relative" }}>
-                    <div
-                      className="bulk-order-transporter-selector"
-                      onClick={() => setShowTransporterDropdown(!showTransporterDropdown)}
-                      style={{
-                        minHeight: "38px",
-                        width: "100%",
-                        color: values.selectTransporter.length > 0 ? "#000" : "#667085",
-                        display: "flex",
-                        alignItems: "center",
-                        border: errors.selectTransporter ? "2px solid #dc3545" : "1px solid #ced4da",
-                        borderRadius: "4px",
-                        padding: "0.375rem 0.75rem",
+                <div style={{ position: "relative" }} className="to-location-dropdown-container">
+                  {/* Main selector that shows the current selection */}
+                  <div
+                    className="bulk-order-location-selector"
+                    onClick={() => setShowToLocationDropdown(!showToLocationDropdown)}
+                    style={{
+                      height: "38px",
+                      color: "#000",
+                      display: "flex",
+                      alignItems: "center",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      padding: "0.375rem 0.75rem",
+                      backgroundColor: "#fff",
+                    }}
+                  >
+                    <span className="bulk-order-location-selector-placeholder" style={{ color: "#000" }}>
+                      {values.toLocation || 'Select'}
+                    </span>
+                    <span style={{ marginLeft: "auto" }}>
+                      <i className="ri-arrow-down-s-line" style={{ fontSize: "18px", color: "black" }}></i>
+                    </span>
+                  </div>
+
+                  {/* To Location dropdown with search functionality */}
+                  {showToLocationDropdown && (
+                    <div className="bulk-order-dropdown" style={{
+                      position: "absolute",
+                      width: "100%",
+                      zIndex: 10,
+                      backgroundColor: "#fff",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                      marginTop: "4px",
+                      maxHeight: "300px",
+                      overflowY: "auto"
+                    }}>
+                      {/* Search header */}
+                      <div className="bulk-order-dropdown-header" style={{
+                        padding: "8px",
                         backgroundColor: "#fff",
-                        cursor: "pointer",
-                        justifyContent: "space-between",
-                        outline: "none",
-                        transition: "border-color 0.15s ease-in-out"
-                      }}
-                    >
-                      <span style={{ flex: 1 }}>
-                        {values.selectTransporter.length > 0
-                          ? `${values.selectTransporter.length} Selected`
-                          : "Select"}
-                      </span>
-                      <i className="ri-arrow-down-s-line" style={{ fontSize: "20px", color: "#667085", marginLeft: "8px" }}></i>
-                    </div>
-                    {errors.selectTransporter && (
-                      <div style={{
-                        color: "#dc3545",
-                        fontSize: "12px",
-                        marginTop: "4px",
-                        fontWeight: "500",
-                        position: "absolute",
-                        width: "100%"
+                        borderBottom: "1px solid #ddd"
                       }}>
-                        {errors.selectTransporter}
-                      </div>
-                    )}
-                    {showTransporterDropdown && (
-                      <div className="bulk-order-dropdown" style={{
-                        position: "absolute",
-                        width: "100%",
-                        zIndex: 1000,
-                        marginTop: "4px",
-                        backgroundColor: "#fff",
-                        border: "1px solid #ced4da",
-                        borderRadius: "4px",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                        maxHeight: "300px",
-                        overflowY: "auto"
-                      }}>
-                        {/* Rest of the dropdown content */}
-                        <div className="checkbox-container">
-                          <input
-                            type="checkbox"
-                            checked={areAllFilteredTransportersSelected()}
-                            onChange={handleSelectAllTransporters}
-                            onClick={(e) => e.stopPropagation()}
-                            style={{
-                              width: "18px",
-                              height: "18px",
-                              cursor: "pointer",
-                              accentColor: "#405189"
-                            }}
-                          />
-                        </div>
                         <input
                           type="text"
-                          placeholder="Search by name, ID, contact..."
-                          value={searchTerm}
-                          onChange={handleTransporterSearch}
+                          placeholder="Search"
+                          value={toLocationSearchTerm}
+                          onChange={(e) => setToLocationSearchTerm(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
                           className="bulk-order-dropdown-search"
                           style={{
-                            flex: 1,
+                            width: "100%",
                             padding: "8px 12px",
                             border: "1px solid #ddd",
                             borderRadius: "4px",
                             color: "#000",
-                            fontSize: "14px"
+                            fontSize: "14px",
+                            outline: "none"
                           }}
                         />
-                        <div className="bulk-order-dropdown-content">
-                          {loadingTransporters ? (
-                            <div className="so-sales-orders-loading">
-                              <i className="ri-loader-4-line spin"></i>
-                              <span className="loading-text">Loading transporters...</span>
-                            </div>
-                          ) : !filteredTransporters || filteredTransporters.length === 0 ? (
-                            <div className="so-sales-orders-empty">
-                              <i className="ri-inbox-line"></i>
-                              <span className="empty-text">
-                                {searchTerm ? 'No transporters found matching your search' : 'No transporters found'}
-                              </span>
-                            </div>
-                          ) : (
-                            filteredTransporters.map((transporter, index) => {
-                              // Add safety check for transporter object
-                              if (!transporter || !transporter.id) {
-                                return null;
-                              }
-
-                              return (
-                                <div
-                                  key={`${transporter.id}-${index}`}
-                                  className="bulk-order-dropdown-item"
-                                  onClick={() => handleTransporterSelect(transporter)}
-                                >
-                                  <div className="checkbox-container">
-                                    <input
-                                      type="checkbox"
-                                      checked={values.selectTransporter.some(t => t.id === transporter.id)}
-                                      onChange={(e) => {
-                                        e.stopPropagation();
-                                        if (e.target.checked) {
-                                          handleTransporterSelect(transporter);
-                                        } else {
-                                          handleRemoveTransporter(transporter.id);
-                                        }
-                                      }}
-                                    />
-                                  </div>
-                                  <div className="transporter-id">
-                                    {transporter.id || 'N/A'}
-                                  </div>
-                                  <div className="transporter-name">
-                                    {transporter.name || 'N/A'}
-                                  </div>
-                                </div>
-                              );
-                            }).filter(Boolean) // Remove any null entries
-                          )}
-                        </div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Add TransporterViewer component */}
-                  {values.selectTransporter.length > 0 && (
-                    <TransporterViewer
-                      selectedTransporters={values.selectTransporter}
-                      onRemove={(transporterId) => {
-                        handleRemoveTransporter(transporterId);
-                      }}
-                    />
+                      {/* Loading indicator */}
+                      {loadingCities && (
+                        <div style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#4361ee"
+                        }}>
+                          <i className="ri-loader-4-line spin" style={{ fontSize: "24px" }}></i>
+                          <div style={{ marginTop: "8px" }}>Loading locations...</div>
+                        </div>
+                      )}
+
+                      {/* Empty state */}
+                      {!loadingCities && filteredToLocations.length === 0 && (
+                        <div style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#666"
+                        }}>
+                          <i className="ri-inbox-line" style={{ fontSize: "24px" }}></i>
+                          <div style={{ marginTop: "8px" }}>No locations found</div>
+                        </div>
+                      )}
+
+                      {/* To Location list items */}
+                      {!loadingCities && filteredToLocations.length > 0 && (
+                        <div className="bulk-order-dropdown-content">
+                          {filteredToLocations.map((location, index) => (
+                            <div
+                              key={index}
+                              className="bulk-order-dropdown-item"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                padding: "10px 8px",
+                                borderBottom: "1px solid #eee",
+                                color: "#000",
+                                cursor: "pointer"
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setValues(prevValues => ({
+                                  ...prevValues,
+                                  toLocation: location
+                                }));
+                                setToLocationSearchTerm("");
+                                setShowToLocationDropdown(false);
+                                // Clear error if it exists
+                                if (errors.toLocation) {
+                                  setErrors(prevErrors => {
+                                    const newErrors = { ...prevErrors };
+                                    delete newErrors.toLocation;
+                                    return newErrors;
+                                  });
+                                }
+                              }}
+                            >
+                              <div style={{
+                                flex: 1,
+                                fontSize: "14px",
+                                paddingLeft: "10px"
+                              }}>
+                                {location}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {errors.toLocation && (
+                    <div className="invalid-feedback" style={{ display: "block", color: "#dc3545", fontSize: "12px", marginTop: "4px" }}>
+                      {errors.toLocation}
+                    </div>
                   )}
                 </div>
               </div>
 
+              {/* ROUTE FIELD - MOVED FROM SECOND POSITION */}
               <div className="bulk-order-form-group route-dropdown-container">
                 <Label className="bulk-order-label">
                   Route <span style={{ color: "red" }}>*</span>
@@ -5247,7 +5239,6 @@ const BulkOrder = ({ bidNo }) => {
                       borderRadius: "4px",
                       padding: "0.375rem 0.75rem",
                       backgroundColor: "#fff",
-
                     }}
                   >
                     <span className="bulk-order-route-selector-placeholder" style={{ color: "#000" }}>
@@ -5383,6 +5374,7 @@ const BulkOrder = ({ bidNo }) => {
                 </div>
               </div>
 
+              {/* AUTO ALLOCATE FIELD - MOVED TO FOURTH POSITION */}
               <div className="bulk-order-form-group">
                 <Label className="bulk-order-label">
                   Auto Allocate To L1
@@ -5405,7 +5397,6 @@ const BulkOrder = ({ bidNo }) => {
                 </div>
               </div>
             </div>
-
             {/* Second row: 3 fields with TIME inputs - with BLACK placeholder text */}
             <div className="bulk-order-row">
               <div className="bulk-order-form-group">
@@ -5579,7 +5570,7 @@ const BulkOrder = ({ bidNo }) => {
                                 key={i}
                                 title={t.name}
                                 style={{
-                                  backgroundColor: "#4361ee",
+                                  backgroundColor: "#405189",
                                   color: "white",
                                   padding: "5px 12px",
                                   borderRadius: "4px",
@@ -5636,95 +5627,304 @@ const BulkOrder = ({ bidNo }) => {
                 </div>
               </div>
               {/* Add Modal component that will be shown when viewing transporters from preview */}
-              {showTransporterModal && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 1000
-                  }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      width: "90%",
-                      maxWidth: "500px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "16px",
-                        borderBottom: "1px solid #eee",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center"
-                      }}
-                    >
-                      <h3 style={{ margin: 0, fontSize: "18px" }}>Selected Transporters</h3>
-                      <button
-                        onClick={() => setShowTransporterModal(false)}
-                        style={{
-                          background: "transparent",
-                          border: "none",
-                          fontSize: "20px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        <i className="ri-close-line"></i>
-                      </button>
-                    </div>
-                    <div style={{ padding: "16px", maxHeight: "70vh", overflowY: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                        <thead>
-                          <tr>
-                            <th style={{ padding: "8px", textAlign: "left", borderBottom: "1px solid #eee" }}>ID</th>
-                            <th style={{ padding: "8px", textAlign: "left", borderBottom: "1px solid #eee" }}>Name</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {[...new Map(values.selectTransporter.map(item => [item.id, item])).values()].map((t, i) => (
-                            <tr key={i}>
-                              <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>{t.id}</td>
-                              <td style={{ padding: "8px", borderBottom: "1px solid #eee" }}>{t.name}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    <div
-                      style={{
-                        padding: "16px",
-                        borderTop: "1px solid #eee",
-                        display: "flex",
-                        justifyContent: "flex-end"
-                      }}
-                    >
-                      <button
-                        onClick={() => setShowTransporterModal(false)}
-                        style={{
-                          padding: "8px 16px",
-                          backgroundColor: "#4361ee",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+            
+
+
+{showTransporterModal && (
+  <div className="bulk-order-modal-overlay" style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000
+  }}>
+    <div className="bulk-order-modal-content" style={{
+      backgroundColor: "white",
+      borderRadius: "8px",
+      width: "90%",
+      maxWidth: "800px", // Increased width for more columns
+      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+      maxHeight: "80vh",
+      display: "flex",
+      flexDirection: "column"
+    }}>
+      {/* Modal Header */}
+      <div className="bulk-order-modal-header" style={{
+        padding: "16px 20px",
+        backgroundColor: "white",
+        borderBottom: "1px solid #e9ecef",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderRadius: "8px 8px 0 0"
+      }}>
+        <h3 style={{ 
+          margin: 0, 
+          fontSize: "18px", 
+          fontWeight: "600",
+          color: "#333"
+        }}>
+          Transporter Details
+        </h3>
+        <button
+          onClick={() => setShowTransporterModal(false)}
+          style={{
+            background: "transparent",
+            border: "none",
+            fontSize: "20px",
+            cursor: "pointer",
+            color: "#666",
+            padding: "4px",
+            borderRadius: "4px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <i className="ri-close-line"></i>
+        </button>
+      </div>
+
+      {/* Modal Body */}
+      <div className="bulk-order-modal-body" style={{ 
+        padding: "0", 
+        flex: 1,
+        overflowY: "auto"
+      }}>
+        {/* Table Header */}
+        <div style={{
+          display: "flex",
+          backgroundColor: "#405189", // Blue header background
+          color: "white",
+          position: "sticky",
+          top: 0,
+          zIndex: 1
+        }}>
+          <div style={{
+            flex: "0 0 150px",
+            padding: "12px 16px",
+            fontSize: "14px",
+            fontWeight: "600",
+            borderRight: "1px solid rgba(255,255,255,0.2)"
+          }}>
+            Transporter Code
+          </div>
+          <div style={{
+            flex: "1",
+            padding: "12px 16px",
+            fontSize: "14px",
+            fontWeight: "600",
+            borderRight: "1px solid rgba(255,255,255,0.2)"
+          }}>
+            Transporter Name
+          </div>
+          <div style={{
+            flex: "0 0 180px",
+            padding: "12px 16px",
+            fontSize: "14px",
+            fontWeight: "600",
+            borderRight: "1px solid rgba(255,255,255,0.2)"
+          }}>
+            Contact Person
+          </div>
+          <div style={{
+            flex: "0 0 140px",
+            padding: "12px 16px",
+            fontSize: "14px",
+            fontWeight: "600"
+          }}>
+            Phone No.
+          </div>
+        </div>
+
+        {/* Table Body */}
+        <div className="bulk-order-modal-table-body">
+          {[...new Map(values.selectTransporter.map(item => [item.id, item])).values()].map((transporter, index) => (
+            <div 
+              key={index}
+              style={{
+                display: "flex",
+                borderBottom: "1px solid #e9ecef",
+                backgroundColor: "#fff"
+              }}
+            >
+              {/* Transporter Code */}
+              <div style={{
+                flex: "0 0 150px",
+                padding: "12px 16px",
+                fontSize: "14px",
+                color: "#495057",
+                borderRight: "1px solid #e9ecef",
+                display: "flex",
+                alignItems: "center",
+                fontFamily: "monospace",
+                fontWeight: "500"
+              }}>
+                {transporter.code || transporter.id || 'N/A'}
+              </div>
+              
+              {/* Transporter Name */}
+              <div style={{
+                flex: "1",
+                padding: "12px 16px",
+                fontSize: "14px",
+                color: "#212529",
+                borderRight: "1px solid #e9ecef",
+                display: "flex",
+                alignItems: "center",
+                fontWeight: "500"
+              }}>
+                {transporter.name || 'N/A'}
+              </div>
+              
+              {/* Contact Person */}
+              <div style={{
+                flex: "0 0 180px",
+                padding: "12px 16px",
+                fontSize: "14px",
+                color: "#495057",
+                borderRight: "1px solid #e9ecef",
+                display: "flex",
+                alignItems: "center"
+              }}>
+                {transporter.contactPerson || 'N/A'}
+              </div>
+              
+              {/* Phone No */}
+              <div style={{
+                flex: "0 0 140px",
+                padding: "12px 16px",
+                fontSize: "14px",
+                color: "#495057",
+                display: "flex",
+                alignItems: "center",
+                fontFamily: "monospace"
+              }}>
+                {transporter.contactNumber || 'N/A'}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {values.selectTransporter.length === 0 && (
+          <div style={{
+            padding: "40px 20px",
+            textAlign: "center",
+            color: "#6c757d"
+          }}>
+            <i className="ri-inbox-line" style={{ fontSize: "48px", marginBottom: "16px" }}></i>
+            <div style={{ fontSize: "16px" }}>No transporters selected</div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal Footer with Pagination */}
+      <div className="bulk-order-modal-footer" style={{
+        padding: "16px 20px",
+        borderTop: "1px solid #e9ecef",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "#f8f9fa",
+        borderRadius: "0 0 8px 8px"
+      }}>
+        {/* Total Results */}
+        <div style={{
+          fontSize: "14px",
+          color: "#6c757d"
+        }}>
+          Total Results: {[...new Map(values.selectTransporter.map(item => [item.id, item])).values()].length}
+        </div>
+
+        {/* Pagination Controls */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px"
+        }}>
+          {/* Previous Button */}
+          <button
+            style={{
+              padding: "6px 8px",
+              border: "1px solid #dee2e6",
+              backgroundColor: "#fff",
+              color: "#6c757d",
+              cursor: "not-allowed",
+              borderRadius: "4px",
+              fontSize: "14px"
+            }}
+            disabled
+          >
+            <i className="ri-arrow-left-s-line"></i>
+          </button>
+
+          {/* Page Info */}
+          <span style={{
+            fontSize: "14px",
+            color: "#495057",
+            margin: "0 8px"
+          }}>
+            Page 1 of 1
+          </span>
+
+          {/* Page Number Input */}
+          <input
+            type="text"
+            value="1"
+            readOnly
+            style={{
+              width: "40px",
+              padding: "4px 8px",
+              border: "1px solid #dee2e6",
+              borderRadius: "4px",
+              textAlign: "center",
+              fontSize: "14px"
+            }}
+          />
+
+          {/* Next Button */}
+          <button
+            style={{
+              padding: "6px 8px",
+              border: "1px solid #dee2e6",
+              backgroundColor: "#fff",
+              color: "#6c757d",
+              cursor: "not-allowed",
+              borderRadius: "4px",
+              fontSize: "14px"
+            }}
+            disabled
+          >
+            <i className="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+
+        {/* Cancel Button */}
+        <button
+          onClick={() => setShowTransporterModal(false)}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: "500"
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
             </div>
 
             {/* Delivery and Allocation Section */}
