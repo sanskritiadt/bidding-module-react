@@ -1965,7 +1965,7 @@ const BulkOrder = ({ bidNo }) => {
                     {showTransporterDropdown && (
                       <div className="bulk-order-dropdown" style={{
                         position: "absolute",
-                        width: "100%",
+                        width: "20.8vw",
                         zIndex: 1000,
                         marginTop: "4px",
                         backgroundColor: "#fff",
